@@ -16,14 +16,13 @@ export const HERO = {
   },
 };
 
-// ── Parallax products — знімки екранів BAS для Hero Parallax ─────────────────
+// ── Parallax products ─────────────────────────────────────────────────────────
 
 export type ParallaxProduct = {
   title: string;
   thumbnail: string;
 };
 
-// Замініть thumbnail на реальні скріншоти вашої роботи в BAS
 export const PARALLAX_PRODUCTS: ParallaxProduct[] = [
   { title: "Облік товарів у BAS", thumbnail: "/screenshots/bas-goods.png" },
   { title: "Зарплата та кадри", thumbnail: "/screenshots/bas-salary.png" },
@@ -79,7 +78,7 @@ export const SERVICES: ServiceItem[] = [
     icon: "◈",
     title: "Встановлення програми BAS",
     description:
-      "Встановимо програму BAS на ваш комп'ютер, підключимо до бази даних, налаштуємо під вашу організацію. Покажемо, як починати роботу з першого дня.",
+      "Встановимо програму BAS на ваш комп'ютер, підключимо до бази даних, налаштуємо під вашу організацію. Покажемо як починати роботу з першого дня.",
     tags: ["Виїзд до вас", "Налаштування", "Навчання"],
   },
   {
@@ -181,6 +180,48 @@ export const WORK_STEPS: WorkStep[] = [
     title: "Залишаємось на зв'язку",
     detail:
       "Після роботи не зникаємо. Питання виникнуть — телефонуйте, відповімо.",
+  },
+];
+
+// ── Infrastructure ────────────────────────────────────────────────────────────
+
+// ВАЖЛИВО: тип називається InfraItem і має поля label, value, detail
+export type InfraItem = {
+  label: string;
+  value: string;
+  detail: string;
+};
+
+export const INFRASTRUCTURE: InfraItem[] = [
+  {
+    label: "Живлення",
+    value: "LiFePO₄ 100 Аг",
+    detail: "3 000+ циклів, автоперемикання ≤20 мс",
+  },
+  {
+    label: "Інвертор",
+    value: "5 кВт/год",
+    detail: "Чиста синусоїда, гібридний режим",
+  },
+  {
+    label: "Автономія",
+    value: "8–10 год",
+    detail: "При повному навантаженні обох серверів",
+  },
+  {
+    label: "Гіпервізор",
+    value: "Proxmox VE",
+    detail: "Кластер 2 вузли, live-міграція VM",
+  },
+  {
+    label: "Мережа",
+    value: "2 канали",
+    detail: "Оптика + 4G/LTE резерв, MikroTik",
+  },
+  {
+    label: "Ізоляція",
+    value: "VLAN / VM",
+    detail: "Повна мережева ізоляція клієнтів",
   },
 ];
 

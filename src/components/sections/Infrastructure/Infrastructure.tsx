@@ -1,11 +1,10 @@
-import { INFRASTRUCTURE, STATS } from "@/lib/constants";
+import { INFRASTRUCTURE, STATS, type InfraItem } from "@/lib/constants";
 import styles from "./Infrastructure.module.scss";
 
 export function Infrastructure() {
   return (
     <section className={`section ${styles.infra}`}>
       <div className="container">
-        {/* Header */}
         <header className={styles.infra__header}>
           <p className="t-label">Інфраструктура</p>
           <h2 className={`t-headline ${styles.infra__title}`}>
@@ -13,25 +12,24 @@ export function Infrastructure() {
             <span className={styles.infra__titleDim}>не маркетинг.</span>
           </h2>
           <p className={`t-body-lg ${styles.infra__sub}`}>
-            Два фізичних сервери у кластері, акумулятори LiFePO₄ та два
-            незалежних інтернет-канали. Дізнайтесь, що стоїть за гарантованим
-            аптаймом.
+            Два фізичних сервери, акумулятори LiFePO₄ та два незалежних
+            інтернет-канали. Ось що стоїть за гарантованим аптаймом.
           </p>
         </header>
 
         {/* Stats bar */}
         <div className={styles.infra__statsBar}>
-          {STATS.map((s, i) => (
-            <div key={i} className={`stat ${styles.infra__statItem}`}>
+          {STATS.map((s) => (
+            <div key={s.label} className={`stat ${styles.infra__statItem}`}>
               <span className="stat__number">{s.number}</span>
               <span className="stat__label">{s.label}</span>
             </div>
           ))}
         </div>
 
-        {/* Specs grid */}
+        {/* Specs */}
         <div className={styles.infra__specs}>
-          {INFRASTRUCTURE.map((spec) => (
+          {INFRASTRUCTURE.map((spec: InfraItem) => (
             <div key={spec.label} className={styles.specRow}>
               <span className={`t-label ${styles.specRow__label}`}>
                 {spec.label}
@@ -46,7 +44,6 @@ export function Infrastructure() {
           ))}
         </div>
 
-        {/* Bottom note */}
         <p className={`t-caption ${styles.infra__note}`}>
           Публічна сторінка статусу з графіком аптайму — доступна без
           реєстрації.{" "}
