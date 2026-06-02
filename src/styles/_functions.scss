@@ -1,0 +1,25 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// _functions.scss · CloudBASe
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Strip unit from a value (needed for fluid-text calc)
+@function strip-unit($number) {
+  @return math.div($number, ($number * 0 + 1));
+}
+
+// Convert px to rem
+@function rem($px) {
+  @return math.div($px, 16) * 1rem;
+}
+
+// Alpha variant of a color
+@function alpha($color, $opacity) {
+  @return rgba($color, $opacity);
+}
+
+// Clamp shorthand
+@function fluid($min, $max, $min-vw: 375, $max-vw: 1280) {
+  $slope: math.div($max - $min, $max-vw - $min-vw);
+  $intercept: $min - $slope * $min-vw;
+  @return clamp(#{$min}px, #{$slope * 100}vw + #{$intercept}px, #{$max}px);
+}

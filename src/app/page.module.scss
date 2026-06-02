@@ -1,0 +1,14 @@
+/* src/app/page.module.scss */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 120px; /* Відстань між секціями */
+  padding-bottom: 120px;
+
+  /* Можна зробити трохи менші відступи на мобільних пристроях */
+  @media (max-width: 768px) {
+    gap: 80px;
+    padding-bottom: 80px;
+  }
+}

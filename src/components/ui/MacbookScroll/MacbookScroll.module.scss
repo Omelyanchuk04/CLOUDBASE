@@ -1,0 +1,153 @@
+.section {
+  height: 300vh;
+  position: relative;
+  background-color: var(--background, #0a0a0a); // Темний фон секції
+  color: white;
+}
+
+.stickyContainer {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  perspective: 1500px; // Важливо для 3D
+}
+
+.textBlock {
+  position: absolute;
+  top: 10%;
+  text-align: center;
+  z-index: 10;
+
+  h2 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  p {
+    font-size: 1.2rem;
+    color: #888;
+  }
+}
+
+/* --- САМ МАКБУК --- */
+.macbook {
+  position: relative;
+  width: 85vw;
+  max-width: 1000px;
+  transform-style: preserve-3d; // Дозволяє дітям бути в 3D просторі
+  will-change: transform;
+}
+
+/* 1. Кришка з екраном */
+.macbookLid {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #111; // Рамка
+  border-radius: 20px 20px 0 0;
+  border: 4px solid #6b7280; // Срібний обідок корпусу
+  border-bottom: none;
+  padding: 3% 3% 5% 3%; // Товщина рамки екрана
+  display: flex;
+  flex-direction: column;
+  transform-style: preserve-3d;
+}
+
+.camera {
+  position: absolute;
+  top: 1.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #222;
+  border-radius: 50%;
+}
+
+.screen {
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Тимчасова заглушка замість картинки */
+.screenPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a, #4c1d95);
+  color: white;
+
+  h3 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+  p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+  }
+}
+
+/* 2. Нижня частина (корпус) */
+.macbookBase {
+  position: absolute;
+  top: 100%; // Починається рівно під екраном
+  left: -2%; // Трохи ширше за екран для реалізму
+  width: 104%;
+  height: 65%; // Глибина клавіатури
+  background-color: #9ca3af; // Світло-сірий метал
+  transform-origin: top center;
+  transform: rotateX(-90deg); // Відгинаємо від екрана як відкритий ноут
+  border-radius: 0 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4%;
+
+  // Передня товста кромка Макбука
+  border-bottom: 8px solid #6b7280;
+}
+
+/* Деталі клавіатури */
+.keyboard {
+  width: 85%;
+  height: 55%;
+  background: #374151; // Заглиблення для клавіатури
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 1%;
+  gap: 4px;
+}
+
+.keysRow {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3); // Імітація ряду клавіш
+  border-radius: 4px;
+}
+.spaceBar {
+  flex: 1;
+  width: 40%;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+}
+
+.trackpad {
+  margin-top: 3%;
+  width: 30%;
+  height: 25%;
+  background: #d1d5db; // Трохи світліший за корпус
+  border-radius: 6px;
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+}

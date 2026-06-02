@@ -1,0 +1,118 @@
+.problem {
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.problem__header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: clamp(3rem, 5vw, 5rem);
+  max-width: 44ch;
+}
+
+.problem__titleDim {
+  color: var(--text-secondary);
+}
+
+.problem__sub {
+  max-width: 52ch;
+}
+
+.problem__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.problem__colHead {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(255, 255, 255, 0.02);
+}
+.problem__colHead span {
+  padding: 0.875rem 1.75rem;
+}
+.problem__colHead span:first-child {
+  border-right: 1px solid var(--border);
+}
+
+@media (max-width: 767px) {
+  .problem__colHead {
+    display: none;
+  }
+}
+
+.problem__colBad {
+  color: rgba(255, 255, 255, 0.3);
+}
+.problem__colGood {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.problem__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+
+@media (max-width: 767px) {
+  .problem__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.problem__cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem 1.75rem;
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+.problem__cell p {
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.problem__cell:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.problem__cell__bad {
+  background: var(--bg-alt);
+  border-right: 1px solid var(--border);
+}
+.problem__cell__bad .problem__cellIcon {
+  color: rgba(255, 255, 255, 0.2);
+}
+.problem__cell__bad p {
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 767px) {
+  .problem__cell__bad {
+    border-right: none;
+  }
+}
+
+.problem__cell__good {
+  background: rgba(255, 255, 255, 0.025);
+}
+.problem__cell__good .problem__cellIcon {
+  color: rgba(255, 255, 255, 0.7);
+}
+.problem__cell__good p {
+  color: var(--text-primary);
+}
+
+.problem__cellIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  font-weight: 700;
+}

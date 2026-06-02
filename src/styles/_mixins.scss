@@ -1,0 +1,146 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// _mixins.scss · CloudBASe
+// ─────────────────────────────────────────────────────────────────────────────
+@use "variables" as v;
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@mixin below($bp) {
+  @media (max-width: #{$bp - 1px}) {
+    @content;
+  }
+}
+
+@mixin above($bp) {
+  @media (min-width: #{$bp}) {
+    @content;
+  }
+}
+
+@mixin between($min, $max) {
+  @media (min-width: #{$min}) and (max-width: #{$max - 1px}) {
+    @content;
+  }
+}
+
+// Shortcuts
+@mixin mobile {
+  @include below(v.$bp-md) {
+    @content;
+  }
+}
+@mixin tablet {
+  @include below(v.$bp-lg) {
+    @content;
+  }
+}
+@mixin desktop {
+  @include above(v.$bp-lg) {
+    @content;
+  }
+}
+
+// ── Typography ───────────────────────────────────────────────────────────────
+
+// Fluid font size with clamp
+@mixin fluid-text($min, $max, $min-vw: 375px, $max-vw: 1280px) {
+  font-size: clamp(
+    #{$min},
+    calc(
+      #{$min} + (#{strip-unit($max - $min)}) *
+        ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)})
+    ),
+    #{$max}
+  );
+}
+
+// Apple-style tight heading
+@mixin heading-tight {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+@mixin heading-semi {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+// ── Layout ───────────────────────────────────────────────────────────────────
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+// Section vertical padding — responsive
+@mixin section-spacing($size: "base") {
+  @if $size == "sm" {
+    padding-block: clamp(3rem, 5vw, 6rem);
+  } @else if $size == "lg" {
+    padding-block: clamp(5rem, 10vw, 12rem);
+  } @else {
+    padding-block: clamp(4rem, 8vw, 10rem);
+  }
+}
+
+// ── Visual effects ───────────────────────────────────────────────────────────
+
+// Gap-as-border grid trick (Apple product grid style)
+@mixin gap-grid($gap: 1px, $bg: var(--border), $radius: var(--radius-xl)) {
+  display: grid;
+  gap: $gap;
+  background: $bg;
+  border: #{$gap} solid $bg;
+  border-radius: $radius;
+  overflow: hidden;
+}
+
+// Card cell inside a gap-grid
+@mixin gap-cell($bg: var(--bg-card)) {
+  background: $bg;
+  border-radius: 0;
+  border: none;
+  transition: background-color var(--duration-base) var(--ease-out);
+
+  &:hover {
+    background: var(--bg-card-hover);
+  }
+}
+
+// ── Transitions ──────────────────────────────────────────────────────────────
+
+@mixin transition($props...) {
+  $result: ();
+  @each $prop in $props {
+    $result: append($result, $prop var(--duration-base) var(--ease-out), comma);
+  }
+  transition: $result;
+}
+
+// ── Accessibility ─────────────────────────────────────────────────────────────
+
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
