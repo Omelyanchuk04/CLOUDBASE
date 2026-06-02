@@ -1,6 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // _mixins.scss · CloudBASe
+
 // ─────────────────────────────────────────────────────────────────────────────
+@use "sass:list";
 @use "variables" as v;
 
 // ── Responsive ───────────────────────────────────────────────────────────────
@@ -126,7 +128,12 @@
 @mixin transition($props...) {
   $result: ();
   @each $prop in $props {
-    $result: append($result, $prop var(--duration-base) var(--ease-out), comma);
+    // Ось тут додано list. перед append
+    $result: list.append(
+      $result,
+      $prop var(--duration-base) var(--ease-out),
+      comma
+    );
   }
   transition: $result;
 }
