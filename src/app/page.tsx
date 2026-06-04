@@ -19,11 +19,10 @@ export default function HomePage() {
       {/* 2. Проблеми клієнтів — дзеркало болю */}
       <Problem />
 
-      {/* 3. Наші послуги */}
-      <Services />
+      {/* <Services />
 
-      {/* 4. Паралакс — скріншоти роботи в BAS */}
-      <ParallaxSection />
+    
+      <ParallaxSection /> */}
 
       {/* 6. Як ми працюємо */}
       <HowWeWork />

@@ -17,6 +17,19 @@ export const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  interface InavItem {
+    label: string;
+    href: string;
+  }
+
+  const navList: InavItem[] = [
+    { label: "Хмара", href: "!#" },
+    { label: "BAS", href: "!#" },
+    { label: "Послуги", href: "!#" },
+    { label: "Про нас", href: "!#" },
+    { label: "Контакти", href: "!#" },
+  ];
+
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={styles.container}>
@@ -26,17 +39,12 @@ export const Header = () => {
           <span className={styles.accent}>BASE</span>
         </Link>
 
-        {/* Навігація */}
         <nav className={styles.nav}>
-          <Link href="#services" className={styles.link}>
-            Послуги
-          </Link>
-          <Link href="#infrastructure" className={styles.link}>
-            Інфраструктура
-          </Link>
-          <Link href="#pricing" className={styles.link}>
-            Тарифи
-          </Link>
+          {navList.map((item, index) => (
+            <Link key={item.label} href={item.href} className={styles.link}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         {/* Кнопка дії */}
