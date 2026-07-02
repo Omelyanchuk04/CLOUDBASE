@@ -17,7 +17,7 @@ export default function HomePage() {
       <MacbookSection />
 
       {/* 2. Проблеми клієнтів — дзеркало болю */}
-      <Problem />
+      {/* <Problem /> */}
 
       {/* <Services />
 
@@ -25,7 +25,7 @@ export default function HomePage() {
       <ParallaxSection /> */}
 
       {/* 6. Як ми працюємо */}
-      <HowWeWork />
+      {/* <HowWeWork /> */}
 
       {/* 7. Ціни */}
       <Pricing />
