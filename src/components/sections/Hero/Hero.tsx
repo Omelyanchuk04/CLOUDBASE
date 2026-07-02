@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { HERO } from "@/lib/constants";
 import styles from "./Hero.module.scss";
 
@@ -155,30 +156,17 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Проста картка вигод (Права частина) */}
-        <div className={styles.hero__visual}>
-          <div className={styles.hero__card}>
-            <div className={styles.hero__cardHeader}>
-              <span className={styles.hero__cardShield}>✓</span>
-              {HERO.card.title}
-            </div>
-
-            <div className={styles.hero__cardBody}>
-              {HERO.card.stats.map((stat, idx) => (
-                <div key={idx} className={styles.hero__statRow}>
-                  <span className={styles.hero__statLabel}>{stat.label}</span>
-                  <span
-                    className={
-                      stat.highlight
-                        ? styles.hero__statHighlight
-                        : styles.hero__statValue
-                    }
-                  >
-                    {stat.value}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Зображення (Права частина) */}
+        <div className={styles.hero__visualContainer}>
+          <div className={styles.hero__imageWrapper}>
+            <Image
+              src="/main/PC-img.jpg"
+              alt="PC Interface"
+              width={1200}
+              height={800}
+              className={styles.hero__image}
+              priority
+            />
           </div>
         </div>
       </div>
