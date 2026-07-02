@@ -4,91 +4,140 @@
   left: 0;
   width: 100%;
   z-index: 999;
-  padding: 14px 0;
-  transition: all 0.3s ease;
-  isolation: isolate;
+  padding: 20px 0;
+  transition: padding 0.3s ease;
+  pointer-events: none;
 
-  /* Додаємо стан скролу, який є у вашому React-компоненті */
-  &.scrolled {
-    padding: 10px 0;
+  // &.scrolled {
+  //   padding: 12px 0;
+
+  //   .header__top_shadow {
+  //     background: linear-gradient(
+  //       180deg,
+  //       rgba(0, 0, 0, 0.5) 0%,
+  //       rgba(0, 0, 0, 0) 100%
+  //     );
+  //   }
+  // }
+
+  &__top_shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    z-index: 0;
+    pointer-events: none;
+    transition: background 0.3s ease;
   }
 
   &__container {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
+    pointer-events: auto;
   }
 
-  /* Ліва колонка */
   &__logo_container {
-    margin-right: auto;
     display: flex;
     align-items: center;
     flex: 1;
   }
 
   &__logo {
-    position: relative;
     display: flex;
     align-items: center;
-    padding: 4px 12px;
-    // border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
     border-radius: 100px;
-    // background-color: rgba(20, 20, 20, 0.6);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-
-    // background-color: #454545;
-    // background: linear-gradient(135deg, #6c99fa 0%, #9b9b9b 100%);
-
-    // opacity: 0.85;
+    // background: rgba(30, 30, 30, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    // border: 1px solid rgba(255, 255, 255, 0.08);
+    isolation: isolate;
+    transform: translateZ(0);
   }
 
-  /* Центральна колонка (Навігація) */
   &__nav {
-    position: relative;
-    z-index: 1;
     display: none;
-
     @media (min-width: 992px) {
       display: flex;
     }
-
     align-items: center;
     gap: 32px;
-    padding: 10px 32px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 36px;
     border-radius: 100px;
 
-    /* Фон та блюр винесені в ::before */
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      border-radius: 100px;
-      background-color: rgba(20, 20, 20, 0.6);
-      /* Додано saturate для примусового рендеру в Chrome */
-      backdrop-filter: blur(12px) saturate(180%);
-      -webkit-backdrop-filter: blur(12px) saturate(180%);
-      // transform: translateZ(0);
-      will-change: backdrop-filter;
+    /* 1. ПРОЗОРА РАМКА (Колір задається через градієнт нижче) */
+    border: 1px solid transparent;
+
+    /* 2. ПОДВІЙНИЙ ГРАДІЄНТ (Фон + Градієнтна рамка) */
+    background: 
+      /* Перший шар: внутрішній фон панелі (темне скло) */
+      linear-gradient(
+          135deg,
+          rgba(50, 50, 50, 0.85) 0%,
+          rgba(15, 15, 15, 0.95) 100%
+        )
+        padding-box,
+      /* Другий шар: градієнт самої рамки (яскравий відблиск зліва-зверху, згасає донизу-направо) */
+      linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.35) 0%,
+          rgba(255, 255, 255, 0.02) 100%
+        )
+        border-box;
+
+    /* Залишаємо блюр для Safari/Firefox */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    /* 3. КОМБІНОВАНА ТІНЬ ДЛЯ ГЛИБИНИ */
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      /* Потужна зовнішня тінь */ inset 0 1px 2px rgba(255, 255, 255, 0.15); /* Внутрішнє світіння для додаткового об'єму */
+
+    isolation: isolate;
+    transform: translateZ(0);
+  }
+
+  /* ... інший код хедера ... */
+
+  /* Окремий клас для посилань */
+  .link {
+    color: rgba(255, 255, 255, 0.85); /* Робимо базовий колір трохи світлішим */
+    font-size: 15px;
+    font-weight: 500; /* Збільшуємо товщину шрифту для кращої читабельності */
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    /* Чорна міні-тінь під текстом гарантує, що він не зіллється зі світлими елементами на фоні сторінки */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+
+    &:hover {
+      color: #ffffff;
+      /* При наведенні додаємо ефект неонового/скляного світіння */
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     }
   }
 
-  /* Права колонка */
   &__actions {
     display: flex;
     align-items: center;
     flex: 1;
     justify-content: flex-end;
   }
-
-  /* Кнопка */
   &__button {
     padding: 12px 28px;
     background: linear-gradient(135deg, #5b9dff 0%, #3b7aff 100%);
@@ -97,35 +146,18 @@
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
-
     border-radius: 100px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 4px 20px rgba(91, 157, 255, 0.3);
-
     transition:
       transform 0.2s ease,
       box-shadow 0.2s ease;
-
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 24px rgba(91, 157, 255, 0.5);
     }
-
     &:active {
       transform: translateY(0);
     }
-  }
-}
-
-/* Окремий клас для посилань */
-.link {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 15px;
-  font-weight: 400;
-  text-decoration: none;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #ffffff;
   }
 }
