@@ -26,11 +26,7 @@
     left: 0;
     width: 100%;
     height: 120px;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.3) 0%,
-      rgba(0, 0, 0, 0) 100%
-    );
+    background: linear-gradient(#8181814f 0%, #c4c4c400 100%);
     z-index: 0;
     pointer-events: none;
     transition: background 0.3s ease;
@@ -117,7 +113,7 @@
   /* Окремий клас для посилань */
   .link {
     color: rgba(255, 255, 255, 0.85); /* Робимо базовий колір трохи світлішим */
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500; /* Збільшуємо товщину шрифту для кращої читабельності */
     text-decoration: none;
     transition: all 0.2s ease;
@@ -142,7 +138,7 @@
     padding: 12px 28px;
     background: linear-gradient(135deg, #5b9dff 0%, #3b7aff 100%);
     color: #ffffff;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
