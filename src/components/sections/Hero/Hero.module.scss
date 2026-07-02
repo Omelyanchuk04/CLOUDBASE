@@ -1,21 +1,21 @@
 .hero {
   position: relative;
-  /* Секція має займати весь екран по висоті */
   min-height: 100svh;
-  /* Важливо: гарантуємо, що секція прилягає до верху */
   margin-top: -70px;
   top: 0;
+  /* Задаємо низький z-index, щоб секція лягла ПІД шапку */
+  z-index: 1;
 
   display: flex;
   align-items: center;
-  /* Важливо для зображення, що виходить за межі екрана */
-  overflow: hidden;
 
-  /* Глибокий синій градієнт, який має бути видно під шапкою */
+  /* Змінено з overflow: hidden на overflow-x: clip. 
+     Це ховає горизонтальний скрол від картинки, але не обрізає шапку! */
+  overflow-x: clip;
+  overflow-y: visible;
+
   background: linear-gradient(135deg, #081221 0%, #030712 100%);
 
-  /* Відступ для контенту, щоб він не заліз під шапку. 
-     Якщо у вас немає змінної --header-h, ставимо жорстко 100px */
   padding-top: calc(100px + clamp(2rem, 5vw, 4rem));
   padding-bottom: clamp(4rem, 8vw, 8rem);
 }
@@ -25,11 +25,9 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
   pointer-events: none;
 }
 
-/* Смарагдове світло */
 .hero__glowGreen {
   position: absolute;
   top: -10%;
@@ -44,7 +42,6 @@
   filter: blur(60px);
 }
 
-/* Неоново-синє світло */
 .hero__glowBlue {
   position: absolute;
   bottom: -10%;
@@ -59,7 +56,6 @@
   filter: blur(80px);
 }
 
-/* Фіолетовий акцент по центру для глибини */
 .hero__glowPurple {
   position: absolute;
   top: 30%;
@@ -89,7 +85,6 @@
   position: relative;
   z-index: 3;
   display: grid;
-  /* Контенту віддаємо трохи більше місця (1.1fr) */
   grid-template-columns: 1.1fr 0.9fr;
   gap: 4rem;
   align-items: center;
@@ -170,49 +165,20 @@
   }
 }
 
-/* --- Зображення (Права частина) --- */
+/* --- Зображення PNG (Права частина) --- */
 .hero__visualContainer {
   position: relative;
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   animation: imageFadeIn 1s ease-out 0.2s forwards;
   opacity: 0;
 
-  @media (min-width: 1025px) {
-    /* Змушуємо зображення вийти за межі правої зони */
-    width: 140%;
-    margin-right: -40%;
-  }
-}
-
-.hero__imageWrapper {
-  position: relative;
-  width: 100%;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow:
-    0 24px 48px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-
-  /* М'який 3D ефект (опціонально) */
-  transform: perspective(1000px) rotateY(-4deg) rotateX(4deg);
-  transition:
-    transform 0.4s ease,
-    box-shadow 0.4s ease;
-
-  &:hover {
-    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
-    box-shadow:
-      0 32px 64px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-
-  @media (max-width: 991px) {
-    transform: none;
-    &:hover {
-      transform: none;
-    }
+  @media (min-width: 992px) {
+    /* Ширина відносно ВІКНА браузера, а не контейнера.
+       Це гарантує, що картинка буде величезною. */
+    width: 60vw;
+    /* Зсуваємо її трохи вправо */
+    transform: translateX(10%);
   }
 }
 
@@ -220,9 +186,12 @@
   width: 100%;
   height: auto;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
+  /* ВАЖЛИВО: Вимикаємо дефолтне обмеження ширини від Next.js або глобальних стилів */
+  max-width: none !important;
 }
 
+/* --- Анімації --- */
 @keyframes pulse {
   0%,
   100% {
@@ -249,7 +218,7 @@
 @keyframes imageFadeIn {
   from {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(60px);
   }
   to {
     opacity: 1;

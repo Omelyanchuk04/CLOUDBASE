@@ -5,7 +5,6 @@ import Image from "next/image";
 import { HERO } from "@/lib/constants";
 import styles from "./Hero.module.scss";
 
-// Оновлений ефект Warp Speed (Яскраві промені з довгими хвостами)
 function WarpSpeedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -17,8 +16,8 @@ function WarpSpeedBackground() {
 
     let animationFrameId: number;
     let stars: Star[] = [];
-    const numStars = 150; // Оптимальна кількість для товстих ліній
-    const speed = 15; // Швидкість польоту
+    const numStars = 150;
+    const speed = 15;
 
     class Star {
       x: number = 0;
@@ -48,30 +47,26 @@ function WarpSpeedBackground() {
         const cy = h / 2;
         const fov = w;
 
-        // Поточна точка (голова променя)
         const sx = (this.x / this.z) * fov + cx;
         const sy = (this.y / this.z) * fov + cy;
 
-        // Попередня точка (хвіст променя - робимо його штучно довгим)
-        const tailLength = 120; // Довжина хвоста
+        const tailLength = 120;
         const tailZ = this.z + tailLength;
         const px = (this.x / tailZ) * fov + cx;
         const py = (this.y / tailZ) * fov + cy;
 
-        // Наближення до екрану (0 - далеко, 1 - близько)
         const distanceFactor = Math.max(0.1, 1 - this.z / w);
 
         ctx.beginPath();
         ctx.moveTo(px, py);
         ctx.lineTo(sx, sy);
 
-        // Створюємо градієнт для кожної лінії (хвіст прозорий, голова яскрава)
         const gradient = ctx.createLinearGradient(px, py, sx, sy);
         gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
         gradient.addColorStop(1, `rgba(255, 255, 255, ${distanceFactor})`);
 
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = distanceFactor * 5 + 1.5; // Значно товщі лінії
+        ctx.lineWidth = distanceFactor * 5 + 1.5;
         ctx.lineCap = "round";
         ctx.stroke();
       }
@@ -91,7 +86,7 @@ function WarpSpeedBackground() {
     };
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Повністю прозорий фон для Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       stars.forEach((star) => {
         star.update(speed, canvas.width, canvas.height);
@@ -158,16 +153,14 @@ export function Hero() {
 
         {/* Зображення (Права частина) */}
         <div className={styles.hero__visualContainer}>
-          <div className={styles.hero__imageWrapper}>
-            <Image
-              src="/main/PC-img.jpg"
-              alt="PC Interface"
-              width={1200}
-              height={800}
-              className={styles.hero__image}
-              priority
-            />
-          </div>
+          <Image
+            src="/main/PC-img.png"
+            alt="PC Interface"
+            width={1200}
+            height={800}
+            className={styles.hero__image}
+            priority
+          />
         </div>
       </div>
     </section>
