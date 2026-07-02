@@ -6,31 +6,8 @@
   z-index: 999;
   padding: 20px 0;
   transition: padding 0.3s ease;
-  pointer-events: none;
-
-  // &.scrolled {
-  //   padding: 12px 0;
-
-  //   .header__top_shadow {
-  //     background: linear-gradient(
-  //       180deg,
-  //       rgba(0, 0, 0, 0.5) 0%,
-  //       rgba(0, 0, 0, 0) 100%
-  //     );
-  //   }
-  // }
-
-  &__top_shadow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 120px;
-    background: linear-gradient(#8181814f 0%, #c4c4c400 100%);
-    z-index: 0;
-    pointer-events: none;
-    transition: background 0.3s ease;
-  }
+  background: transparent; /* Жодного фону */
+  pointer-events: none; /* Пропускає кліки крізь пустоти */
 
   &__container {
     position: relative;
@@ -43,7 +20,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    pointer-events: auto;
+    pointer-events: auto; /* Повертає клікабельність контенту шапки */
   }
 
   &__logo_container {
@@ -57,12 +34,11 @@
     align-items: center;
     padding: 6px 12px;
     border-radius: 100px;
-    // background: rgba(30, 30, 30, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    // border: 1px solid rgba(255, 255, 255, 0.08);
     isolation: isolate;
     transform: translateZ(0);
+    pointer-events: auto; /* Захист для кліків */
   }
 
   &__nav {
@@ -75,19 +51,17 @@
     padding: 12px 36px;
     border-radius: 100px;
 
-    /* 1. ПРОЗОРА РАМКА (Колір задається через градієнт нижче) */
+    /* 1. ПРОЗОРА РАМКА */
     border: 1px solid transparent;
 
     /* 2. ПОДВІЙНИЙ ГРАДІЄНТ (Фон + Градієнтна рамка) */
-    background: 
-      /* Перший шар: внутрішній фон панелі (темне скло) */
+    background:
       linear-gradient(
           135deg,
           rgba(50, 50, 50, 0.85) 0%,
           rgba(15, 15, 15, 0.95) 100%
         )
         padding-box,
-      /* Другий шар: градієнт самої рамки (яскравий відблиск зліва-зверху, згасає донизу-направо) */
       linear-gradient(
           135deg,
           rgba(255, 255, 255, 0.35) 0%,
@@ -95,35 +69,30 @@
         )
         border-box;
 
-    /* Залишаємо блюр для Safari/Firefox */
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 
     /* 3. КОМБІНОВАНА ТІНЬ ДЛЯ ГЛИБИНИ */
     box-shadow:
       0 12px 40px rgba(0, 0, 0, 0.4),
-      /* Потужна зовнішня тінь */ inset 0 1px 2px rgba(255, 255, 255, 0.15); /* Внутрішнє світіння для додаткового об'єму */
+      inset 0 1px 2px rgba(255, 255, 255, 0.15);
 
     isolation: isolate;
     transform: translateZ(0);
+    pointer-events: auto; /* Захист для кліків */
   }
 
-  /* ... інший код хедера ... */
-
-  /* Окремий клас для посилань */
   .link {
-    color: rgba(255, 255, 255, 0.85); /* Робимо базовий колір трохи світлішим */
+    color: rgba(255, 255, 255, 0.85);
     font-size: 14px;
-    font-weight: 500; /* Збільшуємо товщину шрифту для кращої читабельності */
+    font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
-
-    /* Чорна міні-тінь під текстом гарантує, що він не зіллється зі світлими елементами на фоні сторінки */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    pointer-events: auto; /* Захист для кліків */
 
     &:hover {
       color: #ffffff;
-      /* При наведенні додаємо ефект неонового/скляного світіння */
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     }
   }
@@ -133,7 +102,9 @@
     align-items: center;
     flex: 1;
     justify-content: flex-end;
+    pointer-events: auto; /* Захист для кліків */
   }
+
   &__button {
     padding: 12px 28px;
     background: linear-gradient(135deg, #5b9dff 0%, #3b7aff 100%);
@@ -148,6 +119,8 @@
     transition:
       transform 0.2s ease,
       box-shadow 0.2s ease;
+    pointer-events: auto; /* Захист для кліків */
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 24px rgba(91, 157, 255, 0.5);

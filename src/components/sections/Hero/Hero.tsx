@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { HERO } from "@/lib/constants";
 import styles from "./Hero.module.scss";
 
-// Ефект Warp Speed (лінії назустріч у космосі)
+// Оновлений ефект Warp Speed (Яскраві промені з довгими хвостами)
 function WarpSpeedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -16,59 +16,62 @@ function WarpSpeedBackground() {
 
     let animationFrameId: number;
     let stars: Star[] = [];
-    const numStars = 300; // Кількість ліній
+    const numStars = 150; // Оптимальна кількість для товстих ліній
     const speed = 15; // Швидкість польоту
 
     class Star {
       x: number = 0;
       y: number = 0;
       z: number = 0;
-      pz: number = 0;
 
       constructor(w: number, h: number) {
         this.reset(w, h);
-        // Розкидаємо початкові координати Z щоб не було різкого старту
         this.z = Math.random() * w;
-        this.pz = this.z;
       }
 
       reset(w: number, h: number) {
         this.x = (Math.random() - 0.5) * w * 2;
         this.y = (Math.random() - 0.5) * h * 2;
         this.z = w;
-        this.pz = this.z;
       }
 
       update(speed: number, w: number, h: number) {
-        this.pz = this.z;
         this.z -= speed;
         if (this.z < 1) {
           this.reset(w, h);
-          this.pz = this.z;
         }
       }
 
       draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
         const cx = w / 2;
         const cy = h / 2;
-        const fov = w; // Поле зору
+        const fov = w;
 
-        // Поточні координати з урахуванням перспективи
+        // Поточна точка (голова променя)
         const sx = (this.x / this.z) * fov + cx;
         const sy = (this.y / this.z) * fov + cy;
 
-        // Попередні координати для малювання лінії (шлейфу)
-        const px = (this.x / this.pz) * fov + cx;
-        const py = (this.y / this.pz) * fov + cy;
+        // Попередня точка (хвіст променя - робимо його штучно довгим)
+        const tailLength = 120; // Довжина хвоста
+        const tailZ = this.z + tailLength;
+        const px = (this.x / tailZ) * fov + cx;
+        const py = (this.y / tailZ) * fov + cy;
 
-        // Яскравість та товщина залежать від близькості до екрану
-        const distanceFactor = 1 - this.z / w;
+        // Наближення до екрану (0 - далеко, 1 - близько)
+        const distanceFactor = Math.max(0.1, 1 - this.z / w);
 
         ctx.beginPath();
         ctx.moveTo(px, py);
         ctx.lineTo(sx, sy);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${distanceFactor})`; // Білі напівпрозорі лінії
-        ctx.lineWidth = distanceFactor * 3;
+
+        // Створюємо градієнт для кожної лінії (хвіст прозорий, голова яскрава)
+        const gradient = ctx.createLinearGradient(px, py, sx, sy);
+        gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
+        gradient.addColorStop(1, `rgba(255, 255, 255, ${distanceFactor})`);
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = distanceFactor * 5 + 1.5; // Значно товщі лінії
+        ctx.lineCap = "round";
         ctx.stroke();
       }
     }
@@ -87,9 +90,7 @@ function WarpSpeedBackground() {
     };
 
     const animate = () => {
-      // Використовуємо напівпрозорий фон для ефекту розмиття руху (motion blur)
-      ctx.fillStyle = "rgba(10, 10, 10, 0.4)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Повністю прозорий фон для Canvas
 
       stars.forEach((star) => {
         star.update(speed, canvas.width, canvas.height);
@@ -117,14 +118,17 @@ function WarpSpeedBackground() {
 export function Hero() {
   return (
     <section className={styles.hero}>
-      {/* Динамічний фон */}
+      {/* Яскравий кольоровий фон */}
+      <div className={styles.hero__glow} aria-hidden="true">
+        <div className={styles.hero__glowGreen} />
+        <div className={styles.hero__glowBlue} />
+        <div className={styles.hero__glowPurple} />
+      </div>
+
       <WarpSpeedBackground />
 
-      {/* Затемнення для кращої читабельності тексту */}
-      <div className={styles.hero__overlay} aria-hidden="true" />
-
       <div className={`container ${styles.hero__inner}`}>
-        {/* ЛІВА ЧАСТИНА: Контент */}
+        {/* Контент (Ліва частина) */}
         <div className={styles.hero__content}>
           <div className={styles.hero__badge}>
             <span className={styles.hero__badgeDot} aria-hidden="true" />
@@ -151,11 +155,11 @@ export function Hero() {
           </div>
         </div>
 
-        {/* ПРАВА ЧАСТИНА: Glassmorphism Візуал */}
+        {/* Проста картка вигод (Права частина) */}
         <div className={styles.hero__visual}>
           <div className={styles.hero__card}>
             <div className={styles.hero__cardHeader}>
-              <span className={styles.hero__cardPulse} />
+              <span className={styles.hero__cardShield}>✓</span>
               {HERO.card.title}
             </div>
 

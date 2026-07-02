@@ -1,11 +1,77 @@
 .hero {
   position: relative;
-  min-height: calc(100svh - var(--header-h, 72px));
+  /* Секція має займати весь екран по висоті */
+  min-height: 100svh;
+  /* Важливо: гарантуємо, що секція прилягає до верху */
+  margin-top: -70px;
+  top: 0;
+
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: #0a0a0a; // Темний фон як база
-  padding-block: clamp(4rem, 8vw, 8rem);
+
+  /* Глибокий синій градієнт, який має бути видно під шапкою */
+  background: linear-gradient(135deg, #081221 0%, #030712 100%);
+
+  /* Відступ для контенту, щоб він не заліз під шапку. 
+     Якщо у вас немає змінної --header-h, ставимо жорстко 100px */
+  padding-top: calc(100px + clamp(2rem, 5vw, 4rem));
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+/* --- Яскравий Ambient Glow --- */
+.hero__glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Смарагдове світло */
+.hero__glowGreen {
+  position: absolute;
+  top: -10%;
+  right: 0%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(
+    circle,
+    rgba(34, 197, 94, 0.25) 0%,
+    transparent 65%
+  );
+  filter: blur(60px);
+}
+
+/* Неоново-синє світло */
+.hero__glowBlue {
+  position: absolute;
+  bottom: -10%;
+  left: -5%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.2) 0%,
+    transparent 60%
+  );
+  filter: blur(80px);
+}
+
+/* Фіолетовий акцент по центру для глибини */
+.hero__glowPurple {
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.15) 0%,
+    transparent 70%
+  );
+  filter: blur(100px);
+  mix-blend-mode: screen;
 }
 
 .hero__warp {
@@ -13,25 +79,14 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.hero__overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at center,
-    transparent 0%,
-    rgba(10, 10, 10, 0.8) 80%
-  );
   z-index: 1;
   pointer-events: none;
+  opacity: 1;
 }
 
 .hero__inner {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
@@ -55,15 +110,17 @@
 .hero__badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   padding: 0.5rem 1rem;
   border-radius: 100px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   width: fit-content;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   color: #fff;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .hero__badgeDot {
@@ -71,25 +128,28 @@
   height: 8px;
   border-radius: 50%;
   background: #22c55e;
-  box-shadow: 0 0 12px #22c55e;
+  box-shadow:
+    0 0 12px #22c55e,
+    0 0 20px #22c55e;
   animation: pulse 2s ease-in-out infinite;
 }
 
 .hero__heading {
-  // Розмір заголовка тепер не такий гігантський, легко читається
-  font-size: clamp(2.25rem, 4vw, 3.5rem);
-  line-height: 1.15;
+  font-size: clamp(2.5rem, 4.5vw, 3.75rem);
+  line-height: 1.1;
   font-weight: 600;
   color: #fff;
   letter-spacing: -0.02em;
-  max-width: 20ch;
+  max-width: 18ch;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .hero__sub {
   font-size: 1.125rem;
   line-height: 1.6;
-  color: #a1a1aa;
-  max-width: 52ch;
+  color: #e2e8f0;
+  max-width: 48ch;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .hero__ctas {
@@ -108,7 +168,7 @@
   }
 }
 
-/* --- Visual Card (Права частина) --- */
+/* --- Проста Картка (Права частина) --- */
 .hero__visual {
   display: flex;
   justify-content: center;
@@ -118,26 +178,29 @@
 }
 
 .hero__card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 2rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2.25rem;
   width: 100%;
-  max-width: 420px;
-  backdrop-filter: blur(16px);
+  max-width: 440px;
+  backdrop-filter: blur(24px);
   box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
-  // Додаємо легкий 3D ефект повороту
-  transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+  transform: perspective(1000px) rotateY(-4deg) rotateX(4deg);
   transition:
     transform 0.4s ease,
-    border-color 0.4s ease;
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 
   &:hover {
     transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow:
+      0 32px 64px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 
   @media (max-width: 991px) {
@@ -154,49 +217,60 @@
   align-items: center;
   gap: 0.75rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   margin-bottom: 1.5rem;
   color: #fff;
-  font-weight: 500;
-  font-size: 1.125rem;
+  font-weight: 600;
+  font-size: 1.25rem;
 }
 
-.hero__cardPulse {
-  width: 10px;
-  height: 10px;
+.hero__cardShield {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 12px #22c55e;
+  background: rgba(34, 197, 94, 0.25);
+  color: #4ade80;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
 }
 
 .hero__cardBody {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .hero__statRow {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.95rem;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .hero__statLabel {
-  color: #71717a;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
 }
 
 .hero__statValue {
-  color: #e4e4e7;
+  color: #fff;
+  font-size: 1.15rem;
   font-weight: 500;
 }
 
 .hero__statHighlight {
-  color: #22c55e;
+  color: #4ade80;
+  font-size: 1.15rem;
   font-weight: 600;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
 }
 
-/* Animations */
 @keyframes pulse {
   0%,
   100% {
@@ -204,7 +278,7 @@
     transform: scale(1);
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.6;
     transform: scale(1.2);
   }
 }
