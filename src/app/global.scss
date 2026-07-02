@@ -40,7 +40,10 @@ body {
   font-size: v.$text-base;
   line-height: 1.6;
   min-height: 100vh;
-  /* overflow-x: hidden; ВИДАЛЕНО ЗВІДСИ */
+
+  /* Замість hidden використовуємо clip. 
+     Він обрізає зайве, але НЕ блокує backdrop-filter! */
+  // overflow: clip;
 }
 
 img,
