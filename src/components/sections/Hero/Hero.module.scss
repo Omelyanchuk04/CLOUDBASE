@@ -3,24 +3,21 @@
   min-height: 100svh;
   margin-top: -70px;
   top: 0;
-  /* Задаємо низький z-index, щоб секція лягла ПІД шапку */
   z-index: 1;
 
   display: flex;
   align-items: center;
 
-  /* Змінено з overflow: hidden на overflow-x: clip. 
-     Це ховає горизонтальний скрол від картинки, але не обрізає шапку! */
   overflow-x: clip;
   overflow-y: visible;
 
-  background: linear-gradient(135deg, #081221 0%, #030712 100%);
+  /* ФОН: Глибокий синьо-фіолетовий (Midnight Indigo) */
+  background: linear-gradient(135deg, #1a1b41 0%, #0d1024 50%, #070914 100%);
 
   padding-top: calc(100px + clamp(2rem, 5vw, 4rem));
   padding-bottom: clamp(4rem, 8vw, 8rem);
 }
 
-/* --- Яскравий Ambient Glow --- */
 .hero__glow {
   position: absolute;
   inset: 0;
@@ -36,7 +33,7 @@
   height: 50vw;
   background: radial-gradient(
     circle,
-    rgba(34, 197, 94, 0.25) 0%,
+    rgba(34, 197, 94, 0.35) 0%,
     transparent 65%
   );
   filter: blur(60px);
@@ -50,7 +47,7 @@
   height: 60vw;
   background: radial-gradient(
     circle,
-    rgba(14, 165, 233, 0.2) 0%,
+    rgba(14, 165, 233, 0.35) 0%,
     transparent 60%
   );
   filter: blur(80px);
@@ -64,7 +61,7 @@
   height: 40vw;
   background: radial-gradient(
     circle,
-    rgba(139, 92, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0.3) 0%,
     transparent 70%
   );
   filter: blur(100px);
@@ -85,10 +82,15 @@
   position: relative;
   z-index: 3;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+
+  /* 40% тексту та 60% картинці */
+  grid-template-columns: 4fr 6fr;
   gap: 4rem;
   align-items: center;
+
   width: 100%;
+  max-width: 1444px;
+  margin: 0 auto;
 
   @media (max-width: 991px) {
     grid-template-columns: 1fr;
@@ -100,59 +102,94 @@
 .hero__content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
   animation: fadeUp 0.8s ease-out forwards;
-}
-
-.hero__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 1rem;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: fit-content;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #fff;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.hero__badgeDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow:
-    0 0 12px #22c55e,
-    0 0 20px #22c55e;
-  animation: pulse 2s ease-in-out infinite;
+  // align-self: flex-start;
 }
 
 .hero__heading {
-  font-size: clamp(2.5rem, 4.5vw, 3.75rem);
-  line-height: 1.1;
-  font-weight: 600;
-  color: #fff;
+  /* === ЗМЕНШЕНО ШРИФТ ВСЬОГО ЗАГОЛОВКА === */
+  font-size: clamp(2rem, 4vw, 3.25rem); /* Було: clamp(2.5rem, 5vw, 4.25rem) */
+  line-height: 1.15;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  max-width: 18ch;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 80%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  max-width: 22ch; /* Трохи розширив контейнер, бо букви стали меншими */
+  filter: drop-shadow(0 4px 20px rgba(165, 180, 252, 0.15));
+}
+
+/* Клас просто для перенесення тексту на новий рядок */
+.newLineText {
+  display: block;
+  margin-top: 0.1em;
 }
 
 .hero__sub {
-  font-size: 1.125rem;
-  line-height: 1.6;
-  color: #e2e8f0;
-  max-width: 48ch;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #94a3b8;
+  max-width: 45ch;
+  font-weight: 400;
 }
+
+/* === СТИЛІ ДЛЯ ЛОГОТИПІВ ВСЕРЕДИНІ ТЕКСТУ === */
+.inlineLogos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  vertical-align: baseline;
+  transform: translateY(
+    0.1em
+  ); /* Коригування по вертикалі для рівності з текстом */
+  margin: 0 0.1em;
+}
+
+.inlineLogo {
+  height: 1.1em; /* Завдяки em картинки підлаштовуються під розмір шрифту */
+  width: auto;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.logoSeparator {
+  font-weight: 300;
+  font-size: 60px;
+  color: #94a3b8;
+  /* Обов'язково скидаємо градієнт батьківського заголовка для слеша */
+  -webkit-text-fill-color: #94a3b8;
+  background: none;
+}
+/* ========================================= */
 
 .hero__ctas {
   display: flex;
   gap: 1rem;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+
+  a {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    padding: 0.875rem 2rem;
+    border-radius: 100px;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(165, 180, 252, 0.6);
+      box-shadow: 0 0 20px rgba(165, 180, 252, 0.2);
+      transform: translateY(-2px);
+    }
+  }
 
   @media (max-width: 575px) {
     flex-direction: column;
@@ -160,6 +197,8 @@
 
     a {
       width: 100%;
+      text-align: center;
+      display: flex;
       justify-content: center;
     }
   }
@@ -170,40 +209,31 @@
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   animation: imageFadeIn 1s ease-out 0.2s forwards;
   opacity: 0;
 
   @media (min-width: 992px) {
-    /* Ширина відносно ВІКНА браузера, а не контейнера.
-       Це гарантує, що картинка буде величезною. */
-    width: 60vw;
-    /* Зсуваємо її трохи вправо */
-    transform: translateX(10%);
+    width: 100%;
+    transform: none;
   }
 }
 
 .hero__image {
-  width: 100%;
   height: auto;
   display: block;
   object-fit: contain;
-  /* ВАЖЛИВО: Вимикаємо дефолтне обмеження ширини від Next.js або глобальних стилів */
+  object-position: left center;
   max-width: none !important;
+  width: 100%;
+
+  @media (min-width: 992px) {
+    /* На вузьких екранах виходить за правий край (bleed ефект) */
+    width: max(100%, 850px);
+  }
 }
 
 /* --- Анімації --- */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.2);
-  }
-}
-
 @keyframes fadeUp {
   from {
     opacity: 0;
