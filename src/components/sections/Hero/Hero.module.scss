@@ -84,7 +84,7 @@
   display: grid;
 
   /* 40% тексту та 60% картинці */
-  grid-template-columns: 4fr 6fr;
+  grid-template-columns: 9fr 11fr;
   gap: 4rem;
   align-items: center;
 
@@ -205,6 +205,7 @@
 }
 
 /* --- Зображення PNG (Права частина) --- */
+/* --- Зображення PNG (Права частина) --- */
 .hero__visualContainer {
   position: relative;
   display: flex;
@@ -224,12 +225,26 @@
   display: block;
   object-fit: contain;
   object-position: left center;
-  max-width: none !important;
   width: 100%;
 
-  @media (min-width: 992px) {
-    /* На вузьких екранах виходить за правий край (bleed ефект) */
+  /* Стан для мобільних та екранів до 1400px (картинка виходить за межі) */
+  max-width: none;
+
+  @media (min-width: 992px) and (max-width: 1399.98px) {
+    /* На середніх екранах і до 1400px залишаємо bleed-ефект */
     width: max(100%, 850px);
+  }
+
+  /* Проміжний стан (1400px - 1443px) плавно підлаштовує розмір під контейнер */
+  @media (min-width: 1400px) and (max-width: 1443.98px) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Стан для екранів 1444px і більше (картинка строго в межах контейнера) */
+  @media (min-width: 1444px) {
+    width: 100%;
+    max-width: 100%; /* Жорстке обмеження, щоб не виходити за межі екрана */
   }
 }
 

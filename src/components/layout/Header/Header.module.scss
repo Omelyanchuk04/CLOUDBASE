@@ -28,7 +28,7 @@
   max-width: 1200px;
 
   z-index: 9999;
-  padding: 8px 0;
+  padding: 6px 1px;
   border-radius: 24px;
   transition: all 0.4s ease;
   pointer-events: auto;
@@ -99,8 +99,8 @@
     }
     align-items: center;
     gap: 32px;
-    padding: 10px 32px;
-    border-radius: 18px;
+    padding: 8px 24px;
+    border-radius: 16px;
 
     /* Легке виділення внутрішнього меню */
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -109,7 +109,7 @@
 
   .link {
     color: rgba(255, 255, 255, 0.85);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
@@ -129,10 +129,10 @@
   }
 
   &__button {
-    padding: 10px 24px;
+    padding: 6px 18px;
     background: linear-gradient(135deg, #74aeff 0%, #4c8aff 100%);
     color: #ffffff;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
