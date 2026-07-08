@@ -36,7 +36,6 @@ function DataFlowBackground() {
       loadedImages.push(img);
     });
 
-    const numFiles = 60;
     const speed = 6;
 
     class FileParticle {
@@ -115,6 +114,10 @@ function DataFlowBackground() {
 
     const initFiles = () => {
       files = [];
+      // ОПТИМІЗАЦІЯ ДЛЯ МОБІЛЬНИХ: Зменшуємо кількість частинок
+      const isMobile = window.innerWidth < 768;
+      const numFiles = isMobile ? 15 : 60;
+
       for (let i = 0; i < numFiles; i++) {
         files.push(new FileParticle(canvas.width, canvas.height));
       }

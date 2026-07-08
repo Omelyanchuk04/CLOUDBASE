@@ -73,6 +73,32 @@
   mix-blend-mode: screen;
 }
 
+/* ОПТИМІЗАЦІЯ ПЛЯМ ТА ВИДИМІСТЬ НА МОБІЛЬНИХ */
+@media (max-width: 768px) {
+  .hero__glowGreen {
+    top: 0%;
+    right: -20%;
+    width: 150vw; /* Розтягуємо, щоб було видно на вузькому екрані */
+    height: 150vw;
+    filter: blur(40px); /* Зменшуємо блюр для плавності скролу */
+  }
+  .hero__glowBlue {
+    bottom: 10%;
+    left: -30%;
+    width: 150vw;
+    height: 150vw;
+    filter: blur(40px);
+  }
+  .hero__glowPurple {
+    top: 20%;
+    left: 10%;
+    width: 120vw;
+    height: 120vw;
+    filter: blur(40px);
+    mix-blend-mode: normal; /* Знімаємо важкий режим накладання */
+  }
+}
+
 .hero__warp {
   position: absolute;
   inset: 0;
@@ -189,23 +215,6 @@
   }
 }
 
-.hero__logos {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 0.5rem;
-
-  img {
-    opacity: 0.5;
-    filter: grayscale(100%);
-    transition: opacity 0.3s;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-}
-
 /* --- НИЖНЯ ЧАСТИНА: Пристрої --- */
 .hero__visual {
   position: relative;
@@ -257,7 +266,7 @@
 /* --- РЕСПОНСИВНІСТЬ ДЛЯ ПЛАНШЕТІВ --- */
 @media (max-width: 991px) {
   .device__imac {
-    width: 45%; /* Акуратно зменшено */
+    width: 45%;
   }
   .device__laptopLeft {
     left: 0%;
@@ -269,24 +278,24 @@
   }
 }
 
-/* --- РЕСПОНСИВНІСТЬ ДЛЯ МОБІЛЬНИХ (ВИПРАВЛЕНО) --- */
+/* --- РЕСПОНСИВНІСТЬ ДЛЯ МОБІЛЬНИХ (ВИПРАВЛЕНО Z-INDEX ТА РОЗМІРИ) --- */
 @media (max-width: 768px) {
   .hero__visual {
     padding-bottom: 1rem;
   }
   .device__imac {
-    width: 55%; /* Зроблено меншим, щоб не здавався гігантським */
-    z-index: 2; /* Повернуто на задній план */
+    width: 60%; /* Зменшений iMac */
+    z-index: 2; /* Залишається позаду */
   }
   .device__laptopLeft,
   .device__laptopRight {
-    width: 40%; /* Ноутбуки пропорційно підлаштовані */
-    z-index: 3; /* Гарантуємо, що вони спереду */
+    width: 45%;
+    z-index: 3; /* Ноутбуки гарантовано перекривають iMac */
   }
   .device__laptopLeft {
-    left: -2%;
+    left: -5%;
   }
   .device__laptopRight {
-    right: -2%;
+    right: -5%;
   }
 }
