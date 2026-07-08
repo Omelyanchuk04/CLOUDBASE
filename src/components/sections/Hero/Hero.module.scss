@@ -1,21 +1,19 @@
 .hero {
   position: relative;
-  min-height: 100svh;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
   margin-top: -70px;
+  padding-top: 70px;
   top: 0;
   z-index: 1;
 
   display: flex;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
 
-  overflow-x: clip;
-  overflow-y: visible;
-
-  /* ФОН: Глибокий синьо-фіолетовий (Midnight Indigo) */
   background: linear-gradient(135deg, #1a1b41 0%, #0d1024 50%, #070914 100%);
-
-  padding-top: calc(100px + clamp(2rem, 5vw, 4rem));
-  padding-bottom: clamp(4rem, 8vw, 8rem);
 }
 
 .hero__glow {
@@ -81,192 +79,196 @@
 .hero__inner {
   position: relative;
   z-index: 3;
-  display: grid;
-
-  /* 40% тексту та 60% картинці */
-  grid-template-columns: 9fr 11fr;
-  gap: 4rem;
-  align-items: center;
-
-  width: 100%;
-  max-width: 1444px;
-  margin: 0 auto;
-
-  @media (max-width: 991px) {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-}
-
-/* --- Content (Ліва частина) --- */
-.hero__content {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
-  animation: fadeUp 0.8s ease-out forwards;
-  // align-self: flex-start;
+  align-items: center;
+  width: 100%;
+  max-width: 1444px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-.hero__heading {
-  /* === ЗМЕНШЕНО ШРИФТ ВСЬОГО ЗАГОЛОВКА === */
-  font-size: clamp(2rem, 4vw, 3.25rem); /* Було: clamp(2.5rem, 5vw, 4.25rem) */
-  line-height: 1.15;
+/* --- ВЕРХНЯ ЧАСТИНА: Контейнер текстів --- */
+.hero__textContent {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+
+  /* ВИПРАВЛЕННЯ: CSS Grid дозволяє елементам накладатися, зберігаючи висоту батька */
+  display: grid;
+  align-items: center;
+  justify-items: center;
+
+  margin: clamp(2rem, 6vh, 4rem) auto 1.5rem;
+  z-index: 10;
+}
+
+.hero__textInitial {
+  grid-area: 1 / 1; /* Накладаємо в першу клітинку грід-сітки */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  will-change: transform, opacity;
+  z-index: 2;
+}
+
+.hero__textSecond {
+  grid-area: 1 / 1; /* Накладаємо в ту ж саму клітинку */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 1;
+}
+
+.hero__heading,
+.hero__headingAlt {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.1;
   font-weight: 700;
   letter-spacing: -0.02em;
-
   background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 80%, #818cf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-
-  max-width: 22ch; /* Трохи розширив контейнер, бо букви стали меншими */
-  filter: drop-shadow(0 4px 20px rgba(165, 180, 252, 0.15));
+  max-width: 22ch;
+  margin: 0;
 }
 
-/* Клас просто для перенесення тексту на новий рядок */
-.newLineText {
-  display: block;
-  margin-top: 0.1em;
-}
-
-.hero__sub {
-  font-size: 1.15rem;
-  line-height: 1.7;
+.hero__sub,
+.hero__subAlt {
+  font-size: clamp(0.95rem, 1.2vw, 1.125rem);
+  line-height: 1.5;
   color: #94a3b8;
-  max-width: 45ch;
+  max-width: 650px;
   font-weight: 400;
+  margin: 0;
 }
-
-/* === СТИЛІ ДЛЯ ЛОГОТИПІВ ВСЕРЕДИНІ ТЕКСТУ === */
-.inlineLogos {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25em;
-  vertical-align: baseline;
-  transform: translateY(
-    0.1em
-  ); /* Коригування по вертикалі для рівності з текстом */
-  margin: 0 0.1em;
-}
-
-.inlineLogo {
-  height: 1.1em; /* Завдяки em картинки підлаштовуються під розмір шрифту */
-  width: auto;
-  object-fit: contain;
-  display: inline-block;
-}
-
-.logoSeparator {
-  font-weight: 300;
-  font-size: 60px;
-  color: #94a3b8;
-  /* Обов'язково скидаємо градієнт батьківського заголовка для слеша */
-  -webkit-text-fill-color: #94a3b8;
-  background: none;
-}
-/* ========================================= */
 
 .hero__ctas {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+  width: 100%;
+}
 
-  a {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    padding: 0.875rem 2rem;
-    border-radius: 100px;
-    font-weight: 500;
-    text-decoration: none;
+.btnYellowGlass {
+  background: rgba(250, 204, 21, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  color: #1e1b4b;
+  box-shadow: 0 4px 30px rgba(250, 204, 21, 0.25);
+  padding: 0.875rem 2.25rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  pointer-events: auto;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(165, 180, 252, 0.6);
-      box-shadow: 0 0 20px rgba(165, 180, 252, 0.2);
-      transform: translateY(-2px);
-    }
-  }
-
-  @media (max-width: 575px) {
-    flex-direction: column;
-    width: 100%;
-
-    a {
-      width: 100%;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-    }
+  &:hover {
+    background: rgba(250, 204, 21, 1);
+    box-shadow: 0 0 25px rgba(250, 204, 21, 0.5);
+    transform: translateY(-2px);
   }
 }
 
-/* --- Зображення PNG (Права частина) --- */
-/* --- Зображення PNG (Права частина) --- */
-.hero__visualContainer {
-  position: relative;
+.hero__logos {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  animation: imageFadeIn 1s ease-out 0.2s forwards;
-  opacity: 0;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
 
-  @media (min-width: 992px) {
-    width: 100%;
-    transform: none;
+  img {
+    opacity: 0.5;
+    filter: grayscale(100%);
+    transition: opacity 0.3s;
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
 
-.hero__image {
-  height: auto;
-  display: block;
-  object-fit: contain;
-  object-position: left center;
+/* --- НИЖНЯ ЧАСТИНА: Пристрої --- */
+.hero__visual {
+  position: relative;
   width: 100%;
+  max-width: 1100px;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 2vh;
+}
 
-  /* Стан для мобільних та екранів до 1400px (картинка виходить за межі) */
-  max-width: none;
+.device {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+  max-height: 48vh;
+  will-change: transform, opacity;
 
-  @media (min-width: 992px) and (max-width: 1399.98px) {
-    /* На середніх екранах і до 1400px залишаємо bleed-ефект */
-    width: max(100%, 850px);
-  }
-
-  /* Проміжний стан (1400px - 1443px) плавно підлаштовує розмір під контейнер */
-  @media (min-width: 1400px) and (max-width: 1443.98px) {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  /* Стан для екранів 1444px і більше (картинка строго в межах контейнера) */
-  @media (min-width: 1444px) {
-    width: 100%;
-    max-width: 100%; /* Жорстке обмеження, щоб не виходити за межі екрана */
+  img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: bottom;
   }
 }
 
-/* --- Анімації --- */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+.device__imac {
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.device__laptopLeft {
+  height: 70%; /* Зробив ноутбуки трохи меншими відносно iMac */
+  z-index: 3;
+  left: 0%; /* ВИПРАВЛЕНО: Відсунуто максимально до лівого краю */
+  opacity: 0;
+  transform: translateX(-150px);
+}
+
+.device__laptopRight {
+  height: 70%;
+  z-index: 3;
+  right: 0%; /* ВИПРАВЛЕНО: Відсунуто максимально до правого краю */
+  opacity: 0;
+  transform: translateX(150px);
+}
+
+@media (max-width: 991px) {
+  .device__laptopLeft {
+    left: 0%;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .device__laptopRight {
+    right: 0%;
   }
 }
 
-@keyframes imageFadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(60px);
+@media (max-width: 768px) {
+  .device__laptopLeft,
+  .device__laptopRight {
+    display: none;
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+  .device__imac {
+    max-height: 35vh;
   }
 }

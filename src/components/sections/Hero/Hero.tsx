@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect } from "react";
 import Image from "next/image";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { HERO } from "@/lib/constants";
 import styles from "./Hero.module.scss";
+
+gsap.registerPlugin(ScrollTrigger);
 
 function DataFlowBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,7 +21,6 @@ function DataFlowBackground() {
     let animationFrameId: number;
     let files: FileParticle[] = [];
 
-    // === 1. ЗАВАНТАЖЕННЯ ТВОЇХ ІКОНОК ===
     const iconPaths = [
       "/icons/backup-icon.png",
       "/icons/finance-report-icon.png",
@@ -33,15 +36,14 @@ function DataFlowBackground() {
       loadedImages.push(img);
     });
 
-    // === НАЛАШТУВАННЯ ПОТОКУ ===
-    const numFiles = 100; // Оптимальна кількість для картинок, щоб не було "каші"
-    const speed = 6; // Плавна швидкість
+    const numFiles = 60;
+    const speed = 6;
 
     class FileParticle {
       x: number = 0;
       y: number = 0;
       z: number = 0;
-      imgIndex: number = 0; // Індекс вибраної картинки
+      imgIndex: number = 0;
 
       constructor(w: number, h: number) {
         this.reset(w, h);
@@ -52,7 +54,6 @@ function DataFlowBackground() {
         this.x = (Math.random() - 0.5) * w * 1.5;
         this.y = (Math.random() - 0.5) * h * 1.5;
         this.z = w;
-        // Випадково вибираємо одну з 5 завантажених картинок
         this.imgIndex = Math.floor(Math.random() * loadedImages.length);
       }
 
@@ -71,17 +72,14 @@ function DataFlowBackground() {
         const px = (this.x / this.z) * fov + cx;
         const py = (this.y / this.z) * fov + cy;
 
-        // Плавно з'являються вдалині
         let opacity = 1;
         if (this.z > w * 0.7) {
           opacity = 1 - (this.z - w * 0.7) / (w * 0.3);
         }
         opacity = Math.max(0.05, opacity);
 
-        // Масштаб картинки залежно від наближення
         const scale = (fov / this.z) * 0.8;
 
-        // 1. МАЛЮЄМО "ХВІСТ" ВІД ШВИДКОСТІ
         const tailZ = this.z + 100;
         const tailPx = (this.x / tailZ) * fov + cx;
         const tailPy = (this.y / tailZ) * fov + cy;
@@ -96,23 +94,14 @@ function DataFlowBackground() {
         ctx.lineWidth = scale * 1.5;
         ctx.stroke();
 
-        // 2. МАЛЮЄМО САМУ PNG ІКОНКУ
         const img = loadedImages[this.imgIndex];
 
-        // Перевіряємо, чи картинка вже встигла завантажитися браузером
         if (img && img.complete && img.naturalWidth > 0) {
           ctx.save();
           ctx.translate(px, py);
-
-          // Задаємо прозорість для картинки
           ctx.globalAlpha = opacity;
-
-          // Базовий розмір іконки (наприклад, 40x40 пікселів), який множиться на масштаб
           const size = 20 * scale;
-
-          // Малюємо картинку по центру координат
           ctx.drawImage(img, -size / 2, -size / 2, size, size);
-
           ctx.restore();
         }
       }
@@ -133,12 +122,10 @@ function DataFlowBackground() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       files.forEach((file) => {
         file.update(speed, canvas.width, canvas.height);
         file.draw(ctx, canvas.width, canvas.height);
       });
-
       animationFrameId = requestAnimationFrame(animate);
     };
 
@@ -157,72 +144,53 @@ function DataFlowBackground() {
   );
 }
 
-const replaceTextWithLogos = (text: string) => {
-  const parts = text.split(/(BAS\/1[СCсc]|1[СCсc]\/BAS)/i);
-
-  return parts.map((part, i) => {
-    if (part.match(/BAS\/1[СCсc]|1[СCсc]\/BAS/i)) {
-      return (
-        <span key={i} className={styles.inlineLogos}>
-          <Image
-            src="/main/1s-logo.svg"
-            alt="1C"
-            width={50}
-            height={40}
-            className={styles.inlineLogo}
-            style={{ width: "auto", height: "50px" }}
-            priority
-          />
-          <span className={styles.logoSeparator}>/</span>
-
-          <Image
-            src="/main/BAS-logo.png"
-            alt="BAS"
-            width={90}
-            height={40}
-            className={styles.inlineLogo}
-            style={{ width: "auto", height: "40px" }}
-            priority
-          />
-          <span className={styles.logoSeparator}>/</span>
-          <Image
-            src="/main/KBS-logo.png"
-            alt="KBS"
-            width={90}
-            height={40}
-            className={styles.inlineLogo}
-            style={{ width: "auto", height: "40px" }}
-            priority
-          />
-          <span className={styles.logoSeparator}>/</span>
-          <Image
-            src="/main/MEDOC-logo.png"
-            alt="MEDOC"
-            width={90}
-            height={40}
-            className={styles.inlineLogo}
-            style={{ width: "auto", height: "45px" }}
-            priority
-          />
-        </span>
-      );
-    }
-    // Якщо це текст ПІСЛЯ логотипів, просто переносимо його на новий рядок
-    else if (i > 1 && part.trim().length > 0) {
-      return (
-        <span key={i} className={styles.newLineText}>
-          {part.trim()}
-        </span>
-      );
-    } else {
-      return part;
-    }
-  });
-};
-
 export function Hero() {
+  const containerRef = useRef<HTMLElement>(null);
+  const laptopLeftRef = useRef<HTMLDivElement>(null);
+  const laptopRightRef = useRef<HTMLDivElement>(null);
+  const textInitialRef = useRef<HTMLDivElement>(null);
+  const textSecondRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "+=1200",
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+        },
+      });
+
+      tl.to(
+        textInitialRef.current,
+        { opacity: 0, y: -30, duration: 1, ease: "power2.inOut" },
+        0,
+      )
+        .to(
+          textSecondRef.current,
+          { opacity: 1, y: 0, duration: 1, ease: "power2.inOut" },
+          0,
+        )
+        .to(
+          laptopLeftRef.current,
+          { x: 0, opacity: 1, duration: 1, ease: "power2.out" },
+          0.2,
+        )
+        .to(
+          laptopRightRef.current,
+          { x: 0, opacity: 1, duration: 1, ease: "power2.out" },
+          0.2,
+        );
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} ref={containerRef}>
       <div className={styles.hero__glow} aria-hidden="true">
         <div className={styles.hero__glowGreen} />
         <div className={styles.hero__glowBlue} />
@@ -231,33 +199,91 @@ export function Hero() {
 
       <DataFlowBackground />
 
-      <div className={`container ${styles.hero__inner}`}>
-        <div className={styles.hero__content}>
-          <h1 className={styles.hero__heading}>
-            {replaceTextWithLogos(HERO.heading)}
-          </h1>
+      <div className={styles.hero__inner}>
+        {/* === КОНТЕЙНЕР ТЕКСТУ === */}
+        <div className={styles.hero__textContent}>
+          <div className={styles.hero__textInitial} ref={textInitialRef}>
+            {/* Бейдж видалено */}
+            <h1 className={styles.hero__heading}>{HERO.heading}</h1>
+            <p className={styles.hero__sub}>{HERO.subheading}</p>
 
-          <p className={styles.hero__sub}>{HERO.subheading}</p>
+            <div className={styles.hero__ctas}>
+              <button className={styles.btnYellowGlass}>
+                {HERO.ctas.primary.label}
+              </button>
+            </div>
 
-          <div className={styles.hero__ctas}>
-            <a
-              href={HERO.ctas.secondary.href}
-              className="btn btn--outline btn--lg"
-            >
-              {HERO.ctas.secondary.label}
-            </a>
+            <div className={styles.hero__logos}>
+              <Image src="/main/1s-logo.svg" alt="1C" width={24} height={24} />
+              <Image
+                src="/main/BAS-logo.png"
+                alt="BAS"
+                width={45}
+                height={20}
+              />
+              <Image
+                src="/main/KBS-logo.png"
+                alt="KBS"
+                width={45}
+                height={20}
+              />
+              <Image
+                src="/main/MEDOC-logo.png"
+                alt="MEDOC"
+                width={50}
+                height={25}
+              />
+            </div>
+          </div>
+
+          <div className={styles.hero__textSecond} ref={textSecondRef}>
+            <h2 className={styles.hero__headingAlt}>
+              Один сервер — доступ для всіх
+            </h2>
+            <p className={styles.hero__subAlt}>
+              Працюйте з будь-якого пристрою, з дому чи офісу, без затримок. Ми
+              об'єднуємо ваші пристрої у єдину захищену мережу.
+            </p>
           </div>
         </div>
 
-        <div className={styles.hero__visualContainer}>
-          <Image
-            src="/main/PC-REMOTE-img.png"
-            alt="PC Interface"
-            width={1200}
-            height={800}
-            className={styles.hero__image}
-            priority
-          />
+        {/* === КОНТЕЙНЕР ПРИСТРОЇВ === */}
+        <div className={styles.hero__visual}>
+          <div
+            className={`${styles.device} ${styles.device__laptopLeft}`}
+            ref={laptopLeftRef}
+          >
+            <Image
+              src="/main/MacBook%20Air%20img.png"
+              alt="MacBook Air"
+              width={800}
+              height={500}
+              priority
+            />
+          </div>
+
+          <div className={`${styles.device} ${styles.device__imac}`}>
+            <Image
+              src="/main/iMac%20img.png"
+              alt="iMac"
+              width={1000}
+              height={750}
+              priority
+            />
+          </div>
+
+          <div
+            className={`${styles.device} ${styles.device__laptopRight}`}
+            ref={laptopRightRef}
+          >
+            <Image
+              src="/main/MacBook%20Pro%20img.png"
+              alt="MacBook Pro"
+              width={800}
+              height={500}
+              priority
+            />
+          </div>
         </div>
       </div>
     </section>

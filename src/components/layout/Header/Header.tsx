@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-// LOGO та logo імпортуються як у вас
-import logo from "../../ui/icons/Logo/logo-img.png";
+import logo from "../../ui/icons/Logo/logo.svg";
 import styles from "./Header.module.scss";
 
 interface INavItem {
@@ -34,7 +33,7 @@ export const Header = () => {
   }, []);
 
   const headerContent = (
-    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
+    <header className={styles.header}>
       {/* Видалено: &__top_shadow - вона більше не потрібна */}
 
       <div className={styles.header__container}>
