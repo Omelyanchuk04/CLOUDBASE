@@ -10,6 +10,7 @@ import styles from "./Hero.module.scss";
 gsap.registerPlugin(ScrollTrigger);
 
 function DataFlowBackground() {
+  // ... (весь код DataFlowBackground залишається без змін)
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ function DataFlowBackground() {
       loadedImages.push(img);
     });
 
-    const numFiles = 60;
+    const numFiles = 100;
     const speed = 6;
 
     class FileParticle {
@@ -146,6 +147,7 @@ function DataFlowBackground() {
 
 export function Hero() {
   const containerRef = useRef<HTMLElement>(null);
+  const imacRef = useRef<HTMLDivElement>(null); // Додано реф для iMac
   const laptopLeftRef = useRef<HTMLDivElement>(null);
   const laptopRightRef = useRef<HTMLDivElement>(null);
   const textInitialRef = useRef<HTMLDivElement>(null);
@@ -174,14 +176,17 @@ export function Hero() {
           { opacity: 1, y: 0, duration: 1, ease: "power2.inOut" },
           0,
         )
+        // Нове: iMac плавно зменшується до нормального розміру (scale: 1)
+        .to(imacRef.current, { scale: 1, duration: 1, ease: "power2.out" }, 0.2)
+        // Ноутбуки виїжджають і збільшуються
         .to(
           laptopLeftRef.current,
-          { x: 0, opacity: 1, duration: 1, ease: "power2.out" },
+          { x: 0, opacity: 1, scale: 1, duration: 1, ease: "power2.out" },
           0.2,
         )
         .to(
           laptopRightRef.current,
-          { x: 0, opacity: 1, duration: 1, ease: "power2.out" },
+          { x: 0, opacity: 1, scale: 1, duration: 1, ease: "power2.out" },
           0.2,
         );
     }, containerRef);
@@ -203,7 +208,6 @@ export function Hero() {
         {/* === КОНТЕЙНЕР ТЕКСТУ === */}
         <div className={styles.hero__textContent}>
           <div className={styles.hero__textInitial} ref={textInitialRef}>
-            {/* Бейдж видалено */}
             <h1 className={styles.hero__heading}>{HERO.heading}</h1>
             <p className={styles.hero__sub}>{HERO.subheading}</p>
 
@@ -262,7 +266,11 @@ export function Hero() {
             />
           </div>
 
-          <div className={`${styles.device} ${styles.device__imac}`}>
+          {/* Додано ref для iMac */}
+          <div
+            className={`${styles.device} ${styles.device__imac}`}
+            ref={imacRef}
+          >
             <Image
               src="/main/iMac%20img.png"
               alt="iMac"

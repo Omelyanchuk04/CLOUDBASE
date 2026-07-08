@@ -26,29 +26,29 @@
 .hero__glowGreen {
   position: absolute;
   top: -10%;
-  right: 0%;
-  width: 50vw;
-  height: 50vw;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
   background: radial-gradient(
     circle,
     rgba(34, 197, 94, 0.35) 0%,
     transparent 65%
   );
-  filter: blur(60px);
+  filter: blur(80px);
 }
 
 .hero__glowBlue {
   position: absolute;
   bottom: -10%;
-  left: -5%;
-  width: 60vw;
-  height: 60vw;
+  left: -10%;
+  width: 70vw;
+  height: 70vw;
   background: radial-gradient(
     circle,
     rgba(14, 165, 233, 0.35) 0%,
     transparent 60%
   );
-  filter: blur(80px);
+  filter: blur(90px);
 }
 
 .hero__glowPurple {
@@ -89,13 +89,11 @@
   padding: 0 1rem;
 }
 
-/* --- ВЕРХНЯ ЧАСТИНА: Контейнер текстів --- */
 .hero__textContent {
   position: relative;
   width: 100%;
   max-width: 900px;
 
-  /* ВИПРАВЛЕННЯ: CSS Grid дозволяє елементам накладатися, зберігаючи висоту батька */
   display: grid;
   align-items: center;
   justify-items: center;
@@ -105,7 +103,7 @@
 }
 
 .hero__textInitial {
-  grid-area: 1 / 1; /* Накладаємо в першу клітинку грід-сітки */
+  grid-area: 1 / 1;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -117,7 +115,7 @@
 }
 
 .hero__textSecond {
-  grid-area: 1 / 1; /* Накладаємо в ту ж саму клітинку */
+  grid-area: 1 / 1;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -141,7 +139,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  max-width: 22ch;
+  max-width: 26ch;
   margin: 0;
 }
 
@@ -201,7 +199,6 @@
   }
 }
 
-/* --- НИЖНЯ ЧАСТИНА: Пристрої --- */
 .hero__visual {
   position: relative;
   width: 100%;
@@ -211,7 +208,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding-bottom: 2vh;
+  padding-bottom: 0;
 }
 
 .device {
@@ -221,8 +218,8 @@
   justify-content: center;
   align-items: flex-end;
   height: 100%;
-  max-height: 48vh;
-  will-change: transform, opacity;
+  max-height: 55vh;
+  will-change: transform, opacity, scale;
 
   img {
     height: 100%;
@@ -232,26 +229,35 @@
   }
 }
 
+/* ОНОВЛЕНИЙ КЛАС ДЛЯ iMac */
 .device__imac {
+  width: 65%;
   z-index: 2;
   left: 50%;
-  transform: translateX(-50%);
+  /* Збільшений на 15% на початку (до скролу) */
+  transform: translateX(-50%) scale(1.15);
+  /* Дуже важливо: збільшується від низу, щоб не відриватися від підлоги */
+  transform-origin: bottom center;
 }
 
 .device__laptopLeft {
-  height: 70%; /* Зробив ноутбуки трохи меншими відносно iMac */
+  height: 70%;
   z-index: 3;
-  left: 0%; /* ВИПРАВЛЕНО: Відсунуто максимально до лівого краю */
-  opacity: 0;
-  transform: translateX(-150px);
+  left: 0%;
+  opacity: 0.7;
+  transform: translateX(-15vw) scale(0.85);
+  /* Також додаємо transform-origin для ноутбуків для стабільності */
+  transform-origin: bottom center;
 }
 
 .device__laptopRight {
   height: 70%;
   z-index: 3;
-  right: 0%; /* ВИПРАВЛЕНО: Відсунуто максимально до правого краю */
-  opacity: 0;
-  transform: translateX(150px);
+  right: 0%;
+  opacity: 0.7;
+  transform: translateX(15vw) scale(0.85);
+  /* Також додаємо transform-origin для ноутбуків для стабільності */
+  transform-origin: bottom center;
 }
 
 @media (max-width: 991px) {
