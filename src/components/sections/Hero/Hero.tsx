@@ -10,7 +10,6 @@ import styles from "./Hero.module.scss";
 gsap.registerPlugin(ScrollTrigger);
 
 function DataFlowBackground() {
-  // ... (весь код DataFlowBackground залишається без змін)
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -37,7 +36,7 @@ function DataFlowBackground() {
       loadedImages.push(img);
     });
 
-    const numFiles = 100;
+    const numFiles = 60;
     const speed = 6;
 
     class FileParticle {
@@ -147,7 +146,7 @@ function DataFlowBackground() {
 
 export function Hero() {
   const containerRef = useRef<HTMLElement>(null);
-  const imacRef = useRef<HTMLDivElement>(null); // Додано реф для iMac
+  const imacRef = useRef<HTMLDivElement>(null);
   const laptopLeftRef = useRef<HTMLDivElement>(null);
   const laptopRightRef = useRef<HTMLDivElement>(null);
   const textInitialRef = useRef<HTMLDivElement>(null);
@@ -159,7 +158,7 @@ export function Hero() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=1200",
+          end: "+=2500",
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -168,26 +167,51 @@ export function Hero() {
 
       tl.to(
         textInitialRef.current,
-        { opacity: 0, y: -30, duration: 1, ease: "power2.inOut" },
+        { opacity: 0, y: -40, duration: 1, ease: "power2.inOut" },
         0,
       )
         .to(
           textSecondRef.current,
-          { opacity: 1, y: 0, duration: 1, ease: "power2.inOut" },
-          0,
+          { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+          1,
         )
-        // Нове: iMac плавно зменшується до нормального розміру (scale: 1)
-        .to(imacRef.current, { scale: 1, duration: 1, ease: "power2.out" }, 0.2)
-        // Ноутбуки виїжджають і збільшуються
-        .to(
+        .fromTo(
+          imacRef.current,
+          { scale: 1.15, xPercent: -50 },
+          {
+            scale: 1,
+            xPercent: -50,
+            duration: 2,
+            ease: "power2.out",
+            force3D: true,
+          },
+          0.5,
+        )
+        .fromTo(
           laptopLeftRef.current,
-          { x: 0, opacity: 1, scale: 1, duration: 1, ease: "power2.out" },
-          0.2,
+          { xPercent: -80, opacity: 0, scale: 0.8 },
+          {
+            xPercent: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 2,
+            ease: "power2.out",
+            force3D: true,
+          },
+          0.5,
         )
-        .to(
+        .fromTo(
           laptopRightRef.current,
-          { x: 0, opacity: 1, scale: 1, duration: 1, ease: "power2.out" },
-          0.2,
+          { xPercent: 80, opacity: 0, scale: 0.8 },
+          {
+            xPercent: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 2,
+            ease: "power2.out",
+            force3D: true,
+          },
+          0.5,
         );
     }, containerRef);
 
@@ -216,28 +240,6 @@ export function Hero() {
                 {HERO.ctas.primary.label}
               </button>
             </div>
-
-            <div className={styles.hero__logos}>
-              <Image src="/main/1s-logo.svg" alt="1C" width={24} height={24} />
-              <Image
-                src="/main/BAS-logo.png"
-                alt="BAS"
-                width={45}
-                height={20}
-              />
-              <Image
-                src="/main/KBS-logo.png"
-                alt="KBS"
-                width={45}
-                height={20}
-              />
-              <Image
-                src="/main/MEDOC-logo.png"
-                alt="MEDOC"
-                width={50}
-                height={25}
-              />
-            </div>
           </div>
 
           <div className={styles.hero__textSecond} ref={textSecondRef}>
@@ -258,7 +260,7 @@ export function Hero() {
             ref={laptopLeftRef}
           >
             <Image
-              src="/main/MacBook%20Air%20img.png"
+              src="/main/MacBook%20Pro%20img.png"
               alt="MacBook Air"
               width={800}
               height={500}
@@ -266,13 +268,12 @@ export function Hero() {
             />
           </div>
 
-          {/* Додано ref для iMac */}
           <div
             className={`${styles.device} ${styles.device__imac}`}
             ref={imacRef}
           >
             <Image
-              src="/main/iMac%20img.png"
+              src="/main/PC-REMOTE-img1.png"
               alt="iMac"
               width={1000}
               height={750}

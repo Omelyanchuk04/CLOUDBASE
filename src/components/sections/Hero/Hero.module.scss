@@ -12,8 +12,6 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-
-  background: linear-gradient(135deg, #1a1b41 0%, #0d1024 50%, #070914 100%);
 }
 
 .hero__glow {
@@ -21,6 +19,15 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+.hero__glowGreen,
+.hero__glowBlue,
+.hero__glowPurple {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .hero__glowGreen {
@@ -93,27 +100,14 @@
   position: relative;
   width: 100%;
   max-width: 900px;
-
   display: grid;
   align-items: center;
   justify-items: center;
-
   margin: clamp(2rem, 6vh, 4rem) auto 1.5rem;
   z-index: 10;
 }
 
-.hero__textInitial {
-  grid-area: 1 / 1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.25rem;
-  will-change: transform, opacity;
-  z-index: 2;
-}
-
+.hero__textInitial,
 .hero__textSecond {
   grid-area: 1 / 1;
   width: 100%;
@@ -122,19 +116,29 @@
   align-items: center;
   text-align: center;
   gap: 1.25rem;
-  opacity: 0;
-  transform: translateY(30px);
-  pointer-events: none;
   will-change: transform, opacity;
+}
+
+.hero__textInitial {
+  z-index: 2;
+}
+
+.hero__textSecond {
+  opacity: 0;
+  transform: translateY(40px);
+  pointer-events: none;
   z-index: 1;
 }
 
 .hero__heading,
 .hero__headingAlt {
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  font-size: clamp(1.8rem, 3.8vw, 3.25rem);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 80%, #818cf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -145,10 +149,13 @@
 
 .hero__sub,
 .hero__subAlt {
-  font-size: clamp(0.95rem, 1.2vw, 1.125rem);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
   line-height: 1.5;
   color: #94a3b8;
-  max-width: 650px;
+  max-width: 600px;
   font-weight: 400;
   margin: 0;
 }
@@ -156,7 +163,7 @@
 .hero__ctas {
   display: flex;
   justify-content: center;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
   width: 100%;
 }
 
@@ -167,10 +174,10 @@
   border: 1px solid rgba(250, 204, 21, 0.5);
   color: #1e1b4b;
   box-shadow: 0 4px 30px rgba(250, 204, 21, 0.25);
-  padding: 0.875rem 2.25rem;
+  padding: 0.75rem 1.75rem;
   border-radius: 100px;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
   cursor: pointer;
   pointer-events: auto;
@@ -199,6 +206,7 @@
   }
 }
 
+/* --- НИЖНЯ ЧАСТИНА: Пристрої --- */
 .hero__visual {
   position: relative;
   width: 100%;
@@ -214,67 +222,71 @@
 .device {
   position: absolute;
   bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 100%;
-  max-height: 55vh;
-  will-change: transform, opacity, scale;
+  display: block;
+  will-change: transform, opacity;
 
   img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    object-position: bottom;
+    width: 100%;
+    height: auto;
+    display: block;
   }
 }
 
-/* ОНОВЛЕНИЙ КЛАС ДЛЯ iMac */
 .device__imac {
-  width: 65%;
-  z-index: 2;
+  width: 40%;
+  z-index: 2; /* iMac завжди позаду ноутбуків */
   left: 50%;
-  /* Збільшений на 15% на початку (до скролу) */
-  transform: translateX(-50%) scale(1.15);
-  /* Дуже важливо: збільшується від низу, щоб не відриватися від підлоги */
   transform-origin: bottom center;
+  transform: translateX(-50%);
 }
 
 .device__laptopLeft {
-  height: 70%;
-  z-index: 3;
-  left: 0%;
-  opacity: 0.7;
-  transform: translateX(-15vw) scale(0.85);
-  /* Також додаємо transform-origin для ноутбуків для стабільності */
+  width: 38%;
+  z-index: 3; /* Ноутбук спереду */
+  left: 2%;
   transform-origin: bottom center;
 }
 
 .device__laptopRight {
-  height: 70%;
-  z-index: 3;
-  right: 0%;
-  opacity: 0.7;
-  transform: translateX(15vw) scale(0.85);
-  /* Також додаємо transform-origin для ноутбуків для стабільності */
+  width: 38%;
+  z-index: 3; /* Ноутбук спереду */
+  right: 2%;
   transform-origin: bottom center;
 }
 
+/* --- РЕСПОНСИВНІСТЬ ДЛЯ ПЛАНШЕТІВ --- */
 @media (max-width: 991px) {
+  .device__imac {
+    width: 45%; /* Акуратно зменшено */
+  }
   .device__laptopLeft {
     left: 0%;
+    width: 40%;
   }
   .device__laptopRight {
     right: 0%;
+    width: 40%;
   }
 }
 
+/* --- РЕСПОНСИВНІСТЬ ДЛЯ МОБІЛЬНИХ (ВИПРАВЛЕНО) --- */
 @media (max-width: 768px) {
-  .device__laptopLeft,
-  .device__laptopRight {
-    display: none;
+  .hero__visual {
+    padding-bottom: 1rem;
   }
   .device__imac {
-    max-height: 35vh;
+    width: 55%; /* Зроблено меншим, щоб не здавався гігантським */
+    z-index: 2; /* Повернуто на задній план */
+  }
+  .device__laptopLeft,
+  .device__laptopRight {
+    width: 40%; /* Ноутбуки пропорційно підлаштовані */
+    z-index: 3; /* Гарантуємо, що вони спереду */
+  }
+  .device__laptopLeft {
+    left: -2%;
+  }
+  .device__laptopRight {
+    right: -2%;
   }
 }
