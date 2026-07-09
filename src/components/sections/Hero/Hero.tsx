@@ -114,7 +114,6 @@ function DataFlowBackground() {
 
     const initFiles = () => {
       files = [];
-      // ОПТИМІЗАЦІЯ ДЛЯ МОБІЛЬНИХ: Зменшуємо кількість частинок
       const isMobile = window.innerWidth < 768;
       const numFiles = isMobile ? 15 : 60;
 
@@ -148,6 +147,7 @@ function DataFlowBackground() {
 }
 
 export function Hero() {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLElement>(null);
   const imacRef = useRef<HTMLDivElement>(null);
   const laptopLeftRef = useRef<HTMLDivElement>(null);
@@ -159,11 +159,12 @@ export function Hero() {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: containerRef.current,
+          trigger:
+            wrapperRef.current /* ВИПРАВЛЕНО: Тригер — це зовнішня обгортка */,
+          pin: containerRef.current /* ВИПРАВЛЕНО: Пін — це внутрішня секція */,
           start: "top top",
-          end: "+=2500",
+          end: "+=3000",
           scrub: 1,
-          pin: true,
           anticipatePin: 1,
         },
       });
@@ -180,19 +181,25 @@ export function Hero() {
         )
         .fromTo(
           imacRef.current,
-          { scale: 1.15, xPercent: -50 },
+          { scale: 1.15, xPercent: -50, transformOrigin: "bottom center" },
           {
             scale: 1,
             xPercent: -50,
             duration: 2,
             ease: "power2.out",
             force3D: true,
+            transformOrigin: "bottom center",
           },
           0.5,
         )
         .fromTo(
           laptopLeftRef.current,
-          { xPercent: -80, opacity: 0, scale: 0.8 },
+          {
+            xPercent: -50,
+            opacity: 0,
+            scale: 0.8,
+            transformOrigin: "bottom center",
+          },
           {
             xPercent: 0,
             opacity: 1,
@@ -200,12 +207,18 @@ export function Hero() {
             duration: 2,
             ease: "power2.out",
             force3D: true,
+            transformOrigin: "bottom center",
           },
           0.5,
         )
         .fromTo(
           laptopRightRef.current,
-          { xPercent: 80, opacity: 0, scale: 0.8 },
+          {
+            xPercent: 50,
+            opacity: 0,
+            scale: 0.8,
+            transformOrigin: "bottom center",
+          },
           {
             xPercent: 0,
             opacity: 1,
@@ -213,91 +226,95 @@ export function Hero() {
             duration: 2,
             ease: "power2.out",
             force3D: true,
+            transformOrigin: "bottom center",
           },
           0.5,
         );
-    }, containerRef);
+    }, wrapperRef); // Context прив'язаний до обгортки
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section className={styles.hero} ref={containerRef}>
-      <div className={styles.hero__glow} aria-hidden="true">
-        <div className={styles.hero__glowGreen} />
-        <div className={styles.hero__glowBlue} />
-        <div className={styles.hero__glowPurple} />
-      </div>
+    /* Нова обгортка, яка "приймає удар" від'ємного відступу на себе */
+    <div className={styles.hero__wrapper} ref={wrapperRef}>
+      <section className={styles.hero} ref={containerRef}>
+        <div className={styles.hero__glow} aria-hidden="true">
+          <div className={styles.hero__glowGreen} />
+          <div className={styles.hero__glowBlue} />
+          <div className={styles.hero__glowPurple} />
+        </div>
 
-      <DataFlowBackground />
+        <DataFlowBackground />
 
-      <div className={styles.hero__inner}>
-        {/* === КОНТЕЙНЕР ТЕКСТУ === */}
-        <div className={styles.hero__textContent}>
-          <div className={styles.hero__textInitial} ref={textInitialRef}>
-            <h1 className={styles.hero__heading}>{HERO.heading}</h1>
-            <p className={styles.hero__sub}>{HERO.subheading}</p>
+        <div className={styles.hero__inner}>
+          {/* === КОНТЕЙНЕР ТЕКСТУ === */}
+          <div className={styles.hero__textContent}>
+            <div className={styles.hero__textInitial} ref={textInitialRef}>
+              <h1 className={styles.hero__heading}>{HERO.heading}</h1>
+              <p className={styles.hero__sub}>{HERO.subheading}</p>
 
-            <div className={styles.hero__ctas}>
-              <button className={styles.btnYellowGlass}>
-                {HERO.ctas.primary.label}
-              </button>
+              <div className={styles.hero__ctas}>
+                <button className={styles.btnYellowGlass}>
+                  {HERO.ctas.primary.label}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.hero__textSecond} ref={textSecondRef}>
+              <h2 className={styles.hero__headingAlt}>
+                Один сервер — доступ для всіх
+              </h2>
+              <p className={styles.hero__subAlt}>
+                Працюйте з будь-якого пристрою, з дому чи офісу, без затримок.
+                Ми об'єднуємо ваші пристрої у єдину захищену мережу.
+              </p>
             </div>
           </div>
 
-          <div className={styles.hero__textSecond} ref={textSecondRef}>
-            <h2 className={styles.hero__headingAlt}>
-              Один сервер — доступ для всіх
-            </h2>
-            <p className={styles.hero__subAlt}>
-              Працюйте з будь-якого пристрою, з дому чи офісу, без затримок. Ми
-              об'єднуємо ваші пристрої у єдину захищену мережу.
-            </p>
+          {/* === КОНТЕЙНЕР ПРИСТРОЇВ === */}
+          <div className={styles.hero__visual}>
+            <div
+              className={`${styles.device} ${styles.device__laptopLeft}`}
+              ref={laptopLeftRef}
+            >
+              <Image
+                src="/main/MacBook%20Pro%20img.png"
+                alt="MacBook Pro Left"
+                width={800}
+                height={500}
+                priority
+              />
+            </div>
+
+            <div
+              className={`${styles.device} ${styles.device__imac}`}
+              ref={imacRef}
+            >
+              <Image
+                src="/main/PC-REMOTE-img1.png"
+                alt="iMac Server"
+                width={1000}
+                height={750}
+                priority
+              />
+            </div>
+
+            <div
+              className={`${styles.device} ${styles.device__laptopRight}`}
+              ref={laptopRightRef}
+            >
+              <Image
+                src="/main/MacBook%20Pro%20img.png"
+                alt="MacBook Pro Right"
+                width={800}
+                height={500}
+                priority
+              />
+            </div>
           </div>
         </div>
-
-        {/* === КОНТЕЙНЕР ПРИСТРОЇВ === */}
-        <div className={styles.hero__visual}>
-          <div
-            className={`${styles.device} ${styles.device__laptopLeft}`}
-            ref={laptopLeftRef}
-          >
-            <Image
-              src="/main/MacBook%20Pro%20img.png"
-              alt="MacBook Air"
-              width={800}
-              height={500}
-              priority
-            />
-          </div>
-
-          <div
-            className={`${styles.device} ${styles.device__imac}`}
-            ref={imacRef}
-          >
-            <Image
-              src="/main/PC-REMOTE-img1.png"
-              alt="iMac"
-              width={1000}
-              height={750}
-              priority
-            />
-          </div>
-
-          <div
-            className={`${styles.device} ${styles.device__laptopRight}`}
-            ref={laptopRightRef}
-          >
-            <Image
-              src="/main/MacBook%20Pro%20img.png"
-              alt="MacBook Pro"
-              width={800}
-              height={500}
-              priority
-            />
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

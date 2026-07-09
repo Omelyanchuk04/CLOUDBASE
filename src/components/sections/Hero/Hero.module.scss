@@ -1,17 +1,26 @@
+/* НОВИЙ КЛАС ОБГОРТКИ: ізолює від'ємний марджин від GSAP */
+.hero__wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: -70px;
+  z-index: 1;
+}
+
 .hero {
   position: relative;
   width: 100%;
-  height: 100vh;
-  height: 100svh;
-  margin-top: -70px;
+  min-height: 100vh;
+  min-height: 100svh;
+
+  /* ВИПРАВЛЕНО: Жодних margin-top тут немає, тільки padding */
   padding-top: 70px;
   top: 0;
-  z-index: 1;
 
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  // background: linear-gradient(135deg, #1a1b41 0%, #0d1024 50%, #070914 100%);
 }
 
 .hero__glow {
@@ -73,14 +82,13 @@
   mix-blend-mode: screen;
 }
 
-/* ОПТИМІЗАЦІЯ ПЛЯМ ТА ВИДИМІСТЬ НА МОБІЛЬНИХ */
 @media (max-width: 768px) {
   .hero__glowGreen {
     top: 0%;
     right: -20%;
-    width: 150vw; /* Розтягуємо, щоб було видно на вузькому екрані */
+    width: 150vw;
     height: 150vw;
-    filter: blur(40px); /* Зменшуємо блюр для плавності скролу */
+    filter: blur(40px);
   }
   .hero__glowBlue {
     bottom: 10%;
@@ -95,7 +103,7 @@
     width: 120vw;
     height: 120vw;
     filter: blur(40px);
-    mix-blend-mode: normal; /* Знімаємо важкий режим накладання */
+    mix-blend-mode: normal;
   }
 }
 
@@ -115,21 +123,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
   max-width: 1444px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1rem 0;
+  gap: clamp(2rem, 5vh, 4rem);
 }
 
+/* --- ВЕРХНЯ ЧАСТИНА: Контейнер текстів --- */
 .hero__textContent {
+  flex: 0 0 auto;
   position: relative;
   width: 100%;
   max-width: 900px;
   display: grid;
-  align-items: center;
+  align-items: start;
   justify-items: center;
-  margin: clamp(2rem, 6vh, 4rem) auto 1.5rem;
+  min-height: 250px;
   z-index: 10;
 }
 
@@ -217,80 +229,77 @@
 
 /* --- НИЖНЯ ЧАСТИНА: Пристрої --- */
 .hero__visual {
+  flex: 0 0 auto;
   position: relative;
   width: 100%;
   max-width: 1100px;
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  padding-bottom: 0;
+  height: clamp(200px, 35vh, 450px);
+  display: block;
 }
 
 .device {
   position: absolute;
   bottom: 0;
-  display: block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: flex-end;
+  transform-origin: bottom center;
   will-change: transform, opacity;
+  height: 100%;
 
   img {
-    width: 100%;
-    height: auto;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: bottom center;
     display: block;
   }
 }
 
 .device__imac {
-  width: 40%;
-  z-index: 2; /* iMac завжди позаду ноутбуків */
+  height: 100%;
+  z-index: 2;
   left: 50%;
-  transform-origin: bottom center;
-  transform: translateX(-50%);
 }
 
 .device__laptopLeft {
-  width: 38%;
-  z-index: 3; /* Ноутбук спереду */
-  left: 2%;
-  transform-origin: bottom center;
+  height: 70%;
+  z-index: 3;
+  left: 5%;
 }
 
 .device__laptopRight {
-  width: 38%;
-  z-index: 3; /* Ноутбук спереду */
-  right: 2%;
-  transform-origin: bottom center;
+  height: 70%;
+  z-index: 3;
+  right: 5%;
 }
 
-/* --- РЕСПОНСИВНІСТЬ ДЛЯ ПЛАНШЕТІВ --- */
 @media (max-width: 991px) {
-  .device__imac {
-    width: 45%;
-  }
   .device__laptopLeft {
     left: 0%;
-    width: 40%;
+    height: 65%;
   }
   .device__laptopRight {
     right: 0%;
-    width: 40%;
+    height: 65%;
   }
 }
 
-/* --- РЕСПОНСИВНІСТЬ ДЛЯ МОБІЛЬНИХ (ВИПРАВЛЕНО Z-INDEX ТА РОЗМІРИ) --- */
 @media (max-width: 768px) {
+  .hero__inner {
+    padding-top: 50px;
+  }
   .hero__visual {
-    padding-bottom: 1rem;
+    height: clamp(150px, 25vh, 250px);
   }
   .device__imac {
-    width: 60%; /* Зменшений iMac */
-    z-index: 2; /* Залишається позаду */
+    height: 100%;
+    z-index: 2;
   }
   .device__laptopLeft,
   .device__laptopRight {
-    width: 45%;
-    z-index: 3; /* Ноутбуки гарантовано перекривають iMac */
+    height: 65%;
+    z-index: 3;
   }
   .device__laptopLeft {
     left: -5%;
