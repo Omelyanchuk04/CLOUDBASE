@@ -154,52 +154,40 @@ export function Hero() {
   const laptopRightRef = useRef<HTMLDivElement>(null);
   const textInitialRef = useRef<HTMLDivElement>(null);
   const textSecondRef = useRef<HTMLDivElement>(null);
+  const textThirdRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger:
-            wrapperRef.current /* ВИПРАВЛЕНО: Тригер — це зовнішня обгортка */,
-          pin: containerRef.current /* ВИПРАВЛЕНО: Пін — це внутрішня секція */,
+          trigger: wrapperRef.current,
+          pin: containerRef.current,
           start: "top top",
-          end: "+=3000",
+          end: "+=3500", // Дистанція скролу
           scrub: 1,
           anticipatePin: 1,
         },
       });
 
-      tl.to(
-        textInitialRef.current,
-        { opacity: 0, y: -40, duration: 1, ease: "power2.inOut" },
-        0,
-      )
-        .to(
-          textSecondRef.current,
-          { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
-          1,
-        )
+      tl.to(textInitialRef.current, { opacity: 0, y: -40, duration: 1 }, 0)
+        .to(textSecondRef.current, { opacity: 1, y: 0, duration: 1 }, 1)
+        .to(textSecondRef.current, { opacity: 0, y: -40, duration: 1 }, 2) // Другий зникає
+        .to(textThirdRef.current, { opacity: 1, y: 0, duration: 1 }, 3) // Третій з'являється
         .fromTo(
           imacRef.current,
-          { scale: 1.15, xPercent: -50, transformOrigin: "bottom center" },
+          { scale: 1.15, xPercent: -50 },
           {
             scale: 1,
             xPercent: -50,
             duration: 2,
             ease: "power2.out",
             force3D: true,
-            transformOrigin: "bottom center",
           },
           0.5,
         )
         .fromTo(
           laptopLeftRef.current,
-          {
-            xPercent: -50,
-            opacity: 0,
-            scale: 0.8,
-            transformOrigin: "bottom center",
-          },
+          { xPercent: -50, opacity: 0, scale: 0.8 },
           {
             xPercent: 0,
             opacity: 1,
@@ -207,18 +195,12 @@ export function Hero() {
             duration: 2,
             ease: "power2.out",
             force3D: true,
-            transformOrigin: "bottom center",
           },
           0.5,
         )
         .fromTo(
           laptopRightRef.current,
-          {
-            xPercent: 50,
-            opacity: 0,
-            scale: 0.8,
-            transformOrigin: "bottom center",
-          },
+          { xPercent: 50, opacity: 0, scale: 0.8 },
           {
             xPercent: 0,
             opacity: 1,
@@ -226,19 +208,18 @@ export function Hero() {
             duration: 2,
             ease: "power2.out",
             force3D: true,
-            transformOrigin: "bottom center",
           },
           0.5,
         );
-    }, wrapperRef); // Context прив'язаний до обгортки
+    }, wrapperRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    /* Нова обгортка, яка "приймає удар" від'ємного відступу на себе */
     <div className={styles.hero__wrapper} ref={wrapperRef}>
       <section className={styles.hero} ref={containerRef}>
+        {/* Підсвітка на задньому фоні */}
         <div className={styles.hero__glow} aria-hidden="true">
           <div className={styles.hero__glowGreen} />
           <div className={styles.hero__glowBlue} />
@@ -250,6 +231,7 @@ export function Hero() {
         <div className={styles.hero__inner}>
           {/* === КОНТЕЙНЕР ТЕКСТУ === */}
           <div className={styles.hero__textContent}>
+            {/* 1 ЧЕРГА */}
             <div className={styles.hero__textInitial} ref={textInitialRef}>
               <h1 className={styles.hero__heading}>{HERO.heading}</h1>
               <p className={styles.hero__sub}>{HERO.subheading}</p>
@@ -261,14 +243,50 @@ export function Hero() {
               </div>
             </div>
 
+            {/* 2 ЧЕРГА */}
             <div className={styles.hero__textSecond} ref={textSecondRef}>
               <h2 className={styles.hero__headingAlt}>
                 Один сервер — доступ для всіх
               </h2>
               <p className={styles.hero__subAlt}>
                 Працюйте з будь-якого пристрою, з дому чи офісу, без затримок.
-                Ми об'єднуємо ваші пристрої у єдину захищену мережу.
               </p>
+            </div>
+
+            {/* 3 ЧЕРГА */}
+            <div className={styles.hero__textThird} ref={textThirdRef}>
+              <h2 className={styles.hero__headingAlt}>
+                Встановимо будь-яке ПЗ
+              </h2>
+              <p className={styles.hero__subAlt}>
+                Налаштуємо роботу вашої бухгалтерії та спеціалізованих програм.
+              </p>
+              <div className={styles.hero__logos}>
+                <Image
+                  src="/main/1s-logo.svg"
+                  alt="1C"
+                  width={30}
+                  height={30}
+                />
+                <Image
+                  src="/main/BAS-logo.png"
+                  alt="BAS"
+                  width={55}
+                  height={25}
+                />
+                <Image
+                  src="/main/KBS-logo.png"
+                  alt="KBS"
+                  width={55}
+                  height={25}
+                />
+                <Image
+                  src="/main/MEDOC-logo.png"
+                  alt="MEDOC"
+                  width={60}
+                  height={30}
+                />
+              </div>
             </div>
           </div>
 
@@ -280,7 +298,7 @@ export function Hero() {
             >
               <Image
                 src="/main/MacBook%20Pro%20img.png"
-                alt="MacBook Pro Left"
+                alt="Left"
                 width={800}
                 height={500}
                 priority
@@ -293,7 +311,7 @@ export function Hero() {
             >
               <Image
                 src="/main/PC-REMOTE-img1.png"
-                alt="iMac Server"
+                alt="Center"
                 width={1000}
                 height={750}
                 priority
@@ -306,7 +324,7 @@ export function Hero() {
             >
               <Image
                 src="/main/MacBook%20Pro%20img.png"
-                alt="MacBook Pro Right"
+                alt="Right"
                 width={800}
                 height={500}
                 priority

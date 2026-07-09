@@ -1,4 +1,3 @@
-/* НОВИЙ КЛАС ОБГОРТКИ: ізолює від'ємний марджин від GSAP */
 .hero__wrapper {
   position: relative;
   width: 100%;
@@ -11,16 +10,12 @@
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
-
-  /* ВИПРАВЛЕНО: Жодних margin-top тут немає, тільки padding */
   padding-top: 70px;
   top: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  // background: linear-gradient(135deg, #1a1b41 0%, #0d1024 50%, #070914 100%);
 }
 
 .hero__glow {
@@ -146,7 +141,8 @@
 }
 
 .hero__textInitial,
-.hero__textSecond {
+.hero__textSecond,
+.hero__textThird {
   grid-area: 1 / 1;
   width: 100%;
   display: flex;
@@ -161,7 +157,8 @@
   z-index: 2;
 }
 
-.hero__textSecond {
+.hero__textSecond,
+.hero__textThird {
   opacity: 0;
   transform: translateY(40px);
   pointer-events: none;
@@ -212,10 +209,10 @@
   border: 1px solid rgba(250, 204, 21, 0.5);
   color: #1e1b4b;
   box-shadow: 0 4px 30px rgba(250, 204, 21, 0.25);
-  padding: 0.75rem 1.75rem;
-  border-radius: 100px;
-  font-weight: 600;
-  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-weight: 500;
+  font-size: 14px;
   transition: all 0.3s ease;
   cursor: pointer;
   pointer-events: auto;
@@ -224,6 +221,22 @@
     background: rgba(250, 204, 21, 1);
     box-shadow: 0 0 25px rgba(250, 204, 21, 0.5);
     transform: translateY(-2px);
+  }
+}
+
+/* --- СТИЛІ ДЛЯ ЛОГОТИПІВ ПРОГРАМ --- */
+.hero__logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+
+  img {
+    object-fit: contain;
+    /* Фільтр, щоб логотипи виглядали органічніше на темному тлі, якщо потрібно: */
+    /* filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); */
   }
 }
 
@@ -306,5 +319,8 @@
   }
   .device__laptopRight {
     right: -5%;
+  }
+  .hero__logos {
+    gap: 1rem;
   }
 }
