@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import logo from "../../ui/icons/Logo/logo.svg";
+import logo from "../../ui/icons/Logo/logo-single.png";
 import styles from "./Header.module.scss";
 
 interface INavItem {

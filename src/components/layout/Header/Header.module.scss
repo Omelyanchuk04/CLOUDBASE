@@ -11,7 +11,7 @@
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
 
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -29,7 +29,7 @@
 
   z-index: 9999;
   padding: 6px 0;
-  border-radius: 18px;
+  border-radius: 14px;
   transition: all 0.4s ease;
   pointer-events: auto;
 
@@ -55,7 +55,7 @@
   &__logo {
     display: flex;
     align-items: center;
-    height: 25px;
+    height: 40px;
     color: #ffffff;
     transition: color 0.3s ease;
     text-decoration: none;
@@ -113,7 +113,7 @@
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
-    border-radius: 12px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow:
       0 6px 20px rgba(76, 138, 255, 0.3),

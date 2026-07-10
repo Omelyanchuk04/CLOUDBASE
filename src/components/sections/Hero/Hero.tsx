@@ -171,8 +171,8 @@ export function Hero() {
 
       tl.to(textInitialRef.current, { opacity: 0, y: -40, duration: 1 }, 0)
         .to(textSecondRef.current, { opacity: 1, y: 0, duration: 1 }, 1)
-        .to(textSecondRef.current, { opacity: 0, y: -40, duration: 1 }, 2) // Другий зникає
-        .to(textThirdRef.current, { opacity: 1, y: 0, duration: 1 }, 3) // Третій з'являється
+        .to(textSecondRef.current, { opacity: 0, y: -40, duration: 1 }, 2)
+        .to(textThirdRef.current, { opacity: 1, y: 0, duration: 1 }, 3)
         .fromTo(
           imacRef.current,
           { scale: 1.15, xPercent: -50 },
@@ -224,6 +224,11 @@ export function Hero() {
           <div className={styles.hero__glowGreen} />
           <div className={styles.hero__glowBlue} />
           <div className={styles.hero__glowPurple} />
+
+          {/* Контейнер пучка світла для м'яких країв */}
+          <div className={styles.hero__lightBeamContainer}>
+            <div className={styles.hero__lightBeam} />
+          </div>
         </div>
 
         <DataFlowBackground />
