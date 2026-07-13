@@ -238,12 +238,12 @@ export function Hero() {
           <div className={styles.hero__textContent}>
             {/* 1 ЧЕРГА */}
             <div className={styles.hero__textInitial} ref={textInitialRef}>
-              <h1 className={styles.hero__heading}>{HERO.heading}</h1>
-              <p className={styles.hero__sub}>{HERO.subheading}</p>
+              <h1 className={styles.hero__heading}>{HERO.step1.heading}</h1>
+              <p className={styles.hero__sub}>{HERO.step1.subheading}</p>
 
               <div className={styles.hero__ctas}>
                 <button className={styles.btnYellowGlass}>
-                  {HERO.ctas.primary.label}
+                  {HERO.step1.cta}
                 </button>
               </div>
             </div>
@@ -251,21 +251,16 @@ export function Hero() {
             {/* 2 ЧЕРГА */}
             <div className={styles.hero__textSecond} ref={textSecondRef}>
               <h2 className={styles.hero__headingAlt}>
-                Один сервер — доступ для всіх
+                <p>{HERO.step2.headingLine1}</p>
+                <p>{HERO.step2.headingLine2}</p>
               </h2>
-              <p className={styles.hero__subAlt}>
-                Працюйте з будь-якого пристрою, з дому чи офісу, без затримок.
-              </p>
+              <p className={styles.hero__subAlt}>{HERO.step2.subheading}</p>
             </div>
 
             {/* 3 ЧЕРГА */}
             <div className={styles.hero__textThird} ref={textThirdRef}>
-              <h2 className={styles.hero__headingAlt}>
-                Встановимо будь-яке ПЗ
-              </h2>
-              <p className={styles.hero__subAlt}>
-                Налаштуємо роботу вашої бухгалтерії та спеціалізованих програм.
-              </p>
+              <h2 className={styles.hero__headingAlt}>{HERO.step3.heading}</h2>
+              <p className={styles.hero__subAlt}>{HERO.step3.subheading}</p>
               <div className={styles.hero__logos}>
                 <Image
                   src="/main/1s-logo.svg"

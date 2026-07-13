@@ -221,7 +221,7 @@
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
-  font-size: clamp(1.8rem, 3.8vw, 3.25rem);
+  font-size: clamp(2rem, 3.8vw, 4rem);
   line-height: 1.15;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -261,7 +261,7 @@
   color: #1e1b4b;
   box-shadow: 0 4px 30px rgba(250, 204, 21, 0.25);
   padding: 8px 16px;
-  border-radius: 40px;
+  border-radius: 12px;
   font-weight: 500;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -271,7 +271,6 @@
   &:hover {
     background: rgba(250, 204, 21, 1);
     box-shadow: 0 0 25px rgba(250, 204, 21, 0.5);
-    transform: translateY(-2px);
   }
 }
 
