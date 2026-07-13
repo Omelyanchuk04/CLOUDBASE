@@ -76,12 +76,19 @@ export function ServerSection() {
         model.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
-            mesh.material.side = THREE.FrontSide;
 
-            if (mesh.material instanceof THREE.MeshStandardMaterial) {
-              mesh.material.metalness = 0.2;
-              mesh.material.roughness = 0.6;
-            }
+            const materials = Array.isArray(mesh.material)
+              ? mesh.material
+              : [mesh.material];
+
+            materials.forEach((material) => {
+              material.side = THREE.FrontSide;
+
+              if (material instanceof THREE.MeshStandardMaterial) {
+                material.metalness = 0.2;
+                material.roughness = 0.6;
+              }
+            });
 
             if (mesh.name.includes("Fan")) {
               fansFound.push(mesh);
