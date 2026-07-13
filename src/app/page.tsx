@@ -6,12 +6,15 @@ import { ParallaxSection } from "@/components/sections/ParallaxSection/ParallaxS
 import { MacbookSection } from "@/components/sections/MacbookSection/MacbookSection";
 import { HowWeWork } from "@/components/sections/HowWeWork/HowWeWork";
 import { Pricing } from "@/components/sections/Pricing/Pricing";
+import { ServerSection } from "@/components/sections/Server/ServerSection";
 
 export default function HomePage() {
   return (
     <>
       {/* 1. Хто ми і що робимо */}
       <Hero />
+
+      <ServerSection />
 
       {/* 5. MacBook-скрол — показуємо хмарну версію */}
       <MacbookSection />
