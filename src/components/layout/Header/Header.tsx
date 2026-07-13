@@ -34,8 +34,6 @@ export const Header = () => {
 
   const headerContent = (
     <header className={styles.header}>
-      {/* Видалено: &__top_shadow - вона більше не потрібна */}
-
       <div className={styles.header__container}>
         {/* Логотип */}
         <div className={styles.header__logo_container}>
@@ -44,7 +42,6 @@ export const Header = () => {
           </Link>
         </div>
 
-        {/* Навігація (Острівець зі склом) */}
         <nav className={styles.header__nav}>
           {navList.map((item) => (
             <Link key={item.label} href={item.href} className={styles.link}>
@@ -53,7 +50,6 @@ export const Header = () => {
           ))}
         </nav>
 
-        {/* Кнопка дії */}
         <div className={styles.header__actions}>
           <Link
             href="https://t.me/androniv"
