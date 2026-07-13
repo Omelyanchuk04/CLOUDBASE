@@ -1,52 +1,73 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./ServerSection.module.scss";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export function ServerSection() {
+  const sectionRef = useRef<HTMLElement>(null);
   const mountRef = useRef<HTMLDivElement>(null);
 
+  // Створюємо реф для відстеження прогресу скролу (від 0 до 1)
+  const scrollProgress = useRef({ val: 0 });
+
+  // === GSAP Залипання та Плавність ===
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // Замість статичного залипання ми створюємо анімацію прогресу
+      gsap.to(scrollProgress.current, {
+        val: 1, // Значення зміниться від 0 до 1 під час скролу
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          pin: true,
+          start: "top top",
+          end: "+=3500", // Зрівняли швидкість з першою секцією
+          scrub: 2, // 2 секунди інерції — робить скрол дуже маслянистим і плавним
+          anticipatePin: 1,
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // === Three.js Логіка ===
   useEffect(() => {
     if (!mountRef.current) return;
 
     const currentMount = mountRef.current;
-
-    // Використовуємо window.innerWidth для 100% ширини екрана
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    // ------------------- 1. СЦЕНА -------------------
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#252525");
 
-    // ------------------- 2. КАМЕРА (Зближена) -------------------
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 100);
-    // Підсунули камеру ближче
+    // Початкова позиція камери
     camera.position.set(0, 1.2, 5);
-    // Обов'язково вказуємо куди дивитися, бо контролери видалені
     camera.lookAt(0, 0, 0);
 
-    // ------------------- 3. СВІТЛО -------------------
-    const ambientLight = new THREE.AmbientLight("white", 0.6);
-    scene.add(ambientLight);
-
-    const dirLight = new THREE.DirectionalLight("white", 1);
-    dirLight.position.set(5, 5, 5);
-    scene.add(dirLight);
-
-    const backLight = new THREE.DirectionalLight("white", 0.7);
-    backLight.position.set(-5, 5, -5);
-    scene.add(backLight);
-
-    // ------------------- 4. РЕНДЕР -------------------
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    renderer.shadowMap.enabled = false;
+
     currentMount.appendChild(renderer.domElement);
 
-    // Вимикаємо контекстне меню на канвасі
     const preventContextMenu = (event: Event) => event.stopPropagation();
     renderer.domElement.addEventListener(
       "contextmenu",
@@ -54,7 +75,21 @@ export function ServerSection() {
       true,
     );
 
-    // ------------------- ГЛОБАЛЬНІ ЗМІННІ ДЛЯ ПОВІТРЯ -------------------
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    keyLight.position.set(5, 5, 5);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xa5b4fc, 0.8);
+    fillLight.position.set(-5, 3, 5);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    rimLight.position.set(0, 5, -5);
+    scene.add(rimLight);
+
     let airGeometry: THREE.BufferGeometry;
     let airFlow: THREE.LineSegments;
     const velocities: any[] = [];
@@ -63,7 +98,7 @@ export function ServerSection() {
     const redColor = new THREE.Color("#ff0000");
     const tempColor = new THREE.Color();
 
-    // ------------------- 5. ЗАВАНТАЖЕННЯ МОДЕЛІ -------------------
+    let serverGroup: THREE.Group | null = null;
     const fans: THREE.Group[] = [];
     const loader = new GLTFLoader();
 
@@ -76,17 +111,15 @@ export function ServerSection() {
         model.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
-
             const materials = Array.isArray(mesh.material)
               ? mesh.material
               : [mesh.material];
 
             materials.forEach((material) => {
               material.side = THREE.FrontSide;
-
               if (material instanceof THREE.MeshStandardMaterial) {
-                material.metalness = 0.2;
-                material.roughness = 0.6;
+                material.metalness = 0.5;
+                material.roughness = 0.4;
               }
             });
 
@@ -117,7 +150,6 @@ export function ServerSection() {
           fans.push(pivot);
         });
 
-        // Масштабування
         const mainBox = new THREE.Box3().setFromObject(model);
         const size = mainBox.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
@@ -129,11 +161,9 @@ export function ServerSection() {
         const scaledBox = new THREE.Box3().setFromObject(model);
         const center = scaledBox.getCenter(new THREE.Vector3());
 
-        // Центруємо саму модель (поки що без обертання)
         model.position.set(-center.x, -center.y, -center.z);
         model.updateMatrixWorld(true);
 
-        // ------------------- 6. СТВОРЕННЯ ПОТОКІВ ПОВІТРЯ -------------------
         const frontFanPositions: THREE.Vector3[] = [];
         fans.forEach((pivot) => {
           if (!pivot.name.includes("6")) {
@@ -179,25 +209,20 @@ export function ServerSection() {
         const airMaterial = new THREE.LineBasicMaterial({
           vertexColors: true,
           transparent: true,
-          opacity: 0.5,
+          opacity: 0.7,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
         });
 
         airFlow = new THREE.LineSegments(airGeometry, airMaterial);
 
-        // === ГРУПУВАННЯ ТА ПОВОРОТ ===
-        // Створюємо спільну групу для моделі та повітря
-        const serverGroup = new THREE.Group();
-
-        // Додаємо обидва елементи в групу
+        serverGroup = new THREE.Group();
         serverGroup.add(model);
         serverGroup.add(airFlow);
 
-        // Повертаємо всю групу (разом з частинками)
+        // Початковий поворот
         serverGroup.rotation.x = -Math.PI / 2 + 0.3;
 
-        // Додаємо згрупований об'єкт на сцену
         scene.add(serverGroup);
         serverGroup.updateMatrixWorld(true);
       },
@@ -205,7 +230,6 @@ export function ServerSection() {
       (error) => console.error("Помилка завантаження моделі:", error),
     );
 
-    // ------------------- 7. АДАПТИВНІСТЬ -------------------
     const handleResize = () => {
       const newWidth = window.innerWidth;
       const newHeight = window.innerHeight;
@@ -216,11 +240,32 @@ export function ServerSection() {
     };
     window.addEventListener("resize", handleResize);
 
-    // ------------------- 8. ЦИКЛ АНІМАЦІЇ -------------------
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries[0].isIntersecting;
+      },
+      { threshold: 0.01 },
+    );
+    observer.observe(currentMount);
+
     let animationFrameId: number;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+
+      if (!isVisible) return;
+
+      // === ЗВ'ЯЗОК СКРОЛУ ТА 3D СЦЕНИ ===
+      const progress = scrollProgress.current.val; // Від 0 до 1
+
+      // 1. Плавно наближаємо камеру (від Z=5 до Z=3.5)
+      camera.position.z = 5 - progress * 1.5;
+
+      // 2. Трохи піднімаємо "ніс" сервера для динаміки
+      if (serverGroup) {
+        serverGroup.rotation.x = -Math.PI / 2 + 0.3 + progress * 0.2;
+      }
 
       fans.forEach((fan) => {
         if (fan.name.includes("6")) {
@@ -295,8 +340,8 @@ export function ServerSection() {
 
     animate();
 
-    // ------------------- 9. ОЧИЩЕННЯ (CLEANUP) -------------------
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       renderer.domElement.removeEventListener(
         "contextmenu",
@@ -316,34 +361,17 @@ export function ServerSection() {
   }, []);
 
   return (
-    <section className={styles.serverSectionWrapper}>
-      {/* Контейнер на всю ширину та висоту */}
-      <div
-        ref={mountRef}
-        className={styles.canvasContainer}
-        style={{
-          width: "100vw",
-          maxWidth: "100%",
-          height: "100vh",
-          position: "relative",
-          left: "50%",
-          transform: "translateX(-50%)",
-          overflow: "hidden",
-        }}
-      />
+    <section className={styles.serverSectionWrapper} ref={sectionRef}>
+      <div className={styles.server__glow} aria-hidden="true">
+        <div className={styles.server__glowGreen} />
+        <div className={styles.server__glowBlue} />
+        <div className={styles.server__glowPurple} />
+      </div>
 
-      <div
-        className={styles.overlayContent}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          pointerEvents: "none",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        {/* Твій текст для секції */}
+      <div ref={mountRef} className={styles.canvasContainer} />
+
+      <div className={styles.overlayContent}>
+        {/* Тут ти зможеш додати текст, який буде з'являтися під час скролу */}
       </div>
     </section>
   );

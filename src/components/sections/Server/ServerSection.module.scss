@@ -2,73 +2,81 @@
   position: relative;
   width: 100vw;
   max-width: 100%;
+
+  /* ЗАМІНИТИ min-height на height */
   height: 100vh;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #0f0f11;
+  height: 100svh; /* Для мобільних браузерів */
+
   overflow: hidden;
+  background: transparent;
   z-index: 1;
 }
 
-/* --- ФОН --- */
-.glow {
+/* === СТИЛІ ФОНУ ДЛЯ БЕЗШОВНОГО ПЕРЕХОДУ === */
+.server__glow {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(
-    circle at 50% 10%,
-    transparent 35%,
+
+  /* ВАЖЛИВО: Оскільки низ Hero закінчується затемненням rgba(0,0,0,0.4), 
+     ми починаємо верх цієї секції з такого ж кольору і плавно розчиняємо його, 
+     щоб зшити дві секції без помітної лінії. */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    transparent 20%,
     rgba(0, 0, 0, 0.4) 100%
   );
 }
 
-.glowGreen,
-.glowBlue,
-.glowPurple {
+.server__glowGreen,
+.server__glowBlue,
+.server__glowPurple {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   backface-visibility: hidden;
   will-change: transform;
 }
 
-.glowGreen {
+/* Розташування підсвіток трохи зміщене, щоб воно виглядало як продовження сторінки */
+.server__glowGreen {
   position: absolute;
-  top: -10%;
-  right: -10%;
+  top: 10%;
+  left: -10%;
   width: 60vw;
   height: 60vw;
   background: radial-gradient(
     circle,
-    rgba(34, 197, 94, 0.35) 0%,
+    rgba(34, 197, 94, 0.25) 0%,
     transparent 65%
   );
   filter: blur(80px);
 }
 
-.glowBlue {
+.server__glowBlue {
   position: absolute;
   bottom: -10%;
-  left: -10%;
+  right: -10%;
   width: 70vw;
   height: 70vw;
   background: radial-gradient(
     circle,
-    rgba(14, 165, 233, 0.35) 0%,
+    rgba(14, 165, 233, 0.25) 0%,
     transparent 60%
   );
   filter: blur(90px);
 }
 
-.glowPurple {
+.server__glowPurple {
   position: absolute;
-  top: 30%;
-  left: 30%;
+  top: 40%;
+  right: 20%;
   width: 40vw;
   height: 40vw;
   background: radial-gradient(
     circle,
-    rgba(139, 92, 246, 0.3) 0%,
+    rgba(139, 92, 246, 0.2) 0%,
     transparent 70%
   );
   filter: blur(100px);
@@ -76,23 +84,23 @@
 }
 
 @media (max-width: 768px) {
-  .glowGreen {
-    top: 0%;
-    right: -20%;
+  .server__glowGreen {
+    top: 10%;
+    left: -20%;
     width: 150vw;
     height: 150vw;
     filter: blur(40px);
   }
-  .glowBlue {
+  .server__glowBlue {
     bottom: 10%;
-    left: -30%;
+    right: -30%;
     width: 150vw;
     height: 150vw;
     filter: blur(40px);
   }
-  .glowPurple {
-    top: 20%;
-    left: 10%;
+  .server__glowPurple {
+    top: 30%;
+    right: 10%;
     width: 120vw;
     height: 120vw;
     filter: blur(40px);
@@ -100,51 +108,27 @@
   }
 }
 
-/* --- 3D CANVAS ТА ТЕКСТ --- */
+/* === КОНТЕЙНЕР THREE.JS === */
 .canvasContainer {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  margin: 0;
-  padding: 0;
-
-  canvas {
-    display: block;
-    outline: none;
-    user-select: none;
-  }
+  width: 100vw;
+  max-width: 100%;
+  height: 100vh;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: hidden;
+  /* Знаходиться поверх підсвітки (z-index: 1) */
+  z-index: 1;
 }
 
+/* === КОНТЕЙНЕР ДЛЯ ТЕКСТУ === */
 .overlayContent {
   position: absolute;
-  inset: 0;
-  z-index: 10;
+  top: 0;
+  left: 0;
   pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: clamp(3rem, 8vh, 6rem) 1rem;
-  color: #ffffff;
-
-  h2 {
-    font-family:
-      -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
-    font-size: clamp(2.5rem, 4vw, 4rem);
-    font-weight: 700;
-    text-align: center;
-    margin: 0;
-    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9);
-  }
-
-  p {
-    font-family:
-      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
-    font-size: clamp(1rem, 1.2vw, 1.15rem);
-    color: #94a3b8;
-    text-align: center;
-    max-width: 600px;
-    margin-top: 1rem;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-  }
+  width: 100%;
+  height: 100%;
+  /* Знаходиться поверх Three.js канвасу (z-index: 2) */
+  z-index: 2;
 }
