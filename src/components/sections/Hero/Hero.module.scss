@@ -337,21 +337,20 @@
 
 @media (max-width: 991px) {
   .device__laptopLeft {
-    left: 0%;
-    height: 65%;
+    left: -5%;
+    height: 55%; /* Трохи менше для планшетів */
   }
   .device__laptopRight {
-    right: 0%;
-    height: 65%;
+    right: -5%;
+    height: 55%;
   }
 }
-
 @media (max-width: 768px) {
   .hero__inner {
     padding-top: 50px;
   }
   .hero__visual {
-    height: clamp(150px, 25vh, 250px);
+    height: clamp(140px, 20vh, 220px);
   }
   .device__imac {
     height: 100%;
@@ -359,14 +358,16 @@
   }
   .device__laptopLeft,
   .device__laptopRight {
-    height: 65%;
+    height: 60%;
     z-index: 3;
   }
   .device__laptopLeft {
-    left: -5%;
+    /* Змінили з -15% на -2%, щоб вони під'їхали ближче до центру */
+    left: -10%;
   }
   .device__laptopRight {
-    right: -5%;
+    /* Змінили з -15% на -2% */
+    right: -10%;
   }
   .hero__logos {
     gap: 1rem;

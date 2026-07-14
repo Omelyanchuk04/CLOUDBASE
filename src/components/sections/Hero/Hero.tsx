@@ -20,6 +20,8 @@ function DataFlowBackground() {
 
     let animationFrameId: number;
     let files: FileParticle[] = [];
+    let imagesLoadedCount = 0;
+    const isMobileRef = { current: false };
 
     const iconPaths = [
       "/icons/backup-icon.png",
@@ -30,9 +32,22 @@ function DataFlowBackground() {
     ];
     const loadedImages: HTMLImageElement[] = [];
 
+    const drawStatic = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      files.forEach((file) => {
+        file.draw(ctx, canvas.width, canvas.height);
+      });
+    };
+
     iconPaths.forEach((path) => {
       const img = new window.Image();
       img.src = path;
+      img.onload = () => {
+        imagesLoadedCount++;
+        if (isMobileRef.current && imagesLoadedCount === iconPaths.length) {
+          drawStatic();
+        }
+      };
       loadedImages.push(img);
     });
 
@@ -106,23 +121,17 @@ function DataFlowBackground() {
       }
     }
 
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      initFiles();
-    };
-
     const initFiles = () => {
       files = [];
-      const isMobile = window.innerWidth < 768;
-      const numFiles = isMobile ? 15 : 60;
-
+      const numFiles = isMobileRef.current ? 15 : 60;
       for (let i = 0; i < numFiles; i++) {
         files.push(new FileParticle(canvas.width, canvas.height));
       }
     };
 
     const animate = () => {
+      if (isMobileRef.current) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       files.forEach((file) => {
         file.update(speed, canvas.width, canvas.height);
@@ -131,9 +140,35 @@ function DataFlowBackground() {
       animationFrameId = requestAnimationFrame(animate);
     };
 
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const wasMobile = isMobileRef.current;
+      isMobileRef.current = window.innerWidth < 768;
+
+      initFiles();
+
+      if (isMobileRef.current) {
+        cancelAnimationFrame(animationFrameId);
+        if (imagesLoadedCount === iconPaths.length) drawStatic();
+      } else if (wasMobile && !isMobileRef.current) {
+        animate();
+      }
+    };
+
     window.addEventListener("resize", resize);
-    resize();
-    animate();
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    isMobileRef.current = window.innerWidth < 768;
+    initFiles();
+
+    if (!isMobileRef.current) {
+      animate();
+    } else if (imagesLoadedCount === iconPaths.length) {
+      drawStatic();
+    }
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -157,75 +192,103 @@ export function Hero() {
   const textThirdRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrapperRef.current,
-          pin: containerRef.current,
-          start: "top top",
-          end: "+=3500", // Дистанція скролу
-          scrub: 1,
-          anticipatePin: 1,
-        },
-      });
+    let mm = gsap.matchMedia();
 
-      tl.to(textInitialRef.current, { opacity: 0, y: -40, duration: 1 }, 0)
-        .to(textSecondRef.current, { opacity: 1, y: 0, duration: 1 }, 1)
-        .to(textSecondRef.current, { opacity: 0, y: -40, duration: 1 }, 2)
-        .to(textThirdRef.current, { opacity: 1, y: 0, duration: 1 }, 3)
-        .fromTo(
-          imacRef.current,
-          { scale: 1.15, xPercent: -50 },
-          {
-            scale: 1,
-            xPercent: -50,
-            duration: 2,
-            ease: "power2.out",
-            force3D: true,
-          },
-          0.5,
-        )
-        .fromTo(
-          laptopLeftRef.current,
-          { xPercent: -50, opacity: 0, scale: 0.8 },
-          {
-            xPercent: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 2,
-            ease: "power2.out",
-            force3D: true,
-          },
-          0.5,
-        )
-        .fromTo(
-          laptopRightRef.current,
-          { xPercent: 50, opacity: 0, scale: 0.8 },
-          {
-            xPercent: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 2,
-            ease: "power2.out",
-            force3D: true,
-          },
-          0.5,
-        );
-    }, wrapperRef);
+    mm.add(
+      {
+        isDesktop: "(min-width: 769px)",
+        isMobile: "(max-width: 768px)",
+      },
+      (context) => {
+        const conditions = context.conditions as {
+          isMobile: boolean;
+          isDesktop: boolean;
+        };
+        const { isMobile } = conditions;
 
-    return () => ctx.revert();
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: wrapperRef.current,
+            pin: containerRef.current,
+            start: "top top",
+            end: "+=3500",
+            scrub: 1,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.to(
+          textInitialRef.current,
+          { opacity: 0, y: -40, duration: 1, force3D: true },
+          0,
+        )
+          .to(
+            textSecondRef.current,
+            { opacity: 1, y: 0, duration: 1, force3D: true },
+            1,
+          )
+          .to(
+            textSecondRef.current,
+            { opacity: 0, y: -40, duration: 1, force3D: true },
+            2,
+          )
+          .to(
+            textThirdRef.current,
+            { opacity: 1, y: 0, duration: 1, force3D: true },
+            3,
+          )
+          .fromTo(
+            imacRef.current,
+            { scale: 1.15, xPercent: -50 },
+            {
+              scale: 1,
+              xPercent: -50,
+              duration: 2,
+              ease: "power2.out",
+              force3D: true,
+            },
+            0.5,
+          )
+          .fromTo(
+            laptopLeftRef.current,
+            // Стартують з-за меж екрана
+            { xPercent: isMobile ? -80 : -50, opacity: 0, scale: 0.8 },
+            {
+              xPercent: 0, // Повертаємо кінцеву точку в 0 для всіх
+              opacity: 1,
+              scale: 1,
+              duration: 2,
+              ease: "power2.out",
+              force3D: true,
+            },
+            0.5,
+          )
+          .fromTo(
+            laptopRightRef.current,
+            { xPercent: isMobile ? 80 : 50, opacity: 0, scale: 0.8 },
+            {
+              xPercent: 0, // Повертаємо кінцеву точку в 0 для всіх
+              opacity: 1,
+              scale: 1,
+              duration: 2,
+              ease: "power2.out",
+              force3D: true,
+            },
+            0.5,
+          );
+      },
+    );
+
+    return () => mm.revert();
   }, []);
 
   return (
     <div className={styles.hero__wrapper} ref={wrapperRef}>
       <section className={styles.hero} ref={containerRef}>
-        {/* Підсвітка на задньому фоні */}
         <div className={styles.hero__glow} aria-hidden="true">
           <div className={styles.hero__glowGreen} />
           <div className={styles.hero__glowBlue} />
           <div className={styles.hero__glowPurple} />
-
-          {/* Контейнер пучка світла для м'яких країв */}
           <div className={styles.hero__lightBeamContainer}>
             <div className={styles.hero__lightBeam} />
           </div>
@@ -236,7 +299,6 @@ export function Hero() {
         <div className={styles.hero__inner}>
           {/* === КОНТЕЙНЕР ТЕКСТУ === */}
           <div className={styles.hero__textContent}>
-            {/* 1 ЧЕРГА */}
             <div className={styles.hero__textInitial} ref={textInitialRef}>
               <h1 className={styles.hero__heading}>{HERO.step1.heading}</h1>
               <p className={styles.hero__sub}>{HERO.step1.subheading}</p>
@@ -248,7 +310,6 @@ export function Hero() {
               </div>
             </div>
 
-            {/* 2 ЧЕРГА */}
             <div className={styles.hero__textSecond} ref={textSecondRef}>
               <h2 className={styles.hero__headingAlt}>
                 <p>{HERO.step2.headingLine1}</p>
@@ -257,7 +318,6 @@ export function Hero() {
               <p className={styles.hero__subAlt}>{HERO.step2.subheading}</p>
             </div>
 
-            {/* 3 ЧЕРГА */}
             <div className={styles.hero__textThird} ref={textThirdRef}>
               <h2 className={styles.hero__headingAlt}>{HERO.step3.heading}</h2>
               <p className={styles.hero__subAlt}>{HERO.step3.subheading}</p>
