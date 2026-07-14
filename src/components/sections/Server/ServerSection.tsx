@@ -13,22 +13,20 @@ export function ServerSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const mountRef = useRef<HTMLDivElement>(null);
 
-  // Створюємо реф для відстеження прогресу скролу (від 0 до 1)
   const scrollProgress = useRef({ val: 0 });
 
-  // === GSAP Залипання та Плавність ===
+  // === GSAP Залипання ===
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Замість статичного залипання ми створюємо анімацію прогресу
       gsap.to(scrollProgress.current, {
-        val: 1, // Значення зміниться від 0 до 1 під час скролу
+        val: 1,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           pin: true,
           start: "top top",
-          end: "+=3500", // Зрівняли швидкість з першою секцією
-          scrub: 2, // 2 секунди інерції — робить скрол дуже маслянистим і плавним
+          end: "+=3500",
+          scrub: 2,
           anticipatePin: 1,
         },
       });
@@ -44,21 +42,23 @@ export function ServerSection() {
     const currentMount = mountRef.current;
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const isMobile = width < 768;
 
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 100);
-    // Початкова позиція камери
     camera.position.set(0, 1.2, 5);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+    const maxPixelRatio = isMobile ? 1 : 1.2;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
     renderer.setClearColor(0x000000, 0);
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -67,7 +67,6 @@ export function ServerSection() {
     renderer.shadowMap.enabled = false;
 
     currentMount.appendChild(renderer.domElement);
-
     const preventContextMenu = (event: Event) => event.stopPropagation();
     renderer.domElement.addEventListener(
       "contextmenu",
@@ -93,10 +92,16 @@ export function ServerSection() {
     let airGeometry: THREE.BufferGeometry;
     let airFlow: THREE.LineSegments;
     const velocities: any[] = [];
-    const lineCount = 200;
+    const lineCount = isMobile ? 100 : 200;
+
     const blueColor = new THREE.Color("#00d2ff");
     const redColor = new THREE.Color("#ff0000");
-    const tempColor = new THREE.Color();
+    const bR = blueColor.r,
+      bG = blueColor.g,
+      bB = blueColor.b;
+    const rR = redColor.r,
+      rG = redColor.g,
+      rB = redColor.b;
 
     let serverGroup: THREE.Group | null = null;
     const fans: THREE.Group[] = [];
@@ -162,7 +167,13 @@ export function ServerSection() {
         const center = scaledBox.getCenter(new THREE.Vector3());
 
         model.position.set(-center.x, -center.y, -center.z);
+
         model.updateMatrixWorld(true);
+        model.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh && !child.name.includes("Fan")) {
+            child.matrixAutoUpdate = false;
+          }
+        });
 
         const frontFanPositions: THREE.Vector3[] = [];
         fans.forEach((pivot) => {
@@ -220,16 +231,20 @@ export function ServerSection() {
         serverGroup.add(model);
         serverGroup.add(airFlow);
 
-        // Початковий поворот
         serverGroup.rotation.x = -Math.PI / 2 + 0.3;
 
         scene.add(serverGroup);
         serverGroup.updateMatrixWorld(true);
+
+        // Викликаємо функцію ресайзу одразу після завантаження моделі,
+        // щоб застосувати мобільний масштаб, якщо потрібно
+        handleResize();
       },
       undefined,
       (error) => console.error("Помилка завантаження моделі:", error),
     );
 
+    // === ДИНАМІЧНА АДАПТИВНІСТЬ ===
     const handleResize = () => {
       const newWidth = window.innerWidth;
       const newHeight = window.innerHeight;
@@ -237,7 +252,14 @@ export function ServerSection() {
       camera.aspect = newWidth / newHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(newWidth, newHeight);
+
+      // Якщо екран менший за 768px, зменшуємо всю групу (сервер + повітря) до 60%
+      if (serverGroup) {
+        const scaleMult = newWidth < 768 ? 0.6 : 1;
+        serverGroup.scale.set(scaleMult, scaleMult, scaleMult);
+      }
     };
+
     window.addEventListener("resize", handleResize);
 
     let isVisible = true;
@@ -256,13 +278,9 @@ export function ServerSection() {
 
       if (!isVisible) return;
 
-      // === ЗВ'ЯЗОК СКРОЛУ ТА 3D СЦЕНИ ===
-      const progress = scrollProgress.current.val; // Від 0 до 1
-
-      // 1. Плавно наближаємо камеру (від Z=5 до Z=3.5)
+      const progress = scrollProgress.current.val;
       camera.position.z = 5 - progress * 1.5;
 
-      // 2. Трохи піднімаємо "ніс" сервера для динаміки
       if (serverGroup) {
         serverGroup.rotation.x = -Math.PI / 2 + 0.3 + progress * 0.2;
       }
@@ -298,14 +316,16 @@ export function ServerSection() {
           let heatRatio = (currentY + 2.0) / 4.0;
           heatRatio = Math.max(0, Math.min(1, heatRatio));
 
-          tempColor.lerpColors(blueColor, redColor, heatRatio);
+          const r = bR + (rR - bR) * heatRatio;
+          const g = bG + (rG - bG) * heatRatio;
+          const b = bB + (rB - bB) * heatRatio;
 
-          colArray[headX] = tempColor.r;
-          colArray[headY] = tempColor.g;
-          colArray[headZ] = tempColor.b;
-          colArray[tailX] = tempColor.r;
-          colArray[tailY] = tempColor.g;
-          colArray[tailZ] = tempColor.b;
+          colArray[headX] = r;
+          colArray[headY] = g;
+          colArray[headZ] = b;
+          colArray[tailX] = r;
+          colArray[tailY] = g;
+          colArray[tailZ] = b;
 
           if (currentY > -2.0 && currentY < 1.0) {
             const turbulenceX = (Math.random() - 0.5) * 0.015;
@@ -325,16 +345,13 @@ export function ServerSection() {
             posArray[tailX] = newX;
             posArray[headZ] = newZ;
             posArray[tailZ] = newZ;
-
             posArray[headY] = newY + velocities[i].length;
             posArray[tailY] = newY;
           }
         }
-
         airGeometry.attributes.position.needsUpdate = true;
         airGeometry.attributes.color.needsUpdate = true;
       }
-
       renderer.render(scene, camera);
     };
 
@@ -353,7 +370,6 @@ export function ServerSection() {
       if (currentMount && currentMount.contains(renderer.domElement)) {
         currentMount.removeChild(renderer.domElement);
       }
-
       scene.clear();
       renderer.dispose();
       if (airGeometry) airGeometry.dispose();
@@ -367,12 +383,8 @@ export function ServerSection() {
         <div className={styles.server__glowBlue} />
         <div className={styles.server__glowPurple} />
       </div>
-
       <div ref={mountRef} className={styles.canvasContainer} />
-
-      <div className={styles.overlayContent}>
-        {/* Тут ти зможеш додати текст, який буде з'являтися під час скролу */}
-      </div>
+      <div className={styles.overlayContent} />
     </section>
   );
 }
