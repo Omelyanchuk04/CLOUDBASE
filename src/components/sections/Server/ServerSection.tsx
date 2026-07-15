@@ -12,7 +12,6 @@ gsap.registerPlugin(ScrollTrigger);
 export function ServerSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const mountRef = useRef<HTMLDivElement>(null);
-
   const scrollProgress = useRef({ val: 0 });
 
   // === GSAP Залипання ===
@@ -40,8 +39,8 @@ export function ServerSection() {
     if (!mountRef.current) return;
 
     const currentMount = mountRef.current;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
     const isMobile = width < 768;
 
     const scene = new THREE.Scene();
@@ -50,17 +49,17 @@ export function ServerSection() {
     camera.position.set(0, 1.2, 5);
     camera.lookAt(0, 0, 0);
 
+    // ОПТИМІЗАЦІЯ 1: Базові налаштування рендера для максимальної продуктивності
     const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
+      antialias: !isMobile, // Вимикаємо згладжування на мобільних
       alpha: true,
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
 
-    const maxPixelRatio = isMobile ? 1 : 1.2;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
+    // ОПТИМІЗАЦІЯ 2: Жорстко фіксуємо Pixel Ratio = 1. Це рятує 4K/Retina монітори від лагів.
+    renderer.setPixelRatio(1);
     renderer.setClearColor(0x000000, 0);
-
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
@@ -92,7 +91,7 @@ export function ServerSection() {
     let airGeometry: THREE.BufferGeometry;
     let airFlow: THREE.LineSegments;
     const velocities: any[] = [];
-    const lineCount = isMobile ? 100 : 200;
+    const lineCount = isMobile ? 80 : 150; // Ще трохи зменшили кількість частинок
 
     const blueColor = new THREE.Color("#00d2ff");
     const redColor = new THREE.Color("#ff0000");
@@ -113,6 +112,7 @@ export function ServerSection() {
         const model = gltf.scene;
         const fansFound: THREE.Mesh[] = [];
 
+        // Оптимізація матеріалів: робимо їх простішими для рендеру
         model.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
@@ -124,7 +124,7 @@ export function ServerSection() {
               material.side = THREE.FrontSide;
               if (material instanceof THREE.MeshStandardMaterial) {
                 material.metalness = 0.5;
-                material.roughness = 0.4;
+                material.roughness = 0.5; // Трохи збільшили roughness для легшого прорахунку світла
               }
             });
 
@@ -232,42 +232,49 @@ export function ServerSection() {
         serverGroup.add(airFlow);
 
         serverGroup.rotation.x = -Math.PI / 2 + 0.3;
+        const scaleMult = window.innerWidth < 768 ? 0.6 : 1;
+        serverGroup.scale.set(scaleMult, scaleMult, scaleMult);
 
         scene.add(serverGroup);
         serverGroup.updateMatrixWorld(true);
 
-        // Викликаємо функцію ресайзу одразу після завантаження моделі,
-        // щоб застосувати мобільний масштаб, якщо потрібно
-        handleResize();
+        // ОПТИМІЗАЦІЯ 3: ПРОГРІВ ШЕЙДЕРІВ
+        // Ми примусово компілюємо та рендеримо сцену один раз прямо зараз (у фоні),
+        // щоб GPU не робив це в момент, коли користувач доскролить сюди.
+        if (renderer.compile) {
+          renderer.compile(scene, camera);
+        }
+        renderer.render(scene, camera);
       },
       undefined,
       (error) => console.error("Помилка завантаження моделі:", error),
     );
 
-    // === ДИНАМІЧНА АДАПТИВНІСТЬ ===
+    // ОПТИМІЗАЦІЯ 4: Debounce для Resize (уникаємо лагів при зміні орієнтації екрана)
+    let resizeTimeout: NodeJS.Timeout;
     const handleResize = () => {
-      const newWidth = window.innerWidth;
-      const newHeight = window.innerHeight;
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
 
-      camera.aspect = newWidth / newHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(newWidth, newHeight);
-
-      // Якщо екран менший за 768px, зменшуємо всю групу (сервер + повітря) до 60%
-      if (serverGroup) {
-        const scaleMult = newWidth < 768 ? 0.6 : 1;
-        serverGroup.scale.set(scaleMult, scaleMult, scaleMult);
-      }
+        if (serverGroup) {
+          const scaleMult = width < 768 ? 0.6 : 1;
+          serverGroup.scale.set(scaleMult, scaleMult, scaleMult);
+        }
+      }, 150); // Чекаємо 150мс після закінчення ресайзу
     };
-
     window.addEventListener("resize", handleResize);
 
-    let isVisible = true;
+    let isVisible = false;
     const observer = new IntersectionObserver(
       (entries) => {
         isVisible = entries[0].isIntersecting;
       },
-      { threshold: 0.01 },
+      { threshold: 0 }, // Реагуємо одразу, як тільки секція торкається екрана
     );
     observer.observe(currentMount);
 
@@ -276,6 +283,7 @@ export function ServerSection() {
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
+      // Якщо секцію не видно - процесор відпочиває
       if (!isVisible) return;
 
       const progress = scrollProgress.current.val;
@@ -360,6 +368,7 @@ export function ServerSection() {
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeout);
       renderer.domElement.removeEventListener(
         "contextmenu",
         preventContextMenu,
