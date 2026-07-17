@@ -13,7 +13,6 @@ export default function HomePage() {
     <>
       {/* 1. Хто ми і що робимо */}
       <Hero />
-
       <ServerSection />
 
       {/* 5. MacBook-скрол — показуємо хмарну версію */}

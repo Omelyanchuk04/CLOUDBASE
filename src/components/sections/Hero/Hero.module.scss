@@ -183,7 +183,7 @@
   flex: 0 0 auto;
   position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   display: grid;
   align-items: start;
   justify-items: center;
@@ -221,7 +221,7 @@
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
-  font-size: clamp(2rem, 3.8vw, 4rem);
+  font-size: clamp(4rem, 5vw, 7rem);
   line-height: 1.15;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -241,7 +241,7 @@
   font-size: clamp(0.95rem, 1.1vw, 1.05rem);
   line-height: 1.5;
   color: #94a3b8;
-  max-width: 600px;
+  max-width: 700px;
   font-weight: 400;
   margin: 0;
 }
