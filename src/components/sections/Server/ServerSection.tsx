@@ -18,7 +18,7 @@ export function ServerSection() {
 
   // Функція генерує правильний шлях: 1 -> "0001.png", 15 -> "0015.png"
   const currentFrameImage = (index: number) =>
-    `/server-sequence/${index.toString().padStart(4, "0")}.png`;
+    `/server-sequence-webp/${index.toString().padStart(4, "0")}.webp`;
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
