@@ -4,6 +4,8 @@
   height: 100vh;
   background-color: #000;
   overflow: hidden;
+  /* Апаратна ізоляція. Браузер не перемальовує інші секції при змінах тут */
+  contain: paint layout;
 }
 
 /* === 1. ДИНАМІЧНИЙ ФОН СВІТІННЯ === */
@@ -15,6 +17,8 @@
   mix-blend-mode: color-dodge;
   overflow: hidden;
   will-change: transform;
+  /* Апаратне прискорення композиції */
+  transform: translateZ(0);
 }
 
 .server__glowGreen,
@@ -26,6 +30,9 @@
   border-radius: 50%;
   will-change: transform, opacity;
   filter: blur(120px);
+  /* Примусове винесення на GPU */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .server__glowGreen {
@@ -110,6 +117,7 @@
     black 85%,
     transparent 100%
   );
+  transform: translateZ(0);
 }
 
 .smokeLayer {
@@ -120,6 +128,9 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  /* Прискорення для гігантських прозорих картинок */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .smoke1 {
@@ -152,6 +163,7 @@
     rgba(0, 0, 0, 1) 75%
   );
   will-change: opacity;
+  transform: translateZ(0);
 }
 
 /* === 4. М'ЯКА ПІДСВІТКА СЕРВЕРА (AURA) === */
@@ -161,7 +173,8 @@
   left: 50%;
   width: 100vw;
   height: 100vh;
-  transform: translate(-50%, -50%);
+  margin-top: -50vh;
+  margin-left: -50vw;
   z-index: 3;
   opacity: 0;
   background: radial-gradient(
@@ -172,6 +185,7 @@
   );
   pointer-events: none;
   will-change: opacity, transform;
+  transform: translate3d(0, 0, 0);
 }
 
 /* === 5. СЕРВЕР (CANVAS) === */
@@ -184,6 +198,7 @@
   background: transparent;
   will-change: transform;
   display: block;
+  transform: translateZ(0);
 }
 
 /* === 6. ХАРАКТЕРИСТИКИ ТА ЛІНІЇ (МІНІМАЛІЗМ) === */
@@ -200,6 +215,7 @@
   align-items: center;
   opacity: 0;
   will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
 }
 
 .featureLeft {
@@ -214,7 +230,6 @@
   text-align: left;
 }
 
-/* Розподілили висоту для 6 блоків */
 .featureTop {
   top: 25%;
 }
@@ -246,15 +261,14 @@
 }
 
 .featureLine {
-  height: 2px;
+  height: 1px;
   width: 80px;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .featureLeft .featureLine {
   margin-left: 20px;
 }
-
 .featureRight .featureLine {
   margin-right: 20px;
 }
@@ -294,7 +308,7 @@
     justify-content: flex-end;
     align-items: center;
     padding-bottom: 40px;
-    gap: 15px; /* Трохи зменшив відступ, бо блоків стало більше */
+    gap: 15px;
   }
 
   .featureItem {
