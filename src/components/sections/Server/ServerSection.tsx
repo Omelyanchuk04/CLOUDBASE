@@ -11,7 +11,6 @@ export function ServerSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Групуємо рефи для зручності
   const smokeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const glowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -23,8 +22,6 @@ export function ServerSection() {
   const currentFrame = useRef({ frame: 0 });
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const lastRenderedFrame = useRef(-1);
-
-  const allFramesLoadedRef = useRef(false);
 
   const currentFrameImage = useCallback(
     (index: number) =>
@@ -38,39 +35,49 @@ export function ServerSection() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    const images: HTMLImageElement[] = [];
-
-    // --- 1. Швидке завантаження 1-го кадру ---
+    // --- 1. Швидке завантаження та ДЕКОДУВАННЯ 1-го кадру ---
     const loadFirstFrame = () => {
       const img = new Image();
       img.src = currentFrameImage(0);
-      img.onload = () => {
-        images[0] = img;
-        imagesRef.current = images;
-        renderFrame(0);
-        lastRenderedFrame.current = 0;
-        loadRestOfFrames();
-      };
+      // img.decode() змушує браузер розпакувати пікселі в пам'ять до рендеру
+      img
+        .decode()
+        .then(() => {
+          imagesRef.current[0] = img;
+          renderFrame(0);
+          lastRenderedFrame.current = 0;
+          loadRestOfFrames();
+        })
+        .catch(() => {
+          // Фолбек, якщо decode не підтримується
+          img.onload = () => {
+            imagesRef.current[0] = img;
+            renderFrame(0);
+            lastRenderedFrame.current = 0;
+            loadRestOfFrames();
+          };
+        });
     };
 
-    // --- 2. Оптимізоване фонове завантаження решти ---
+    // --- 2. Оптимізоване асинхронне фонове завантаження ---
     const loadRestOfFrames = () => {
-      const loadTask = () => {
-        let loadedCount = 1;
+      const loadTask = async () => {
         for (let i = 1; i < frameCount; i++) {
           const img = new Image();
           img.src = currentFrameImage(i);
-          img.onload = img.onerror = () => {
-            images[i] = img;
-            loadedCount++;
-            if (loadedCount === frameCount) allFramesLoadedRef.current = true;
-          };
+          try {
+            // Найважливіша оптимізація: розпаковуємо картинку в GPU/RAM у фоні!
+            // Завдяки цьому ctx.drawImage спрацює миттєво під час скролу.
+            await img.decode();
+            imagesRef.current[i] = img;
+          } catch (e) {
+            // Ігноруємо помилки завантаження окремих кадрів
+          }
         }
       };
 
-      // Використовуємо IdleCallback, щоб не блокувати рендер сторінки
       if ("requestIdleCallback" in window) {
-        requestIdleCallback(loadTask);
+        requestIdleCallback(() => loadTask());
       } else {
         setTimeout(loadTask, 100);
       }
@@ -78,6 +85,7 @@ export function ServerSection() {
 
     loadFirstFrame();
 
+    // Функція малювання максимально проста і швидка
     const renderFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
@@ -115,7 +123,8 @@ export function ServerSection() {
           pin: true,
           start: "top top",
           end: "+=6000",
-          scrub: 0.15,
+          // ЗБІЛЬШЕНО scrub. Це згладжує скрол мишкою ("сходинки") і ховає лаги слабкого ПК
+          scrub: 0.8,
         },
       });
 
@@ -260,26 +269,26 @@ export function ServerSection() {
             ease: "none",
             duration: 5,
             onUpdate: () => {
-              if (!allFramesLoadedRef.current) return;
               const frameIndex = Math.round(currentFrame.current.frame);
+
+              // ВАЖЛИВО: Прибрано зайвий requestAnimationFrame! GSAP вже в ньому працює.
+              // Малюємо кадр ТІЛЬКИ якщо він вже повністю завантажений та декодований (щоб не блокувати скрол)
               if (
                 frameIndex !== lastRenderedFrame.current &&
                 imagesRef.current[frameIndex]
               ) {
-                requestAnimationFrame(() => {
-                  renderFrame(frameIndex);
-                  lastRenderedFrame.current = frameIndex;
-                });
+                renderFrame(frameIndex);
+                lastRenderedFrame.current = frameIndex;
               }
             },
           },
           2,
         );
 
-      // --- ФАЗА 3: Динамічна поява характеристик у циклі ---
+      // --- ФАЗА 3: Динамічна поява характеристик ---
       featureRefs.current.forEach((ref, index) => {
         if (!ref) return;
-        const startTime = 2.2 + index * 0.6; // 2.2, 2.8, 3.4...
+        const startTime = 2.2 + index * 0.6;
         tl.fromTo(
           ref,
           { opacity: 0, y: 15 },
@@ -289,7 +298,7 @@ export function ServerSection() {
           ref,
           { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
           startTime + 0.8,
-        ); // Затримка 0.8s перед зникненням
+        );
       });
     }, sectionRef);
 
@@ -312,7 +321,6 @@ export function ServerSection() {
     };
   }, [currentFrameImage]);
 
-  // Дані для блоків (DRY)
   const featuresData = [
     {
       title: "Надійність 99.9%",
