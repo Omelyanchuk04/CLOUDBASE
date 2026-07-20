@@ -69,10 +69,9 @@ export function ServerSection() {
       );
     };
 
-    // --- 1. Завантаження першого кадру ---
+    // --- 1. Надійне завантаження першого кадру ---
     const loadFirstFrame = () => {
       const img = new Image();
-      img.src = currentFrameImage(0);
 
       const onReady = () => {
         imagesRef.current[0] = img;
@@ -84,15 +83,24 @@ export function ServerSection() {
         loadRestOfFrames();
       };
 
-      img
-        .decode()
-        .then(onReady)
-        .catch(() => {
-          img.onload = onReady;
-        });
+      img.onload = () => {
+        if (img.decode) {
+          img.decode().then(onReady).catch(onReady);
+        } else {
+          onReady();
+        }
+      };
+
+      img.onerror = () => {
+        console.error("[Sequence] Помилка завантаження першого кадру");
+        loadRestOfFrames(); // Запускаємо інші навіть якщо перший впав
+      };
+
+      // ВАЖЛИВО: src присвоюємо ТІЛЬКИ після обробників
+      img.src = currentFrameImage(0);
     };
 
-    // --- 2. Контрольоване завантаження інших кадрів ---
+    // --- 2. Надійне фонове завантаження інших кадрів ---
     const loadRestOfFrames = async () => {
       let loadedCount = 1; // Перший вже завантажено
       const promises: Promise<void>[] = [];
@@ -100,44 +108,50 @@ export function ServerSection() {
       for (let i = 1; i < frameCount; i++) {
         const promise = new Promise<void>((resolve) => {
           const img = new Image();
-          img.src = currentFrameImage(i);
 
-          const onSuccess = () => {
-            imagesRef.current[i] = img;
-            loadedCount++;
-            console.log(
-              `[Sequence] Кадр ${i} готовий. Прогрес: ${loadedCount}/${frameCount}`,
-            );
+          const onReady = () => {
+            // Перевіряємо щоб не додати двічі
+            if (!imagesRef.current[i]) {
+              imagesRef.current[i] = img;
+              loadedCount++;
+              // Виводимо лог кожного десятого кадру, щоб не спамити консоль занадто сильно
+              if (i % 10 === 0 || i === frameCount - 1) {
+                console.log(
+                  `[Sequence] Завантажено: ${loadedCount}/${frameCount}`,
+                );
+              }
+            }
             resolve();
           };
 
-          const onError = () => {
+          img.onload = () => {
+            if (img.decode) {
+              img.decode().then(onReady).catch(onReady);
+            } else {
+              onReady();
+            }
+          };
+
+          img.onerror = () => {
             console.warn(`[Sequence] Помилка завантаження кадру ${i}`);
-            // Резолвимо все одно, щоб не заблокувати Promise.all через один битий кадр
-            resolve();
+            resolve(); // Резолвимо, щоб Promise.all не завис
           };
 
-          img
-            .decode()
-            .then(onSuccess)
-            .catch(() => {
-              img.onload = onSuccess;
-              img.onerror = onError;
-            });
+          img.src = currentFrameImage(i);
         });
 
         promises.push(promise);
       }
 
-      // Чекаємо поки ВСІ кадри пройдуть завантаження/декод
+      // Чекаємо поки ВСІ кадри будуть оброблені
       await Promise.all(promises);
 
       allLoadedRef.current = true;
       console.log(
-        "✅ [Sequence] Всі кадри успішно завантажено та декодовано! Секвенція розблокована.",
+        "✅ [Sequence] Всі кадри успішно завантажено! Секвенція розблокована.",
       );
 
-      // Якщо користувач вже проскролив вниз під час завантаження — рендеримо актуальний кадр
+      // Якщо користувач вже проскролив вниз під час завантаження — оновлюємо кадр до актуального
       const currentScrollFrame = Math.round(currentFrame.current.frame);
       if (currentScrollFrame > 0 && imagesRef.current[currentScrollFrame]) {
         renderFrame(currentScrollFrame);
@@ -300,8 +314,7 @@ export function ServerSection() {
             onUpdate: () => {
               let frameIndex = Math.round(currentFrame.current.frame);
 
-              // ГОЛОВНА ЛОГІКА БЛОКУВАННЯ:
-              // Якщо не всі кадри завантажені, показуємо лише перший (0) кадр
+              // ПОКИ ФОТКИ ВАНТАЖАТЬСЯ — ТРИМАЄМО ПЕРШИЙ КАДР
               if (!allLoadedRef.current) {
                 frameIndex = 0;
               }
@@ -341,7 +354,7 @@ export function ServerSection() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         let frameIndex = Math.round(currentFrame.current.frame);
-        if (!allLoadedRef.current) frameIndex = 0; // Навіть при ресайзі тримаємо 0 кадр, якщо вантажиться
+        if (!allLoadedRef.current) frameIndex = 0;
 
         if (imagesRef.current[frameIndex]) {
           renderFrame(frameIndex);
