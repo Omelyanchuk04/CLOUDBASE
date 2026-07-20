@@ -23,6 +23,9 @@ export function ServerSection() {
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const lastRenderedFrame = useRef(-1);
 
+  // Реф для перевірки чи всі кадри завантажені
+  const allLoadedRef = useRef(false);
+
   const currentFrameImage = useCallback(
     (index: number) =>
       `/server-sequence/${(index + 1).toString().padStart(4, "0")}.png`,
@@ -35,57 +38,7 @@ export function ServerSection() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    // --- 1. Швидке завантаження та ДЕКОДУВАННЯ 1-го кадру ---
-    const loadFirstFrame = () => {
-      const img = new Image();
-      img.src = currentFrameImage(0);
-      // img.decode() змушує браузер розпакувати пікселі в пам'ять до рендеру
-      img
-        .decode()
-        .then(() => {
-          imagesRef.current[0] = img;
-          renderFrame(0);
-          lastRenderedFrame.current = 0;
-          loadRestOfFrames();
-        })
-        .catch(() => {
-          // Фолбек, якщо decode не підтримується
-          img.onload = () => {
-            imagesRef.current[0] = img;
-            renderFrame(0);
-            lastRenderedFrame.current = 0;
-            loadRestOfFrames();
-          };
-        });
-    };
-
-    // --- 2. Оптимізоване асинхронне фонове завантаження ---
-    const loadRestOfFrames = () => {
-      const loadTask = async () => {
-        for (let i = 1; i < frameCount; i++) {
-          const img = new Image();
-          img.src = currentFrameImage(i);
-          try {
-            // Найважливіша оптимізація: розпаковуємо картинку в GPU/RAM у фоні!
-            // Завдяки цьому ctx.drawImage спрацює миттєво під час скролу.
-            await img.decode();
-            imagesRef.current[i] = img;
-          } catch (e) {
-            // Ігноруємо помилки завантаження окремих кадрів
-          }
-        }
-      };
-
-      if ("requestIdleCallback" in window) {
-        requestIdleCallback(() => loadTask());
-      } else {
-        setTimeout(loadTask, 100);
-      }
-    };
-
-    loadFirstFrame();
-
-    // Функція малювання максимально проста і швидка
+    // --- Функція рендеру (малювання) ---
     const renderFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
@@ -116,6 +69,84 @@ export function ServerSection() {
       );
     };
 
+    // --- 1. Завантаження першого кадру ---
+    const loadFirstFrame = () => {
+      const img = new Image();
+      img.src = currentFrameImage(0);
+
+      const onReady = () => {
+        imagesRef.current[0] = img;
+        renderFrame(0);
+        lastRenderedFrame.current = 0;
+        console.log(
+          `[Sequence] Перший кадр (0) готовий. Починаємо фонове завантаження...`,
+        );
+        loadRestOfFrames();
+      };
+
+      img
+        .decode()
+        .then(onReady)
+        .catch(() => {
+          img.onload = onReady;
+        });
+    };
+
+    // --- 2. Контрольоване завантаження інших кадрів ---
+    const loadRestOfFrames = async () => {
+      let loadedCount = 1; // Перший вже завантажено
+      const promises: Promise<void>[] = [];
+
+      for (let i = 1; i < frameCount; i++) {
+        const promise = new Promise<void>((resolve) => {
+          const img = new Image();
+          img.src = currentFrameImage(i);
+
+          const onSuccess = () => {
+            imagesRef.current[i] = img;
+            loadedCount++;
+            console.log(
+              `[Sequence] Кадр ${i} готовий. Прогрес: ${loadedCount}/${frameCount}`,
+            );
+            resolve();
+          };
+
+          const onError = () => {
+            console.warn(`[Sequence] Помилка завантаження кадру ${i}`);
+            // Резолвимо все одно, щоб не заблокувати Promise.all через один битий кадр
+            resolve();
+          };
+
+          img
+            .decode()
+            .then(onSuccess)
+            .catch(() => {
+              img.onload = onSuccess;
+              img.onerror = onError;
+            });
+        });
+
+        promises.push(promise);
+      }
+
+      // Чекаємо поки ВСІ кадри пройдуть завантаження/декод
+      await Promise.all(promises);
+
+      allLoadedRef.current = true;
+      console.log(
+        "✅ [Sequence] Всі кадри успішно завантажено та декодовано! Секвенція розблокована.",
+      );
+
+      // Якщо користувач вже проскролив вниз під час завантаження — рендеримо актуальний кадр
+      const currentScrollFrame = Math.round(currentFrame.current.frame);
+      if (currentScrollFrame > 0 && imagesRef.current[currentScrollFrame]) {
+        renderFrame(currentScrollFrame);
+        lastRenderedFrame.current = currentScrollFrame;
+      }
+    };
+
+    loadFirstFrame();
+
     const ctxGsap = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -123,7 +154,6 @@ export function ServerSection() {
           pin: true,
           start: "top top",
           end: "+=6000",
-          // ЗБІЛЬШЕНО scrub. Це згладжує скрол мишкою ("сходинки") і ховає лаги слабкого ПК
           scrub: 0.8,
         },
       });
@@ -250,7 +280,7 @@ export function ServerSection() {
         0,
       );
 
-      // --- ФАЗА 2: Чистий фон та наближення ---
+      // --- ФАЗА 2: Чистий фон, наближення та АНІМАЦІЯ КАДРІВ ---
       tl.to(
         [darkGradientRef.current, serverBacklightRef.current],
         { opacity: 1, duration: 1.5, ease: "power1.inOut" },
@@ -261,7 +291,6 @@ export function ServerSection() {
           { scale: 1.2, duration: 5, ease: "none" },
           2,
         )
-
         .to(
           currentFrame.current,
           {
@@ -269,10 +298,14 @@ export function ServerSection() {
             ease: "none",
             duration: 5,
             onUpdate: () => {
-              const frameIndex = Math.round(currentFrame.current.frame);
+              let frameIndex = Math.round(currentFrame.current.frame);
 
-              // ВАЖЛИВО: Прибрано зайвий requestAnimationFrame! GSAP вже в ньому працює.
-              // Малюємо кадр ТІЛЬКИ якщо він вже повністю завантажений та декодований (щоб не блокувати скрол)
+              // ГОЛОВНА ЛОГІКА БЛОКУВАННЯ:
+              // Якщо не всі кадри завантажені, показуємо лише перший (0) кадр
+              if (!allLoadedRef.current) {
+                frameIndex = 0;
+              }
+
               if (
                 frameIndex !== lastRenderedFrame.current &&
                 imagesRef.current[frameIndex]
@@ -302,13 +335,17 @@ export function ServerSection() {
       });
     }, sectionRef);
 
-    // --- Оптимізація Ресайзу (Debounce) ---
+    // --- Оптимізація Ресайзу ---
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        const frameIndex = Math.round(currentFrame.current.frame);
-        if (imagesRef.current[frameIndex]) renderFrame(frameIndex);
+        let frameIndex = Math.round(currentFrame.current.frame);
+        if (!allLoadedRef.current) frameIndex = 0; // Навіть при ресайзі тримаємо 0 кадр, якщо вантажиться
+
+        if (imagesRef.current[frameIndex]) {
+          renderFrame(frameIndex);
+        }
       }, 150);
     };
 
