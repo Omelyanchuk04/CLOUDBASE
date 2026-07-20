@@ -11,18 +11,20 @@ export function ServerSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Рефи для шарів диму
   const smoke1Ref = useRef<HTMLDivElement>(null);
   const smoke2Ref = useRef<HTMLDivElement>(null);
   const smoke3Ref = useRef<HTMLDivElement>(null);
   const smoke4Ref = useRef<HTMLDivElement>(null);
 
+  // Рефи для фонового світіння
   const glowGreenRef = useRef<HTMLDivElement>(null);
   const glowBlueRef = useRef<HTMLDivElement>(null);
   const glowPurpleRef = useRef<HTMLDivElement>(null);
   const glowOrangeRef = useRef<HTMLDivElement>(null);
   const glowCyanRef = useRef<HTMLDivElement>(null);
 
-  // Рефи для нового чистого фону
+  // Рефи для чистого фону (наближення)
   const darkGradientRef = useRef<HTMLDivElement>(null);
   const serverBacklightRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +32,9 @@ export function ServerSection() {
   const currentFrame = useRef({ frame: 0 });
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const lastRenderedFrame = useRef(-1);
+
+  // Флаг завантаження всіх кадрів
+  const allFramesLoadedRef = useRef(false);
 
   const currentFrameImage = (index: number) =>
     `/server-sequence/${(index + 1).toString().padStart(4, "0")}.png`;
@@ -42,30 +47,54 @@ export function ServerSection() {
 
     const images: HTMLImageElement[] = [];
 
-    for (let i = 0; i < frameCount; i++) {
+    // --- 1. ПРІОРИТЕТНЕ ЗАВАНТАЖЕННЯ 1-ГО КАДРУ ---
+    const loadFirstFrame = () => {
       const img = new Image();
-      img.src = currentFrameImage(i);
+      img.src = currentFrameImage(0);
+      img.onload = () => {
+        images[0] = img;
+        imagesRef.current = images;
 
-      img
-        .decode()
-        .then(() => {
-          if (i === 0 && lastRenderedFrame.current === -1) {
-            renderFrame(0);
-            lastRenderedFrame.current = 0;
+        // Малюємо перший кадр одразу, як він завантажився
+        renderFrame(0);
+        lastRenderedFrame.current = 0;
+
+        // Після цього запускаємо фонове завантаження решти
+        loadRestOfFrames();
+      };
+    };
+
+    // --- 2. ФОНОВЕ ЗАВАНТАЖЕННЯ РЕШТИ КАДРІВ ---
+    const loadRestOfFrames = () => {
+      let loadedCount = 1; // Перший вже є
+
+      for (let i = 1; i < frameCount; i++) {
+        const img = new Image();
+        img.src = currentFrameImage(i);
+
+        img.onload = () => {
+          images[i] = img;
+          loadedCount++;
+
+          // Коли всі кадри завантажені, даємо дозвіл на анімацію
+          if (loadedCount === frameCount) {
+            allFramesLoadedRef.current = true;
           }
-        })
-        .catch(() => {
-          img.onload = () => {
-            if (i === 0 && lastRenderedFrame.current === -1) {
-              renderFrame(0);
-              lastRenderedFrame.current = 0;
-            }
-          };
-        });
-      images.push(img);
-    }
-    imagesRef.current = images;
+        };
+        // На випадок помилки завантаження окремого кадру, щоб не блокувати все
+        img.onerror = () => {
+          loadedCount++;
+          if (loadedCount === frameCount) {
+            allFramesLoadedRef.current = true;
+          }
+        };
+      }
+    };
 
+    // Запускаємо процес завантаження
+    loadFirstFrame();
+
+    // --- Функція відмальовування кадру ---
     const renderFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
@@ -243,6 +272,7 @@ export function ServerSection() {
           2,
         )
 
+        // Секвенція сервера
         .to(
           currentFrame.current,
           {
@@ -250,6 +280,9 @@ export function ServerSection() {
             ease: "none",
             duration: 4,
             onUpdate: () => {
+              // Анімуємо тільки якщо всі кадри завантажені
+              if (!allFramesLoadedRef.current) return;
+
               const frameIndex = Math.round(currentFrame.current.frame);
               if (
                 frameIndex !== lastRenderedFrame.current &&
@@ -282,6 +315,7 @@ export function ServerSection() {
 
   return (
     <section className={styles.serverSectionWrapper} ref={sectionRef}>
+      {/* Динамічний фон світіння */}
       <div className={styles.server__glow} aria-hidden="true">
         <div ref={glowGreenRef} className={styles.server__glowGreen} />
         <div ref={glowBlueRef} className={styles.server__glowBlue} />
@@ -290,6 +324,7 @@ export function ServerSection() {
         <div ref={glowCyanRef} className={styles.server__glowCyan} />
       </div>
 
+      {/* Контейнер для вибуху диму */}
       <div className={styles.smokeContainer} aria-hidden="true">
         <div
           ref={smoke1Ref}
@@ -309,7 +344,7 @@ export function ServerSection() {
         />
       </div>
 
-      {/* НОВИЙ ЧИСТИЙ ФОН: Глибокий градієнт та м'яка аура */}
+      {/* Глибокий градієнт та м'яка аура */}
       <div
         ref={darkGradientRef}
         className={styles.darkGradientBg}
@@ -321,8 +356,10 @@ export function ServerSection() {
         aria-hidden="true"
       />
 
+      {/* Canvas сервера */}
       <canvas ref={canvasRef} className={styles.canvasContainer} />
 
+      {/* Контент поверх */}
       <div className={styles.overlayContent}></div>
     </section>
   );
