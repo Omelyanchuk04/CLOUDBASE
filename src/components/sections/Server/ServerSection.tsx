@@ -11,29 +11,33 @@ export function ServerSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Рефи для шарів диму
   const smoke1Ref = useRef<HTMLDivElement>(null);
   const smoke2Ref = useRef<HTMLDivElement>(null);
   const smoke3Ref = useRef<HTMLDivElement>(null);
   const smoke4Ref = useRef<HTMLDivElement>(null);
 
-  // Рефи для фонового світіння
   const glowGreenRef = useRef<HTMLDivElement>(null);
   const glowBlueRef = useRef<HTMLDivElement>(null);
   const glowPurpleRef = useRef<HTMLDivElement>(null);
   const glowOrangeRef = useRef<HTMLDivElement>(null);
   const glowCyanRef = useRef<HTMLDivElement>(null);
 
-  // Рефи для чистого фону (наближення)
   const darkGradientRef = useRef<HTMLDivElement>(null);
   const serverBacklightRef = useRef<HTMLDivElement>(null);
+
+  // Окремі рефи для 6 характеристик
+  const feature1Ref = useRef<HTMLDivElement>(null);
+  const feature2Ref = useRef<HTMLDivElement>(null);
+  const feature3Ref = useRef<HTMLDivElement>(null);
+  const feature4Ref = useRef<HTMLDivElement>(null);
+  const feature5Ref = useRef<HTMLDivElement>(null);
+  const feature6Ref = useRef<HTMLDivElement>(null);
 
   const frameCount = 180;
   const currentFrame = useRef({ frame: 0 });
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const lastRenderedFrame = useRef(-1);
 
-  // Флаг завантаження всіх кадрів
   const allFramesLoadedRef = useRef(false);
 
   const currentFrameImage = (index: number) =>
@@ -47,7 +51,6 @@ export function ServerSection() {
 
     const images: HTMLImageElement[] = [];
 
-    // --- 1. ПРІОРИТЕТНЕ ЗАВАНТАЖЕННЯ 1-ГО КАДРУ ---
     const loadFirstFrame = () => {
       const img = new Image();
       img.src = currentFrameImage(0);
@@ -55,18 +58,15 @@ export function ServerSection() {
         images[0] = img;
         imagesRef.current = images;
 
-        // Малюємо перший кадр одразу, як він завантажився
         renderFrame(0);
         lastRenderedFrame.current = 0;
 
-        // Після цього запускаємо фонове завантаження решти
         loadRestOfFrames();
       };
     };
 
-    // --- 2. ФОНОВЕ ЗАВАНТАЖЕННЯ РЕШТИ КАДРІВ ---
     const loadRestOfFrames = () => {
-      let loadedCount = 1; // Перший вже є
+      let loadedCount = 1;
 
       for (let i = 1; i < frameCount; i++) {
         const img = new Image();
@@ -76,12 +76,10 @@ export function ServerSection() {
           images[i] = img;
           loadedCount++;
 
-          // Коли всі кадри завантажені, даємо дозвіл на анімацію
           if (loadedCount === frameCount) {
             allFramesLoadedRef.current = true;
           }
         };
-        // На випадок помилки завантаження окремого кадру, щоб не блокувати все
         img.onerror = () => {
           loadedCount++;
           if (loadedCount === frameCount) {
@@ -91,10 +89,8 @@ export function ServerSection() {
       }
     };
 
-    // Запускаємо процес завантаження
     loadFirstFrame();
 
-    // --- Функція відмальовування кадру ---
     const renderFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
@@ -131,13 +127,12 @@ export function ServerSection() {
           trigger: sectionRef.current,
           pin: true,
           start: "top top",
-          end: "+=5000",
+          end: "+=6000", // Трохи збільшили дистанцію скролу, бо додали більше фішок
           scrub: 0.15,
         },
       });
 
       // --- ФАЗА 1: Вибух диму + Виїзд сервера ---
-
       tl.fromTo(
         glowGreenRef.current,
         { xPercent: -15, yPercent: 10, scale: 0.9 },
@@ -258,29 +253,25 @@ export function ServerSection() {
         );
 
       // --- ФАЗА 2: Чистий фон та наближення ---
-
-      // Плавно проявляємо глибокий фон та м'яку ауру
       tl.to(
         [darkGradientRef.current, serverBacklightRef.current],
         { opacity: 1, duration: 1.5, ease: "power1.inOut" },
         2,
       )
-        // Аура злегка "дихає", розширюючись разом із наближенням сервера
         .to(
           serverBacklightRef.current,
-          { scale: 1.2, duration: 4, ease: "none" },
+          { scale: 1.2, duration: 5, ease: "none" },
           2,
         )
 
-        // Секвенція сервера
+        // Секвенція сервера (розтягнуто на 5 секунд, щоб всі фішки встигли показатись)
         .to(
           currentFrame.current,
           {
             frame: frameCount - 1,
             ease: "none",
-            duration: 4,
+            duration: 5,
             onUpdate: () => {
-              // Анімуємо тільки якщо всі кадри завантажені
               if (!allFramesLoadedRef.current) return;
 
               const frameIndex = Math.round(currentFrame.current.frame);
@@ -297,6 +288,81 @@ export function ServerSection() {
           },
           2,
         );
+
+      // --- ФАЗА 3: Послідовна поява 6 характеристик зі скролом ---
+      // Вони будуть чергуватися вліво-вправо і плавно зникати.
+
+      // 1 (Лівий верх)
+      tl.fromTo(
+        feature1Ref.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        2.2,
+      ).to(
+        feature1Ref.current,
+        { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+        3.0,
+      );
+
+      // 2 (Правий верх)
+      tl.fromTo(
+        feature2Ref.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        2.8,
+      ).to(
+        feature2Ref.current,
+        { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+        3.6,
+      );
+
+      // 3 (Ліва середина)
+      tl.fromTo(
+        feature3Ref.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        3.4,
+      ).to(
+        feature3Ref.current,
+        { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+        4.2,
+      );
+
+      // 4 (Права середина)
+      tl.fromTo(
+        feature4Ref.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        4.0,
+      ).to(
+        feature4Ref.current,
+        { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+        4.8,
+      );
+
+      // 5 (Лівий низ)
+      tl.fromTo(
+        feature5Ref.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        4.6,
+      ).to(
+        feature5Ref.current,
+        { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+        5.4,
+      );
+
+      // 6 (Правий низ)
+      tl.fromTo(
+        feature6Ref.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        5.2,
+      ).to(
+        feature6Ref.current,
+        { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+        6.0,
+      );
     }, sectionRef);
 
     const handleResize = () => {
@@ -315,7 +381,6 @@ export function ServerSection() {
 
   return (
     <section className={styles.serverSectionWrapper} ref={sectionRef}>
-      {/* Динамічний фон світіння */}
       <div className={styles.server__glow} aria-hidden="true">
         <div ref={glowGreenRef} className={styles.server__glowGreen} />
         <div ref={glowBlueRef} className={styles.server__glowBlue} />
@@ -324,7 +389,6 @@ export function ServerSection() {
         <div ref={glowCyanRef} className={styles.server__glowCyan} />
       </div>
 
-      {/* Контейнер для вибуху диму */}
       <div className={styles.smokeContainer} aria-hidden="true">
         <div
           ref={smoke1Ref}
@@ -344,7 +408,6 @@ export function ServerSection() {
         />
       </div>
 
-      {/* Глибокий градієнт та м'яка аура */}
       <div
         ref={darkGradientRef}
         className={styles.darkGradientBg}
@@ -359,7 +422,81 @@ export function ServerSection() {
       {/* Canvas сервера */}
       <canvas ref={canvasRef} className={styles.canvasContainer} />
 
-      {/* Контент поверх */}
+      {/* Контейнер з характеристиками */}
+      <div className={styles.featuresContainer}>
+        {/* 1 */}
+        <div
+          ref={feature1Ref}
+          className={`${styles.featureItem} ${styles.featureLeft} ${styles.featureTop}`}
+        >
+          <div className={styles.featureContent}>
+            <h4>Надійність 99.9%</h4>
+            <p>Безперебійна робота бізнесу</p>
+          </div>
+          <div className={styles.featureLine}></div>
+        </div>
+
+        {/* 2 */}
+        <div
+          ref={feature2Ref}
+          className={`${styles.featureItem} ${styles.featureRight} ${styles.featureTop}`}
+        >
+          <div className={styles.featureContent}>
+            <h4>DDoS Захист</h4>
+            <p>Ваша інформація в безпеці</p>
+          </div>
+          <div className={styles.featureLine}></div>
+        </div>
+
+        {/* 3 */}
+        <div
+          ref={feature3Ref}
+          className={`${styles.featureItem} ${styles.featureLeft} ${styles.featureMiddle}`}
+        >
+          <div className={styles.featureContent}>
+            <h4>NVMe Сховище</h4>
+            <p>Блискавична швидкість даних</p>
+          </div>
+          <div className={styles.featureLine}></div>
+        </div>
+
+        {/* 4 */}
+        <div
+          ref={feature4Ref}
+          className={`${styles.featureItem} ${styles.featureRight} ${styles.featureMiddle}`}
+        >
+          <div className={styles.featureContent}>
+            <h4>Масштабованість</h4>
+            <p>Ресурси ростуть разом з вами</p>
+          </div>
+          <div className={styles.featureLine}></div>
+        </div>
+
+        {/* 5 */}
+        <div
+          ref={feature5Ref}
+          className={`${styles.featureItem} ${styles.featureLeft} ${styles.featureBottom}`}
+        >
+          <div className={styles.featureContent}>
+            <h4>Резервне копіювання</h4>
+            <p>Щоденні бекапи важливого</p>
+          </div>
+          <div className={styles.featureLine}></div>
+        </div>
+
+        {/* 6 */}
+        <div
+          ref={feature6Ref}
+          className={`${styles.featureItem} ${styles.featureRight} ${styles.featureBottom}`}
+        >
+          <div className={styles.featureContent}>
+            <h4>Апаратний RAID</h4>
+            <p>Максимальна відмовостійкість</p>
+          </div>
+          <div className={styles.featureLine}></div>
+        </div>
+      </div>
+
       <div className={styles.overlayContent}></div>
     </section>
   );
