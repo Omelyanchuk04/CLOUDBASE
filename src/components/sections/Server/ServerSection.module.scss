@@ -4,7 +4,6 @@
   height: 100vh;
   background-color: #000;
   overflow: hidden;
-  /* Апаратна ізоляція. Браузер не перемальовує інші секції при змінах тут */
   contain: paint layout;
 }
 
@@ -17,7 +16,6 @@
   mix-blend-mode: color-dodge;
   overflow: hidden;
   will-change: transform;
-  /* Апаратне прискорення композиції */
   transform: translateZ(0);
 }
 
@@ -30,7 +28,6 @@
   border-radius: 50%;
   will-change: transform, opacity;
   filter: blur(120px);
-  /* Примусове винесення на GPU */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }
@@ -128,7 +125,6 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  /* Прискорення для гігантських прозорих картинок */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }
@@ -166,7 +162,7 @@
   transform: translateZ(0);
 }
 
-/* === 4. М'ЯКА ПІДСВІТКА СЕРВЕРА (AURA) === */
+/* === 4. М'ЯКА ПІДСВІТКА СЕРВЕРА === */
 .serverBacklight {
   position: absolute;
   top: 50%;
@@ -201,7 +197,7 @@
   transform: translateZ(0);
 }
 
-/* === 6. ХАРАКТЕРИСТИКИ ТА ЛІНІЇ (МІНІМАЛІЗМ) === */
+/* === 6. ХАРАКТЕРИСТИКИ ТА ЛІНІЇ (ДЕСКТОП) === */
 .featuresContainer {
   position: absolute;
   inset: 0;
@@ -281,16 +277,18 @@
   pointer-events: none;
 }
 
-/* === Мобільна адаптація === */
+/* ========================================= */
+/* === МОБІЛЬНА АДАПТАЦІЯ (АДАПТИВ)      === */
+/* ========================================= */
 @media (max-width: 768px) {
   .smokeLayer {
-    width: 180vw;
-    height: 180vw;
+    width: 250vw;
+    height: 250vw;
   }
   .smoke2,
   .smoke4 {
-    width: 200vw;
-    height: 200vw;
+    width: 280vw;
+    height: 280vw;
   }
 
   .server__glowGreen,
@@ -298,30 +296,45 @@
   .server__glowPurple,
   .server__glowOrange,
   .server__glowCyan {
-    width: 90vw;
-    height: 90vw;
+    width: 150vw;
+    height: 150vw;
   }
 
-  .featuresContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    padding-bottom: 40px;
-    gap: 15px;
-  }
-
+  /* Позиціонування характеристик чітко під сервером по центру */
   .featureItem {
-    position: relative;
     right: auto !important;
-    left: auto !important;
-    top: auto !important;
+    left: 50% !important;
+    margin-left: -45%;
+
+    top: 82% !important; /* Опущено вниз, щоб не перекривати модель */
     bottom: auto !important;
+
+    width: 90%;
+
     flex-direction: column !important;
     text-align: center !important;
+    justify-content: center;
+  }
+
+  .featureContent h4 {
+    font-size: 1.3rem;
+  }
+
+  .featureContent p {
+    font-size: 1rem;
   }
 
   .featureLine {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .featureItem {
+    top: 80% !important; /* На дуже малих екранах піднімаємо трохи вище */
+  }
+
+  .featureContent h4 {
+    font-size: 1.15rem;
   }
 }

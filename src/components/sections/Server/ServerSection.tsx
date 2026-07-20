@@ -38,7 +38,7 @@ export function ServerSection() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    // --- Функція рендеру (малювання) ---
+    // --- Функція рендеру (малювання) з адаптацією під мобільні ---
     const renderFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
@@ -49,12 +49,24 @@ export function ServerSection() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.imageSmoothingEnabled = false;
 
-      const ratio = Math.min(
+      const isMobile = window.innerWidth <= 768;
+
+      let ratio = Math.min(
         canvas.width / img.width,
         canvas.height / img.height,
       );
+
+      // Збільшуємо модель сервера на мобільних пристроях
+      if (isMobile) {
+        ratio *= 1.8;
+      }
+
       const centerShift_x = (canvas.width - img.width * ratio) / 2;
-      const centerShift_y = (canvas.height - img.height * ratio) / 2;
+
+      // На телефонах піднімаємо модель трохи вище, щоб звільнити місце для тексту знизу
+      const centerShift_y = isMobile
+        ? (canvas.height - img.height * ratio) / 2 - canvas.height * 0.15
+        : (canvas.height - img.height * ratio) / 2;
 
       ctx.drawImage(
         img,
@@ -99,13 +111,12 @@ export function ServerSection() {
         loadRestOfFrames(); // Запускаємо інші навіть якщо перший впав
       };
 
-      // ВАЖЛИВО: src присвоюємо ТІЛЬКИ після обробників
       img.src = currentFrameImage(0);
     };
 
     // --- 2. Надійне фонове завантаження інших кадрів ---
     const loadRestOfFrames = async () => {
-      let loadedCount = 1; // Перший вже завантажено
+      let loadedCount = 1;
       const promises: Promise<void>[] = [];
 
       for (let i = 1; i < frameCount; i++) {
@@ -113,11 +124,9 @@ export function ServerSection() {
           const img = new Image();
 
           const onReady = () => {
-            // Перевіряємо щоб не додати двічі
             if (!imagesRef.current[i]) {
               imagesRef.current[i] = img;
               loadedCount++;
-              // Виводимо лог кожного десятого кадру, щоб не спамити консоль занадто сильно
               if (i % 10 === 0 || i === frameCount - 1) {
                 console.log(
                   `[Sequence] Завантажено: ${loadedCount}/${frameCount}`,
@@ -137,7 +146,7 @@ export function ServerSection() {
 
           img.onerror = () => {
             console.warn(`[Sequence] Помилка завантаження кадру ${i}`);
-            resolve(); // Резолвимо, щоб Promise.all не завис
+            resolve();
           };
 
           img.src = currentFrameImage(i);
@@ -146,12 +155,10 @@ export function ServerSection() {
         promises.push(promise);
       }
 
-      // Чекаємо поки ВСІ кадри будуть оброблені
       await Promise.all(promises);
 
       allLoadedRef.current = true;
 
-      // Фіксуємо час завершення та вираховуємо різницю в секундах
       const endTime = performance.now();
       const loadTimeSeconds = ((endTime - startTime) / 1000).toFixed(2);
 
@@ -159,7 +166,6 @@ export function ServerSection() {
         `✅ [Sequence] Всі кадри успішно завантажено за ${loadTimeSeconds} сек! Секвенція розблокована.`,
       );
 
-      // Якщо користувач вже проскролив вниз під час завантаження — оновлюємо кадр до актуального
       const currentScrollFrame = Math.round(currentFrame.current.frame);
       if (currentScrollFrame > 0 && imagesRef.current[currentScrollFrame]) {
         renderFrame(currentScrollFrame);
@@ -170,6 +176,8 @@ export function ServerSection() {
     loadFirstFrame();
 
     const ctxGsap = gsap.context(() => {
+      const isMobile = window.innerWidth <= 768;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -343,16 +351,32 @@ export function ServerSection() {
       featureRefs.current.forEach((ref, index) => {
         if (!ref) return;
         const startTime = 2.2 + index * 0.6;
-        tl.fromTo(
-          ref,
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-          startTime,
-        ).to(
-          ref,
-          { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
-          startTime + 0.8,
-        );
+
+        if (isMobile) {
+          // НА МОБІЛЬНОМУ: Сувора черговість, щоб текст не накладався один на одного
+          tl.fromTo(
+            ref,
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" },
+            startTime,
+          ).to(
+            ref,
+            { opacity: 0, y: -10, duration: 0.2, ease: "power2.in" },
+            startTime + 0.35, // Зникає до того, як з'явиться наступний блок
+          );
+        } else {
+          // НА ДЕСКТОПІ: Плавне перекриття
+          tl.fromTo(
+            ref,
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+            startTime,
+          ).to(
+            ref,
+            { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
+            startTime + 0.8,
+          );
+        }
       });
     }, sectionRef);
 
