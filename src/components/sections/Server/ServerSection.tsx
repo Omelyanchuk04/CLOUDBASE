@@ -69,6 +69,9 @@ export function ServerSection() {
       );
     };
 
+    // Фіксуємо час початку завантаження
+    const startTime = performance.now();
+
     // --- 1. Надійне завантаження першого кадру ---
     const loadFirstFrame = () => {
       const img = new Image();
@@ -147,8 +150,13 @@ export function ServerSection() {
       await Promise.all(promises);
 
       allLoadedRef.current = true;
+
+      // Фіксуємо час завершення та вираховуємо різницю в секундах
+      const endTime = performance.now();
+      const loadTimeSeconds = ((endTime - startTime) / 1000).toFixed(2);
+
       console.log(
-        "✅ [Sequence] Всі кадри успішно завантажено! Секвенція розблокована.",
+        `✅ [Sequence] Всі кадри успішно завантажено за ${loadTimeSeconds} сек! Секвенція розблокована.`,
       );
 
       // Якщо користувач вже проскролив вниз під час завантаження — оновлюємо кадр до актуального
