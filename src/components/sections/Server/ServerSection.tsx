@@ -18,7 +18,7 @@ export function ServerSection() {
   const darkGradientRef = useRef<HTMLDivElement>(null);
   const serverBacklightRef = useRef<HTMLDivElement>(null);
 
-  const frameCount = 120;
+  const frameCount = 100;
   const currentFrame = useRef({ frame: 0 });
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const lastRenderedFrame = useRef(-1);
