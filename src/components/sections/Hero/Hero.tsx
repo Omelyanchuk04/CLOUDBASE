@@ -191,6 +191,9 @@ export function Hero() {
   const textSecondRef = useRef<HTMLDivElement>(null);
   const textThirdRef = useRef<HTMLDivElement>(null);
 
+  const ctaContainerRef = useRef<HTMLDivElement>(null);
+  const ctaBtnRef = useRef<HTMLButtonElement>(null);
+
   useLayoutEffect(() => {
     let mm = gsap.matchMedia();
 
@@ -251,10 +254,9 @@ export function Hero() {
           )
           .fromTo(
             laptopLeftRef.current,
-            // Стартують з-за меж екрана
             { xPercent: isMobile ? -80 : -50, opacity: 0, scale: 0.8 },
             {
-              xPercent: 0, // Повертаємо кінцеву точку в 0 для всіх
+              xPercent: 0,
               opacity: 1,
               scale: 1,
               duration: 2,
@@ -267,7 +269,7 @@ export function Hero() {
             laptopRightRef.current,
             { xPercent: isMobile ? 80 : 50, opacity: 0, scale: 0.8 },
             {
-              xPercent: 0, // Повертаємо кінцеву точку в 0 для всіх
+              xPercent: 0,
               opacity: 1,
               scale: 1,
               duration: 2,
@@ -275,6 +277,17 @@ export function Hero() {
               force3D: true,
             },
             0.5,
+          )
+          // === АНІМАЦІЯ КНОПКИ В КІНЦІ СКРОЛУ ===
+          .to(
+            ctaContainerRef.current,
+            { "--bottom-offset": "30px", duration: 1, ease: "power1.inOut" },
+            3.5,
+          )
+          .to(
+            ctaBtnRef.current,
+            { "--bottom-rad": "45px", duration: 1, ease: "power1.inOut" },
+            3.5,
           );
       },
     );
@@ -294,7 +307,7 @@ export function Hero() {
           </div>
         </div>
 
-        <DataFlowBackground />
+        {/* <DataFlowBackground /> */}
 
         <div className={styles.hero__inner}>
           {/* === КОНТЕЙНЕР ТЕКСТУ === */}
@@ -302,12 +315,6 @@ export function Hero() {
             <div className={styles.hero__textInitial} ref={textInitialRef}>
               <h1 className={styles.hero__heading}>{HERO.step1.heading}</h1>
               <p className={styles.hero__sub}>{HERO.step1.subheading}</p>
-
-              <div className={styles.hero__ctas}>
-                <button className={styles.btnYellowGlass}>
-                  {HERO.step1.cta}
-                </button>
-              </div>
             </div>
 
             <div className={styles.hero__textSecond} ref={textSecondRef}>
@@ -391,6 +398,18 @@ export function Hero() {
               />
             </div>
           </div>
+        </div>
+
+        {/* === НАПІВКРУГЛА КНОПКА CTA === */}
+        <div className={styles.hero__bottomCta} ref={ctaContainerRef}>
+          <button className={styles.btnSemicircle} ref={ctaBtnRef}>
+            <span className={styles.btnSemicircle__text}>{HERO.step1.cta}</span>
+            <span className={styles.btnSemicircle__icon}>
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </span>
+          </button>
         </div>
       </section>
     </div>

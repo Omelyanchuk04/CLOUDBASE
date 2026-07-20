@@ -35,10 +35,11 @@ export const Header = () => {
   const headerContent = (
     <header className={styles.header}>
       <div className={styles.header__container}>
-        {/* Логотип */}
+        {/* Логотип + Текст */}
         <div className={styles.header__logo_container}>
           <Link href="/" className={styles.header__logo}>
             <img src={logo.src} alt="CloudBase Logo" />
+            <span className={styles.header__logo_text}>CLOUDBASE</span>
           </Link>
         </div>
 
