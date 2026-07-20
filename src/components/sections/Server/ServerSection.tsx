@@ -28,7 +28,7 @@ export function ServerSection() {
 
   const currentFrameImage = useCallback(
     (index: number) =>
-      `/server-sequence/${(index + 1).toString().padStart(4, "0")}.png`,
+      `/server-sequence-webp/${(index + 1).toString().padStart(4, "0")}.webp`,
     [],
   );
 
