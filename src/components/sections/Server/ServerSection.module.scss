@@ -1,134 +1,232 @@
 .serverSectionWrapper {
   position: relative;
-  width: 100vw;
-  max-width: 100%;
-
-  /* ЗАМІНИТИ min-height на height */
+  width: 100%;
   height: 100vh;
-  height: 100svh; /* Для мобільних браузерів */
-
+  background-color: #000;
   overflow: hidden;
-  background: transparent;
-  z-index: 1;
 }
 
-/* === СТИЛІ ФОНУ ДЛЯ БЕЗШОВНОГО ПЕРЕХОДУ === */
+/* === 1. ДИНАМІЧНИЙ ФОН СВІТІННЯ === */
 .server__glow {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-
-  /* ВАЖЛИВО: Оскільки низ Hero закінчується затемненням rgba(0,0,0,0.4), 
-     ми починаємо верх цієї секції з такого ж кольору і плавно розчиняємо його, 
-     щоб зшити дві секції без помітної лінії. */
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.4) 0%,
-    transparent 20%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
+  mix-blend-mode: color-dodge;
+  overflow: hidden;
+  will-change: transform;
 }
 
 .server__glowGreen,
 .server__glowBlue,
-.server__glowPurple {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
+.server__glowPurple,
+.server__glowOrange,
+.server__glowCyan {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  filter: blur(120px);
 }
 
-/* Розташування підсвіток трохи зміщене, щоб воно виглядало як продовження сторінки */
 .server__glowGreen {
-  position: absolute;
-  top: 10%;
-  left: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(34, 197, 94, 0.25) 0%,
-    transparent 65%
-  );
-  filter: blur(80px);
-}
-
-.server__glowBlue {
-  position: absolute;
-  bottom: -10%;
-  right: -10%;
+  top: -20%;
+  left: 10%;
   width: 70vw;
   height: 70vw;
   background: radial-gradient(
     circle,
-    rgba(14, 165, 233, 0.25) 0%,
-    transparent 60%
+    rgba(34, 197, 94, 0.4) 0%,
+    transparent 70%
   );
-  filter: blur(90px);
+}
+
+.server__glowBlue {
+  bottom: -15%;
+  right: 15%;
+  width: 80vw;
+  height: 80vw;
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.4) 0%,
+    transparent 70%
+  );
 }
 
 .server__glowPurple {
-  position: absolute;
-  top: 40%;
-  right: 20%;
-  width: 40vw;
-  height: 40vw;
+  top: 15%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
   background: radial-gradient(
     circle,
-    rgba(139, 92, 246, 0.2) 0%,
+    rgba(139, 92, 246, 0.4) 0%,
     transparent 70%
   );
-  filter: blur(100px);
-  mix-blend-mode: screen;
 }
 
-@media (max-width: 768px) {
-  .server__glowGreen {
-    top: 10%;
-    left: -20%;
-    width: 150vw;
-    height: 150vw;
-    filter: blur(40px);
-  }
-  .server__glowBlue {
-    bottom: 10%;
-    right: -30%;
-    width: 150vw;
-    height: 150vw;
-    filter: blur(40px);
-  }
-  .server__glowPurple {
-    top: 30%;
-    right: 10%;
-    width: 120vw;
-    height: 120vw;
-    filter: blur(40px);
-    mix-blend-mode: normal;
-  }
+.server__glowOrange {
+  bottom: 20%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(
+    circle,
+    rgba(249, 115, 22, 0.35) 0%,
+    transparent 70%
+  );
 }
 
-/* === КОНТЕЙНЕР THREE.JS === */
-.canvasContainer {
-  width: 100vw;
-  max-width: 100%;
-  height: 100vh;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  overflow: hidden;
-  /* Знаходиться поверх підсвітки (z-index: 1) */
-  z-index: 1;
+.server__glowCyan {
+  top: 40%;
+  left: 30%;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(
+    circle,
+    rgba(6, 182, 212, 0.35) 0%,
+    transparent 70%
+  );
 }
 
-/* === КОНТЕЙНЕР ДЛЯ ТЕКСТУ === */
-.overlayContent {
+/* === 2. КОНТЕЙНЕР ДЛЯ ВИБУХУ ДИМУ === */
+.smokeContainer {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  mix-blend-mode: screen;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+}
+
+.smokeLayer {
+  position: absolute;
+  width: 120vw;
+  height: 120vw;
+  will-change: transform, opacity;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.smoke1 {
+  background-image: url("/background/smoke-1.webp");
+}
+
+.smoke2 {
+  background-image: url("/background/smoke-3.png");
+  width: 130vw;
+  height: 130vw;
+}
+
+.smoke3 {
+  background-image: url("/background/smoke-2.png");
+}
+
+.smoke4 {
+  /* background-image: url("/background/smoke-5.png"); */
+  width: 150vw;
+  height: 150vw;
+}
+
+/* === 3. ЕЛЕГАНТНИЙ ТЕМНИЙ ГРАДІЄНТ (БЕЗ СІТКИ) === */
+.darkGradientBg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  /* Знаходиться поверх Three.js канвасу (z-index: 2) */
   z-index: 2;
+  opacity: 0;
+  /* Дуже глибокий, "дорогий" темний відтінок синього/сланцевого, що переходить у чорний */
+  background: radial-gradient(
+    circle at center,
+    rgba(15, 23, 42, 0.8) 0%,
+    rgba(0, 0, 0, 1) 75%
+  );
+  will-change: opacity;
+}
+
+/* === 4. М'ЯКА ПІДСВІТКА СЕРВЕРА (AURA) === */
+.serverBacklight {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  opacity: 0;
+
+  /* Легкий неоновий акцент безпосередньо за моделлю, щоб виділити її чорний корпус */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(14, 165, 233, 0.15) 0%,
+    rgba(139, 92, 246, 0.05) 40%,
+    transparent 60%
+  );
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+/* === 5. СЕРВЕР (CANVAS) === */
+.canvasContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  background: transparent;
+  will-change: transform;
+  display: block;
+}
+
+/* === 6. КОНТЕНТ (ТЕКСТ) === */
+.overlayContent {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === Мобільна адаптація === */
+@media (max-width: 768px) {
+  .smokeLayer {
+    width: 180vw;
+    height: 180vw;
+  }
+  .smoke2,
+  .smoke4 {
+    width: 200vw;
+    height: 200vw;
+  }
+
+  .server__glowGreen,
+  .server__glowBlue,
+  .server__glowPurple,
+  .server__glowOrange,
+  .server__glowCyan {
+    width: 90vw;
+    height: 90vw;
+  }
 }
