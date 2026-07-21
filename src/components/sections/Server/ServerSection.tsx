@@ -23,12 +23,11 @@ export function ServerSection() {
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const lastRenderedFrame = useRef(-1);
 
-  // Реф для перевірки чи всі кадри завантажені
   const allLoadedRef = useRef(false);
 
   const currentFrameImage = useCallback(
     (index: number) =>
-      `/server-sequence-webp/${(index + 1).toString().padStart(4, "0")}.webp`,
+      `/server-sequence/${(index + 1).toString().padStart(4, "0")}.png`,
     [],
   );
 
@@ -38,35 +37,57 @@ export function ServerSection() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    // --- Функція рендеру (малювання) з адаптацією під мобільні ---
+    // --- 🍏 АВТОМАТИЧНЕ ВИЗНАЧЕННЯ ПОТУЖНОСТІ ПРИСТРОЮ ---
+    // Якщо <= 4 ядер АБО <= 4ГБ оперативки — вважаємо пристрій "слабким"
+    const isWeakDevice =
+      typeof navigator !== "undefined" &&
+      ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+        (navigator.deviceMemory && navigator.deviceMemory <= 4));
+
+    // Ліміти: для слабких ПК 1280px (HD), для сильних — 1920px (Full HD)
+    const MAX_CANVAS_WIDTH = isWeakDevice ? 1280 : 1920;
+
+    // --- Функція рендеру (малювання) з динамічною оптимізацією ---
     const renderFrame = (index: number) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
 
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.imageSmoothingEnabled = false;
-
       const isMobile = window.innerWidth <= 768;
 
+      // 1. Рахуємо цільовий розмір Canvas з урахуванням лімітів
+      let targetWidth = window.innerWidth;
+      let targetHeight = window.innerHeight;
+
+      // Якщо екран більший за ліміт, пропорційно зменшуємо внутрішній розмір Canvas
+      if (targetWidth > MAX_CANVAS_WIDTH) {
+        const shrinkRatio = MAX_CANVAS_WIDTH / targetWidth;
+        targetWidth = MAX_CANVAS_WIDTH;
+        targetHeight = targetHeight * shrinkRatio;
+      }
+
+      // CSS все одно розтягне його на весь екран, але відеокарті буде вдвічі легше!
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = true; // Згладжуємо пікселі при CSS-розтягуванні
+
+      // 2. Рахуємо пропорції для самої картинки відносно нового розміру канвасу
       let ratio = Math.min(
         canvas.width / img.width,
         canvas.height / img.height,
       );
 
-      // Збільшуємо модель сервера на мобільних пристроях
+      // КАРДИНАЛЬНЕ ЗБІЛЬШЕННЯ ДЛЯ ТЕЛЕФОНІВ (Множимо на 3.5, щоб обрізати прозорі поля)
       if (isMobile) {
-        ratio *= 1.8;
+        ratio = (canvas.width / img.width) * 3.5;
       }
 
       const centerShift_x = (canvas.width - img.width * ratio) / 2;
 
-      // На телефонах піднімаємо модель трохи вище, щоб звільнити місце для тексту знизу
-      const centerShift_y = isMobile
-        ? (canvas.height - img.height * ratio) / 2 - canvas.height * 0.15
-        : (canvas.height - img.height * ratio) / 2;
+      // Піднімаємо сервер вище центру на телефоні, щоб звільнити низ для тексту
+      const shiftUp = isMobile ? canvas.height * 0.15 : 0;
+      const centerShift_y = (canvas.height - img.height * ratio) / 2 - shiftUp;
 
       ctx.drawImage(
         img,
@@ -81,10 +102,8 @@ export function ServerSection() {
       );
     };
 
-    // Фіксуємо час початку завантаження
     const startTime = performance.now();
 
-    // --- 1. Надійне завантаження першого кадру ---
     const loadFirstFrame = () => {
       const img = new Image();
 
@@ -108,13 +127,12 @@ export function ServerSection() {
 
       img.onerror = () => {
         console.error("[Sequence] Помилка завантаження першого кадру");
-        loadRestOfFrames(); // Запускаємо інші навіть якщо перший впав
+        loadRestOfFrames();
       };
 
       img.src = currentFrameImage(0);
     };
 
-    // --- 2. Надійне фонове завантаження інших кадрів ---
     const loadRestOfFrames = async () => {
       let loadedCount = 1;
       const promises: Promise<void>[] = [];
@@ -145,7 +163,6 @@ export function ServerSection() {
           };
 
           img.onerror = () => {
-            console.warn(`[Sequence] Помилка завантаження кадру ${i}`);
             resolve();
           };
 
@@ -156,14 +173,12 @@ export function ServerSection() {
       }
 
       await Promise.all(promises);
-
       allLoadedRef.current = true;
 
       const endTime = performance.now();
       const loadTimeSeconds = ((endTime - startTime) / 1000).toFixed(2);
-
       console.log(
-        `✅ [Sequence] Всі кадри успішно завантажено за ${loadTimeSeconds} сек! Секвенція розблокована.`,
+        `✅ [Sequence] Всі кадри успішно завантажено за ${loadTimeSeconds} сек!`,
       );
 
       const currentScrollFrame = Math.round(currentFrame.current.frame);
@@ -188,7 +203,7 @@ export function ServerSection() {
         },
       });
 
-      // --- ФАЗА 1: Фон та Дим ---
+      // --- ФАЗА 1 ---
       const [glow1, glow2, glow3, glow4, glow5] = glowRefs.current;
       tl.fromTo(
         glow1,
@@ -310,7 +325,7 @@ export function ServerSection() {
         0,
       );
 
-      // --- ФАЗА 2: Чистий фон, наближення та АНІМАЦІЯ КАДРІВ ---
+      // --- ФАЗА 2 ---
       tl.to(
         [darkGradientRef.current, serverBacklightRef.current],
         { opacity: 1, duration: 1.5, ease: "power1.inOut" },
@@ -329,12 +344,7 @@ export function ServerSection() {
             duration: 5,
             onUpdate: () => {
               let frameIndex = Math.round(currentFrame.current.frame);
-
-              // ПОКИ ФОТКИ ВАНТАЖАТЬСЯ — ТРИМАЄМО ПЕРШИЙ КАДР
-              if (!allLoadedRef.current) {
-                frameIndex = 0;
-              }
-
+              if (!allLoadedRef.current) frameIndex = 0;
               if (
                 frameIndex !== lastRenderedFrame.current &&
                 imagesRef.current[frameIndex]
@@ -347,25 +357,25 @@ export function ServerSection() {
           2,
         );
 
-      // --- ФАЗА 3: Динамічна поява характеристик ---
+      // --- ФАЗА 3: ТЕКСТИ ---
       featureRefs.current.forEach((ref, index) => {
         if (!ref) return;
         const startTime = 2.2 + index * 0.6;
 
         if (isMobile) {
-          // НА МОБІЛЬНОМУ: Сувора черговість, щоб текст не накладався один на одного
+          // НА ТЕЛЕФОНАХ: швидше з'являється і швидше зникає, щоб уникнути каші
           tl.fromTo(
             ref,
-            { opacity: 0, y: 10 },
-            { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" },
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" },
             startTime,
           ).to(
             ref,
-            { opacity: 0, y: -10, duration: 0.2, ease: "power2.in" },
-            startTime + 0.35, // Зникає до того, як з'явиться наступний блок
+            { opacity: 0, y: -15, duration: 0.15, ease: "power2.in" },
+            startTime + 0.25,
           );
         } else {
-          // НА ДЕСКТОПІ: Плавне перекриття
+          // Десктоп
           tl.fromTo(
             ref,
             { opacity: 0, y: 15 },
@@ -380,17 +390,13 @@ export function ServerSection() {
       });
     }, sectionRef);
 
-    // --- Оптимізація Ресайзу ---
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         let frameIndex = Math.round(currentFrame.current.frame);
         if (!allLoadedRef.current) frameIndex = 0;
-
-        if (imagesRef.current[frameIndex]) {
-          renderFrame(frameIndex);
-        }
+        if (imagesRef.current[frameIndex]) renderFrame(frameIndex);
       }, 150);
     };
 
