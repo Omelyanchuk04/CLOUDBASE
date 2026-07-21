@@ -38,54 +38,59 @@ export function ServerSection() {
     if (!ctx) return;
 
     // --- 🍏 АВТОМАТИЧНЕ ВИЗНАЧЕННЯ ПОТУЖНОСТІ ПРИСТРОЮ ---
-    // Якщо <= 4 ядер АБО <= 4ГБ оперативки — вважаємо пристрій "слабким"
     const isWeakDevice =
       typeof navigator !== "undefined" &&
       ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-        (navigator.deviceMemory && navigator.deviceMemory <= 4));
+        ((navigator as any).deviceMemory &&
+          (navigator as any).deviceMemory <= 4));
 
-    // Ліміти: для слабких ПК 1280px (HD), для сильних — 1920px (Full HD)
-    const MAX_CANVAS_WIDTH = isWeakDevice ? 1280 : 1920;
+    // Ліміти: для слабких ПК малюємо максимум 1280px по ширині
+    const MAX_CANVAS_WIDTH = isWeakDevice ? 1280 : 2560;
 
-    // --- Функція рендеру (малювання) з динамічною оптимізацією ---
-    const renderFrame = (index: number) => {
-      const img = imagesRef.current[index];
-      if (!img || !img.complete || img.naturalWidth === 0) return;
-
-      const isMobile = window.innerWidth <= 768;
-
-      // 1. Рахуємо цільовий розмір Canvas з урахуванням лімітів
+    // --- ФІКС ЛАГІВ: Оновлюємо розмір канвасу ТІЛЬКИ при зміні вікна ---
+    const updateCanvasSize = () => {
       let targetWidth = window.innerWidth;
       let targetHeight = window.innerHeight;
 
-      // Якщо екран більший за ліміт, пропорційно зменшуємо внутрішній розмір Canvas
       if (targetWidth > MAX_CANVAS_WIDTH) {
         const shrinkRatio = MAX_CANVAS_WIDTH / targetWidth;
         targetWidth = MAX_CANVAS_WIDTH;
         targetHeight = targetHeight * shrinkRatio;
       }
 
-      // CSS все одно розтягне його на весь екран, але відеокарті буде вдвічі легше!
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
+      // Змінюємо розмір лише якщо він реально змінився (уникаємо перестворення буфера)
+      if (canvas.width !== targetWidth) canvas.width = targetWidth;
+      if (canvas.height !== targetHeight) canvas.height = targetHeight;
+    };
+
+    // Встановлюємо розмір одразу
+    updateCanvasSize();
+
+    // --- Функція рендеру (малювання) ---
+    const renderFrame = (index: number) => {
+      const img = imagesRef.current[index];
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+
+      const isMobile = window.innerWidth <= 768;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.imageSmoothingEnabled = true; // Згладжуємо пікселі при CSS-розтягуванні
 
-      // 2. Рахуємо пропорції для самої картинки відносно нового розміру канвасу
+      // Вмикаємо згладжування, якщо канвас був зменшений для слабких ПК
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "medium";
+
       let ratio = Math.min(
         canvas.width / img.width,
         canvas.height / img.height,
       );
 
-      // КАРДИНАЛЬНЕ ЗБІЛЬШЕННЯ ДЛЯ ТЕЛЕФОНІВ (Множимо на 3.5, щоб обрізати прозорі поля)
+      // На мобільних збільшуємо масштаб, щоб зрізати пусті поля
       if (isMobile) {
         ratio = (canvas.width / img.width) * 3.5;
       }
 
       const centerShift_x = (canvas.width - img.width * ratio) / 2;
 
-      // Піднімаємо сервер вище центру на телефоні, щоб звільнити низ для тексту
       const shiftUp = isMobile ? canvas.height * 0.15 : 0;
       const centerShift_y = (canvas.height - img.height * ratio) / 2 - shiftUp;
 
@@ -111,9 +116,7 @@ export function ServerSection() {
         imagesRef.current[0] = img;
         renderFrame(0);
         lastRenderedFrame.current = 0;
-        console.log(
-          `[Sequence] Перший кадр (0) готовий. Починаємо фонове завантаження...`,
-        );
+        console.log(`[Sequence] Перший кадр готовий...`);
         loadRestOfFrames();
       };
 
@@ -126,7 +129,6 @@ export function ServerSection() {
       };
 
       img.onerror = () => {
-        console.error("[Sequence] Помилка завантаження першого кадру");
         loadRestOfFrames();
       };
 
@@ -134,7 +136,6 @@ export function ServerSection() {
     };
 
     const loadRestOfFrames = async () => {
-      let loadedCount = 1;
       const promises: Promise<void>[] = [];
 
       for (let i = 1; i < frameCount; i++) {
@@ -142,15 +143,7 @@ export function ServerSection() {
           const img = new Image();
 
           const onReady = () => {
-            if (!imagesRef.current[i]) {
-              imagesRef.current[i] = img;
-              loadedCount++;
-              if (i % 10 === 0 || i === frameCount - 1) {
-                console.log(
-                  `[Sequence] Завантажено: ${loadedCount}/${frameCount}`,
-                );
-              }
-            }
+            if (!imagesRef.current[i]) imagesRef.current[i] = img;
             resolve();
           };
 
@@ -162,13 +155,9 @@ export function ServerSection() {
             }
           };
 
-          img.onerror = () => {
-            resolve();
-          };
-
+          img.onerror = () => resolve();
           img.src = currentFrameImage(i);
         });
-
         promises.push(promise);
       }
 
@@ -176,9 +165,8 @@ export function ServerSection() {
       allLoadedRef.current = true;
 
       const endTime = performance.now();
-      const loadTimeSeconds = ((endTime - startTime) / 1000).toFixed(2);
       console.log(
-        `✅ [Sequence] Всі кадри успішно завантажено за ${loadTimeSeconds} сек!`,
+        `✅ [Sequence] Кадри завантажено за ${((endTime - startTime) / 1000).toFixed(2)} сек!`,
       );
 
       const currentScrollFrame = Math.round(currentFrame.current.frame);
@@ -325,7 +313,7 @@ export function ServerSection() {
         0,
       );
 
-      // --- ФАЗА 2 ---
+      // --- ФАЗА 2: Анімація кадрів ---
       tl.to(
         [darkGradientRef.current, serverBacklightRef.current],
         { opacity: 1, duration: 1.5, ease: "power1.inOut" },
@@ -357,13 +345,12 @@ export function ServerSection() {
           2,
         );
 
-      // --- ФАЗА 3: ТЕКСТИ ---
+      // --- ФАЗА 3: Тексти ---
       featureRefs.current.forEach((ref, index) => {
         if (!ref) return;
         const startTime = 2.2 + index * 0.6;
 
         if (isMobile) {
-          // НА ТЕЛЕФОНАХ: швидше з'являється і швидше зникає, щоб уникнути каші
           tl.fromTo(
             ref,
             { opacity: 0, y: 15 },
@@ -375,7 +362,6 @@ export function ServerSection() {
             startTime + 0.25,
           );
         } else {
-          // Десктоп
           tl.fromTo(
             ref,
             { opacity: 0, y: 15 },
@@ -394,6 +380,8 @@ export function ServerSection() {
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
+        updateCanvasSize(); // Оновлюємо розмір тільки після того, як юзер перестав тягнути вікно
+
         let frameIndex = Math.round(currentFrame.current.frame);
         if (!allLoadedRef.current) frameIndex = 0;
         if (imagesRef.current[frameIndex]) renderFrame(frameIndex);
