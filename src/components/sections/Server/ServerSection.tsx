@@ -58,12 +58,10 @@ export function ServerSection() {
         targetHeight = targetHeight * shrinkRatio;
       }
 
-      // Змінюємо розмір лише якщо він реально змінився (уникаємо перестворення буфера)
       if (canvas.width !== targetWidth) canvas.width = targetWidth;
       if (canvas.height !== targetHeight) canvas.height = targetHeight;
     };
 
-    // Встановлюємо розмір одразу
     updateCanvasSize();
 
     // --- Функція рендеру (малювання) ---
@@ -75,7 +73,6 @@ export function ServerSection() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Вмикаємо згладжування, якщо канвас був зменшений для слабких ПК
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "medium";
 
@@ -84,14 +81,19 @@ export function ServerSection() {
         canvas.height / img.height,
       );
 
-      // На мобільних збільшуємо масштаб, щоб зрізати пусті поля
+      // ==========================================
+      // ТУТ РЕГУЛЮЄТЬСЯ РОЗМІР СЕРВЕРА НА МОБІЛЬНОМУ
+      // ==========================================
       if (isMobile) {
-        ratio = (canvas.width / img.width) * 3.5;
+        // Віднімаємо ще 20px (загалом 40px)
+        const targetMobileWidth = canvas.width * 2.2 - 40;
+        ratio = targetMobileWidth / img.width;
       }
 
       const centerShift_x = (canvas.width - img.width * ratio) / 2;
 
-      const shiftUp = isMobile ? canvas.height * 0.15 : 0;
+      // Піднімаємо трохи вище центру, щоб знизу помістилися тексти
+      const shiftUp = isMobile ? canvas.height * 0.1 : 0;
       const centerShift_y = (canvas.height - img.height * ratio) / 2 - shiftUp;
 
       ctx.drawImage(
@@ -380,7 +382,7 @@ export function ServerSection() {
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        updateCanvasSize(); // Оновлюємо розмір тільки після того, як юзер перестав тягнути вікно
+        updateCanvasSize();
 
         let frameIndex = Math.round(currentFrame.current.frame);
         if (!allLoadedRef.current) frameIndex = 0;

@@ -1,150 +1,483 @@
 /* Підключаємо сучасний геометричний шрифт для логотипа */
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
 
-/* Міксин для надійного скляного ефекту */
 @mixin liquid-glass-panel {
-  /* Напівпрозорий фон */
   background: linear-gradient(
     135deg,
-    rgba(0, 0, 0, 0.18) 0%,
-    rgba(0, 0, 0, 0.15) 100%
+    rgba(15, 23, 42, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 100%
   );
-
-  /* Кросбраузерне розмиття */
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .header {
   position: fixed;
   top: 20px;
   left: 50%;
-
-  /* translateX(-50%) центрує блок, а translateZ(0) примусово включає GPU для Chrome, щоб запрацювало розмиття */
   transform: translateX(-50%) translateZ(0);
   -webkit-transform: translateX(-50%) translateZ(0);
-
   width: calc(100% - 40px);
   max-width: 1200px;
-
-  z-index: 9999;
-  padding: 6px 0;
-  border-radius: 14px;
-  transition: all 0.4s ease;
+  z-index: 10001;
+  padding: 8px 0;
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
 
   @include liquid-glass-panel;
 
+  /* === АДАПТИВ ШАПКИ (Повна ширина на мобільному) === */
+  @media (max-width: 991px) {
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    border-radius: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    padding: 12px 0;
+
+    /* Робимо шапку прозорою, коли відкрите меню, щоб вона зливалася з ним */
+    &:has(~ .fullscreenMenu.open) {
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-bottom: 1px solid transparent;
+      box-shadow: none;
+    }
+  }
+
   &__container {
     width: 100%;
-    max-width: 100%;
     margin: 0 auto;
-    padding: 0 8px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+
+    @media (max-width: 768px) {
+      padding: 0 16px;
+      gap: 12px;
+    }
   }
 
   &__logo_container {
     display: flex;
     align-items: center;
-    flex: 1;
+    z-index: 10002;
   }
 
   &__logo {
     display: flex;
     align-items: center;
-    gap: 12px; /* Відстань між іконкою та текстом */
-    height: 40px;
+    gap: 12px;
+    height: 36px;
     color: #ffffff;
-    transition: color 0.3s ease;
+    transition: opacity 0.3s ease;
     text-decoration: none;
 
     img {
-      padding: 0 0 0 6px;
       height: 100%;
       width: auto;
       display: block;
-      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      height: 28px;
+      gap: 8px;
     }
   }
 
-  /* Стиль тексту логотипа (Стиль Tesla) */
   &__logo_text {
     font-family: "Montserrat", sans-serif;
     font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 4px; /* Широкий міжлітерний інтервал створює преміальний вигляд */
+    font-weight: 600;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: #ffffff;
-    // Оптичне вирівнювання, якщо потрібно (залежить від вашої іконки)
-    // margin-top: 2px;
+
+    @media (max-width: 768px) {
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+
+    /* На дуже маленьких екранах (< 380px) можна приховати текст, щоб влізла кнопка, але зараз він просто зменшений */
+    @media (max-width: 380px) {
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
   }
 
+  /* Десктопна навігація */
   &__nav {
     display: none;
+
     @media (min-width: 992px) {
       display: flex;
+      align-items: center;
+      gap: 36px;
+      padding: 8px 28px;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.02);
     }
-    align-items: center;
-    gap: 32px;
-    padding: 8px 24px;
-    border-radius: 16px;
-
-    /* Легке виділення внутрішнього меню */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.03);
   }
 
   .link {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
-    transition: all 0.2s ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
 
     &:hover {
       color: #ffffff;
-      text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+      text-shadow: 0 0 15px rgba(165, 180, 252, 0.6);
     }
   }
 
   &__actions {
     display: flex;
     align-items: center;
-    flex: 1;
-    justify-content: flex-end;
+    gap: 20px;
+    z-index: 10002;
+
+    @media (max-width: 768px) {
+      gap: 12px; /* Менша відстань між кнопкою і бургером на мобільному */
+    }
   }
 
+  /* Кнопка CTA в шапці */
   &__button {
-    padding: 6px 18px;
-    background: rgba(255, 255, 255, 0.85);
-    color: #3b3b3b;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f172a;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow:
-      0 6px 20px rgba(243, 247, 253, 0.3),
-      inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border-radius: 100px;
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.5);
-      filter: brightness(105%);
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
     }
 
     &:active {
       transform: scale(0.98);
-      filter: brightness(95%);
+    }
+
+    /* Адаптація розміру кнопки під телефон, щоб все влізло в один рядок */
+    @media (max-width: 768px) {
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+  }
+
+  /* === ФУТУРИСТИЧНИЙ БУРГЕР === */
+  &__burger {
+    display: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.3s ease;
+
+    @media (max-width: 991px) {
+      display: flex;
+    }
+
+    @media (max-width: 768px) {
+      width: 38px;
+      height: 38px;
+    }
+
+    .burger__lines {
+      position: relative;
+      width: 20px;
+      height: 14px;
+    }
+
+    span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #ffffff;
+      border-radius: 2px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    span:nth-child(1) {
+      top: 0;
+    }
+    span:nth-child(2) {
+      top: 6px;
+      width: 70%;
+      right: 0;
+      left: auto;
+    }
+    span:nth-child(3) {
+      top: 12px;
+    }
+
+    /* Стан "Хрестик" */
+    &.open {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+
+      span:nth-child(1) {
+        top: 6px;
+        transform: rotate(45deg);
+      }
+      span:nth-child(2) {
+        opacity: 0;
+        transform: translateX(10px);
+      }
+      span:nth-child(3) {
+        top: 6px;
+        transform: rotate(-45deg);
+      }
+    }
+  }
+}
+
+/* ========================================= */
+/* === ПОВНОЕКРАННЕ МЕНЮ (SOLID DARK)    === */
+/* ========================================= */
+.fullscreenMenu {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 10000;
+  background: #060608;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  &__glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vw;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.1) 0%,
+      transparent 70%
+    );
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i) * 0.05s);
+
+    .link__text {
+      font-family:
+        -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: -0.02em;
+      transition:
+        color 0.3s ease,
+        transform 0.3s ease;
+    }
+
+    &:hover .link__text {
+      color: #ffffff;
+      transform: translateY(-4px);
+      text-shadow: 0 0 30px rgba(165, 180, 252, 0.5);
+    }
+  }
+
+  &.open &__link,
+  &.open &__footer {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &__footer {
+    margin-top: 56px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i) * 0.05s);
+  }
+
+  &__btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 350px;
+    padding: 18px 36px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 100px;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      padding: 1px;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(165, 180, 252, 0.8) 50%,
+        rgba(139, 92, 246, 0.5) 100%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      transition: all 0.4s ease;
+      z-index: 1;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(165, 180, 252, 0.25),
+        transparent
+      );
+      transform: skewX(-20deg);
+      transition: none;
+      z-index: 1;
+    }
+
+    .btn__text {
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.3s ease;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    }
+
+    &:hover {
+      background: rgba(15, 23, 42, 1);
+      box-shadow:
+        0 0 30px rgba(165, 180, 252, 0.3),
+        inset 0 0 20px rgba(165, 180, 252, 0.15);
+      transform: translateY(-2px);
+
+      &::before {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.9) 0%,
+          rgba(165, 180, 252, 1) 50%,
+          rgba(139, 92, 246, 0.9) 100%
+        );
+      }
+
+      &::after {
+        left: 150%;
+        transition: left 0.7s ease-in-out;
+      }
+
+      .btn__icon {
+        transform: translateX(5px);
+      }
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 0 15px rgba(165, 180, 252, 0.2);
     }
   }
 }

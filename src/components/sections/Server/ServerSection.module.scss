@@ -306,7 +306,7 @@
     left: 50% !important;
     margin-left: -45%;
 
-    top: 82% !important; /* Опущено вниз, щоб не перекривати модель */
+    top: 75% !important; /* Опущено вниз, щоб не перекривати модель */
     bottom: auto !important;
 
     width: 90%;
@@ -331,7 +331,7 @@
 
 @media (max-width: 480px) {
   .featureItem {
-    top: 80% !important; /* На дуже малих екранах піднімаємо трохи вище */
+    top: 72% !important; /* На дуже малих екранах піднімаємо трохи вище */
   }
 
   .featureContent h4 {

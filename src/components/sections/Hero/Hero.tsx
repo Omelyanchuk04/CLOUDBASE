@@ -332,26 +332,26 @@ export function Hero() {
                 <Image
                   src="/main/1s-logo.svg"
                   alt="1C"
-                  width={30}
-                  height={30}
+                  width={50}
+                  height={50}
                 />
                 <Image
                   src="/main/BAS-logo.png"
                   alt="BAS"
-                  width={55}
-                  height={25}
+                  width={70}
+                  height={32}
                 />
                 <Image
                   src="/main/KBS-logo.png"
                   alt="KBS"
-                  width={55}
-                  height={25}
+                  width={90}
+                  height={41}
                 />
                 <Image
                   src="/main/MEDOC-logo.png"
                   alt="MEDOC"
-                  width={60}
-                  height={30}
+                  width={56}
+                  height={28}
                 />
               </div>
             </div>
