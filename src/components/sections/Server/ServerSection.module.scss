@@ -1,340 +1,292 @@
-.serverSectionWrapper {
+$color-bg-content: #060608;
+$color-text-primary: #ffffff;
+$color-text-secondary: rgba(255, 255, 255, 0.7);
+$color-accent: #8b5cf6;
+$color-accent-hover: #9c73f7;
+$color-card-bg: rgba(20, 25, 35, 0.4);
+$color-card-bg-hover: rgba(30, 35, 50, 0.6);
+$color-control-bg: rgba(255, 255, 255, 0.1);
+$color-control-bg-hover: rgba(255, 255, 255, 0.2);
+
+$font-family-base:
+  -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif;
+
+$radius-lg: 18px;
+
+/* Глобальні налаштування швидкості */
+$transition-fast: 0.4s ease;
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: 2px;
+  }
+}
+
+.section,
+.section * {
+  box-sizing: border-box;
+}
+
+.section {
   position: relative;
   width: 100%;
-  height: 100vh;
-  background-color: #000;
-  overflow: hidden;
-  contain: paint layout;
-}
-
-/* === 1. ДИНАМІЧНИЙ ФОН СВІТІННЯ === */
-.server__glow {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  mix-blend-mode: color-dodge;
-  overflow: hidden;
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-.server__glowGreen,
-.server__glowBlue,
-.server__glowPurple,
-.server__glowOrange,
-.server__glowCyan {
-  position: absolute;
-  border-radius: 50%;
-  will-change: transform, opacity;
-  filter: blur(120px);
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-}
-
-.server__glowGreen {
-  top: -20%;
-  left: 10%;
-  width: 70vw;
-  height: 70vw;
-  background: radial-gradient(
-    circle,
-    rgba(34, 197, 94, 0.4) 0%,
-    transparent 70%
-  );
-}
-.server__glowBlue {
-  bottom: -15%;
-  right: 15%;
-  width: 80vw;
-  height: 80vw;
-  background: radial-gradient(
-    circle,
-    rgba(14, 165, 233, 0.4) 0%,
-    transparent 70%
-  );
-}
-.server__glowPurple {
-  top: 15%;
-  right: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(139, 92, 246, 0.4) 0%,
-    transparent 70%
-  );
-}
-.server__glowOrange {
-  bottom: 20%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(
-    circle,
-    rgba(249, 115, 22, 0.35) 0%,
-    transparent 70%
-  );
-}
-.server__glowCyan {
-  top: 40%;
-  left: 30%;
-  width: 55vw;
-  height: 55vw;
-  background: radial-gradient(
-    circle,
-    rgba(6, 182, 212, 0.35) 0%,
-    transparent 70%
-  );
-}
-
-/* === 2. КОНТЕЙНЕР ДЛЯ ВИБУХУ ДИМУ === */
-.smokeContainer {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  mix-blend-mode: screen;
-
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 15%,
-    black 85%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 15%,
-    black 85%,
-    transparent 100%
-  );
-  transform: translateZ(0);
-}
-
-.smokeLayer {
-  position: absolute;
-  width: 120vw;
-  height: 120vw;
-  will-change: transform, opacity;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-}
-
-.smoke1 {
-  background-image: url("/background/smoke-1.webp");
-}
-.smoke2 {
-  background-image: url("/background/smoke-3.png");
-  width: 130vw;
-  height: 130vw;
-}
-.smoke3 {
-  background-image: url("/background/smoke-2.png");
-}
-.smoke4 {
-  width: 150vw;
-  height: 150vw;
-}
-
-/* === 3. ЕЛЕГАНТНИЙ ТЕМНИЙ ГРАДІЄНТ === */
-.darkGradientBg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  opacity: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(15, 23, 42, 0.8) 0%,
-    rgba(0, 0, 0, 1) 75%
-  );
-  will-change: opacity;
-  transform: translateZ(0);
-}
-
-/* === 4. М'ЯКА ПІДСВІТКА СЕРВЕРА === */
-.serverBacklight {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100vw;
-  height: 100vh;
-  margin-top: -50vh;
-  margin-left: -50vw;
-  z-index: 3;
-  opacity: 0;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(14, 165, 233, 0.15) 0%,
-    rgba(139, 92, 246, 0.05) 40%,
-    transparent 60%
-  );
-  pointer-events: none;
-  will-change: opacity, transform;
-  transform: translate3d(0, 0, 0);
-}
-
-/* === 5. СЕРВЕР (CANVAS) === */
-.canvasContainer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  background: transparent;
-  will-change: transform;
-  display: block;
-  transform: translateZ(0);
-}
-
-/* === 6. ХАРАКТЕРИСТИКИ ТА ЛІНІЇ (ДЕСКТОП) === */
-.featuresContainer {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.featureItem {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  opacity: 0;
-  will-change: transform, opacity;
-  transform: translate3d(0, 0, 0);
-}
-
-.featureLeft {
-  right: 55%;
-  flex-direction: row;
-  text-align: right;
-}
-
-.featureRight {
-  left: 55%;
-  flex-direction: row-reverse;
-  text-align: left;
-}
-
-.featureTop {
-  top: 25%;
-}
-.featureMiddle {
-  top: 50%;
-}
-.featureBottom {
-  top: 75%;
-}
-
-.featureContent {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  background: $color-bg-content;
+  font-family: $font-family-base;
+  color: $color-text-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.featureContent h4 {
-  margin: 0;
-  color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+.content {
+  position: relative;
+  flex: 1;
 }
 
-.featureContent p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9rem;
-}
-
-.featureLine {
-  height: 1px;
-  width: 80px;
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.featureLeft .featureLine {
-  margin-left: 20px;
-}
-.featureRight .featureLine {
-  margin-right: 20px;
-}
-
-/* === 7. КОНТЕНТ === */
-.overlayContent {
+.navControls {
   position: absolute;
-  inset: 0;
-  z-index: 20;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navControlButton {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: $color-control-bg;
+  color: $color-text-primary;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background-color $transition-fast,
+    opacity $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $color-control-bg-hover;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  @include focus-ring;
+}
+
+.grid {
+  max-width: 1240px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 96px 88px;
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  align-items: center;
+  gap: 80px;
+
+  @media (max-width: 1024px) {
+    padding: 80px 64px;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 72px 24px 48px;
+    gap: 40px;
+  }
+}
+
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==========================================
+   АКОРДЕОН-КАРТКИ (ДУЖЕ ПЛАВНІ)
+   ========================================== */
+.featureItem {
+  width: 100%;
+  border-radius: $radius-lg;
+  background: $color-card-bg;
+  border: 1px solid transparent;
+  padding: 16px 20px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+
+  /* Плавна трансформація фону і відступів */
+  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+
+  &:hover {
+    background: $color-card-bg-hover;
+  }
+
+  &.active {
+    background: linear-gradient(
+      135deg,
+      rgba(35, 45, 60, 0.6) 0%,
+      rgba(15, 20, 30, 0.6) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.05);
+    padding: 24px 20px;
+    cursor: default;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: inherit;
+  font-family: inherit;
+  @include focus-ring;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.active .cardTitle {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.plusIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: #fff;
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.active .plusIconWrapper {
+  width: 0;
+  opacity: 0;
+  border-width: 0;
+  margin-right: -14px; /* Ховаємо відступ, щоб текст став на місце */
+  transform: scale(0);
+}
+
+/* Трюк з Grid для плавного розгортання висоти */
+.descWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.active .descWrapper {
+  grid-template-rows: 1fr;
+}
+
+.descInner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  /* Швидке зникнення тексту при закритті */
+  transition: opacity 0.3s ease;
+}
+
+.active .descInner {
+  opacity: 1;
+  /* М'яка затримка при появі, щоб спочатку розсунулась картка */
+  transition: opacity 0.8s ease 0.3s;
+}
+
+.descText {
+  margin: 0;
+  padding-top: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==========================================
+   CROSS-FADE ЗОБРАЖЕННЯ
+   ========================================== */
+.rightPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 450px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 750px;
+  aspect-ratio: 1 / 1;
+  border-radius: $radius-lg;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(139, 92, 246, 0.15) 0%,
+    transparent 100%
+  );
+}
+
+.image {
+  object-fit: contain;
+  opacity: 0;
   pointer-events: none;
-}
+  /* Спочатку сервер трішки зменшений */
+  transform: scale(1.1);
 
-/* ========================================= */
-/* === МОБІЛЬНА АДАПТАЦІЯ (АДАПТИВ)      === */
-/* ========================================= */
-@media (max-width: 768px) {
-  .smokeLayer {
-    width: 250vw;
-    height: 250vw;
-  }
-  .smoke2,
-  .smoke4 {
-    width: 280vw;
-    height: 280vw;
-  }
+  /* Повільне розчинення, коли картинка ховається */
+  transition:
+    opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
 
-  .server__glowGreen,
-  .server__glowBlue,
-  .server__glowPurple,
-  .server__glowOrange,
-  .server__glowCyan {
-    width: 150vw;
-    height: 150vw;
-  }
+  &.activeImage {
+    opacity: 1;
+    pointer-events: auto;
+    /* Плавно наїжджає на користувача */
+    transform: scale(1.35);
+    z-index: 2;
 
-  /* Позиціонування характеристик чітко під сервером по центру */
-  .featureItem {
-    right: auto !important;
-    left: 50% !important;
-    margin-left: -45%;
-
-    top: 75% !important; /* Опущено вниз, щоб не перекривати модель */
-    bottom: auto !important;
-
-    width: 90%;
-
-    flex-direction: column !important;
-    text-align: center !important;
-    justify-content: center;
-  }
-
-  .featureContent h4 {
-    font-size: 1.3rem;
-  }
-
-  .featureContent p {
-    font-size: 1rem;
-  }
-
-  .featureLine {
-    display: none;
+    /* Доооооовга кінематографічна поява */
+    transition:
+      opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
-@media (max-width: 480px) {
-  .featureItem {
-    top: 72% !important; /* На дуже малих екранах піднімаємо трохи вище */
-  }
-
-  .featureContent h4 {
-    font-size: 1.15rem;
+@media (prefers-reduced-motion: reduce) {
+  .section,
+  .section * {
+    transition-duration: 0.01ms !important;
   }
 }

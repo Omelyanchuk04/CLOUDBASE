@@ -1,537 +1,235 @@
 "use client";
 
-import { useRef, useLayoutEffect, useCallback } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useCallback, useEffect, useId, useState } from "react";
+import Image from "next/image";
+
 import styles from "./ServerSection.module.scss";
 
-gsap.registerPlugin(ScrollTrigger);
+export interface Feature {
+  id: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+}
 
-export function ServerSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export interface ServerSectionProps {
+  features?: Feature[];
+  initialActiveIndex?: number;
+}
 
-  const smokeRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const glowRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
+const DEFAULT_FEATURES: Feature[] = [
+  {
+    id: "reliability",
+    title: "Працює 24/7 без вихідних",
+    description:
+      'Програми не "виснуть" і не відключаються. Навіть якщо в офісі зникне світло або інтернет, ваші бази та звіти продовжать надійно працювати.',
+    imageSrc: "/server-sequence/0001.png",
+  },
+  {
+    id: "ddos-protection",
+    title: "Захист від хакерів та вірусів",
+    description:
+      "Ваша бухгалтерія надійно захована від зловмисників. Ніхто сторонній не зможе вкрасти, заблокувати або пошкодити ваші робочі документи.",
+    imageSrc: "/server-sequence/0020.png",
+  },
+  {
+    id: "nvme-storage",
+    title: "Миттєве формування звітів",
+    description:
+      "Забудьте про очікування під час закриття місяця чи завантаження великих баз. Усе відкривається і працює блискавично швидко.",
+    imageSrc: "/server-sequence/0040.png",
+  },
+  {
+    id: "scalability",
+    title: "Місця вистачить на всі роки",
+    description:
+      "Якщо обсяг документів зросте або з'являться нові компанії — ми просто додамо більше пам'яті. Ніяких перевстановлень чи зупинок у роботі.",
+    imageSrc: "/server-sequence/0060.png",
+  },
+  {
+    id: "backups",
+    title: "Щоденні запасні копії",
+    description:
+      "Ми щоночі автоматично зберігаємо копії ваших баз. Навіть якщо ви випадково видалите важливий документ, ми допоможемо його швидко відновити.",
+    imageSrc: "/server-sequence/0080.png",
+  },
+  {
+    id: "hardware-raid",
+    title: "Подвійна надійність збереження",
+    description:
+      "Всі дані записуються одразу на кілька дисків одночасно. Якщо один диск раптом вийде з ладу, інший миттєво збереже всі ваші цифри в безпеці.",
+    imageSrc: "/server-sequence/0100.png",
+  },
+];
 
-  const darkGradientRef = useRef<HTMLDivElement>(null);
-  const serverBacklightRef = useRef<HTMLDivElement>(null);
+export function ServerSection({
+  features = DEFAULT_FEATURES,
+  initialActiveIndex = 0,
+}: ServerSectionProps) {
+  const baseId = useId();
+  const titleId = `${baseId}-title`;
 
-  const frameCount = 100;
-  const currentFrame = useRef({ frame: 0 });
-  const imagesRef = useRef<HTMLImageElement[]>([]);
-  const lastRenderedFrame = useRef(-1);
-
-  const allLoadedRef = useRef(false);
-
-  const currentFrameImage = useCallback(
-    (index: number) =>
-      `/server-sequence/${(index + 1).toString().padStart(4, "0")}.png`,
-    [],
+  const [activeIndex, setActiveIndex] = useState(() =>
+    features.length === 0
+      ? 0
+      : Math.min(Math.max(initialActiveIndex, 0), features.length - 1),
   );
 
-  useLayoutEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
+  const canGoPrev = activeIndex > 0;
+  const canGoNext = activeIndex < features.length - 1;
 
-    // --- 🍏 АВТОМАТИЧНЕ ВИЗНАЧЕННЯ ПОТУЖНОСТІ ПРИСТРОЮ ---
-    const isWeakDevice =
-      typeof navigator !== "undefined" &&
-      ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-        ((navigator as any).deviceMemory &&
-          (navigator as any).deviceMemory <= 4));
+  const goPrev = useCallback(() => {
+    setActiveIndex((current) => Math.max(0, current - 1));
+  }, []);
 
-    // Ліміти: для слабких ПК малюємо максимум 1280px по ширині
-    const MAX_CANVAS_WIDTH = isWeakDevice ? 1280 : 2560;
+  const goNext = useCallback(() => {
+    setActiveIndex((current) => Math.min(features.length - 1, current + 1));
+  }, [features.length]);
 
-    // --- ФІКС ЛАГІВ: Оновлюємо розмір канвасу ТІЛЬКИ при зміні вікна ---
-    const updateCanvasSize = () => {
-      let targetWidth = window.innerWidth;
-      let targetHeight = window.innerHeight;
+  const goTo = useCallback((index: number) => {
+    setActiveIndex(index);
+  }, []);
 
-      if (targetWidth > MAX_CANVAS_WIDTH) {
-        const shrinkRatio = MAX_CANVAS_WIDTH / targetWidth;
-        targetWidth = MAX_CANVAS_WIDTH;
-        targetHeight = targetHeight * shrinkRatio;
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        goPrev();
       }
-
-      if (canvas.width !== targetWidth) canvas.width = targetWidth;
-      if (canvas.height !== targetHeight) canvas.height = targetHeight;
-    };
-
-    updateCanvasSize();
-
-    // --- Функція рендеру (малювання) ---
-    const renderFrame = (index: number) => {
-      const img = imagesRef.current[index];
-      if (!img || !img.complete || img.naturalWidth === 0) return;
-
-      const isMobile = window.innerWidth <= 768;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "medium";
-
-      let ratio = Math.min(
-        canvas.width / img.width,
-        canvas.height / img.height,
-      );
-
-      // ==========================================
-      // ТУТ РЕГУЛЮЄТЬСЯ РОЗМІР СЕРВЕРА НА МОБІЛЬНОМУ
-      // ==========================================
-      if (isMobile) {
-        // Віднімаємо ще 20px (загалом 40px)
-        const targetMobileWidth = canvas.width * 2.2 - 40;
-        ratio = targetMobileWidth / img.width;
-      }
-
-      const centerShift_x = (canvas.width - img.width * ratio) / 2;
-
-      // Піднімаємо трохи вище центру, щоб знизу помістилися тексти
-      const shiftUp = isMobile ? canvas.height * 0.1 : 0;
-      const centerShift_y = (canvas.height - img.height * ratio) / 2 - shiftUp;
-
-      ctx.drawImage(
-        img,
-        0,
-        0,
-        img.width,
-        img.height,
-        centerShift_x,
-        centerShift_y,
-        img.width * ratio,
-        img.height * ratio,
-      );
-    };
-
-    const startTime = performance.now();
-
-    const loadFirstFrame = () => {
-      const img = new Image();
-
-      const onReady = () => {
-        imagesRef.current[0] = img;
-        renderFrame(0);
-        lastRenderedFrame.current = 0;
-        console.log(`[Sequence] Перший кадр готовий...`);
-        loadRestOfFrames();
-      };
-
-      img.onload = () => {
-        if (img.decode) {
-          img.decode().then(onReady).catch(onReady);
-        } else {
-          onReady();
-        }
-      };
-
-      img.onerror = () => {
-        loadRestOfFrames();
-      };
-
-      img.src = currentFrameImage(0);
-    };
-
-    const loadRestOfFrames = async () => {
-      const promises: Promise<void>[] = [];
-
-      for (let i = 1; i < frameCount; i++) {
-        const promise = new Promise<void>((resolve) => {
-          const img = new Image();
-
-          const onReady = () => {
-            if (!imagesRef.current[i]) imagesRef.current[i] = img;
-            resolve();
-          };
-
-          img.onload = () => {
-            if (img.decode) {
-              img.decode().then(onReady).catch(onReady);
-            } else {
-              onReady();
-            }
-          };
-
-          img.onerror = () => resolve();
-          img.src = currentFrameImage(i);
-        });
-        promises.push(promise);
-      }
-
-      await Promise.all(promises);
-      allLoadedRef.current = true;
-
-      const endTime = performance.now();
-      console.log(
-        `✅ [Sequence] Кадри завантажено за ${((endTime - startTime) / 1000).toFixed(2)} сек!`,
-      );
-
-      const currentScrollFrame = Math.round(currentFrame.current.frame);
-      if (currentScrollFrame > 0 && imagesRef.current[currentScrollFrame]) {
-        renderFrame(currentScrollFrame);
-        lastRenderedFrame.current = currentScrollFrame;
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        goNext();
       }
     };
 
-    loadFirstFrame();
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [goPrev, goNext]);
 
-    const ctxGsap = gsap.context(() => {
-      const isMobile = window.innerWidth <= 768;
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          pin: true,
-          start: "top top",
-          end: "+=6000",
-          scrub: 0.8,
-        },
-      });
-
-      // --- ФАЗА 1 ---
-      const [glow1, glow2, glow3, glow4, glow5] = glowRefs.current;
-      tl.fromTo(
-        glow1,
-        { xPercent: -15, yPercent: 10, scale: 0.9 },
-        {
-          xPercent: 10,
-          yPercent: -10,
-          scale: 1.1,
-          duration: 2,
-          ease: "sine.inOut",
-        },
-        0,
-      )
-        .fromTo(
-          glow2,
-          { xPercent: 15, yPercent: -10, scale: 1 },
-          {
-            xPercent: -10,
-            yPercent: 10,
-            scale: 1.2,
-            duration: 2,
-            ease: "sine.inOut",
-          },
-          0,
-        )
-        .fromTo(
-          glow3,
-          { scale: 1.1, opacity: 0.8 },
-          { scale: 1.3, opacity: 1, duration: 2, ease: "sine.inOut" },
-          0,
-        )
-        .fromTo(
-          glow4,
-          { xPercent: 20, yPercent: 20, scale: 0.8 },
-          {
-            xPercent: -20,
-            yPercent: -20,
-            scale: 1,
-            duration: 2,
-            ease: "sine.inOut",
-          },
-          0,
-        )
-        .fromTo(
-          glow5,
-          { xPercent: -20, yPercent: -20, scale: 1 },
-          {
-            xPercent: 20,
-            yPercent: 20,
-            scale: 1.1,
-            duration: 2,
-            ease: "sine.inOut",
-          },
-          0,
-        );
-
-      const [smoke1, smoke2, smoke3, smoke4] = smokeRefs.current;
-      tl.fromTo(
-        smoke1,
-        { x: "0%", y: "0%", scale: 0.8, opacity: 1, rotation: 0 },
-        {
-          x: "-50%",
-          y: "-40%",
-          scale: 3.5,
-          opacity: 0,
-          rotation: -15,
-          duration: 4.5,
-          ease: "power1.inOut",
-        },
-        0,
-      )
-        .fromTo(
-          smoke2,
-          { x: "0%", y: "0%", scale: 1, opacity: 1, rotation: 0 },
-          {
-            x: "50%",
-            y: "30%",
-            scale: 4,
-            opacity: 0,
-            rotation: 15,
-            duration: 4.5,
-            ease: "power1.inOut",
-          },
-          0,
-        )
-        .fromTo(
-          smoke3,
-          { x: "0%", y: "0%", scale: 0.9, opacity: 1, rotation: 0 },
-          {
-            x: "-40%",
-            y: "50%",
-            scale: 3.5,
-            opacity: 0,
-            rotation: 25,
-            duration: 4.5,
-            ease: "power1.inOut",
-          },
-          0,
-        )
-        .fromTo(
-          smoke4,
-          { x: "0%", y: "0%", scale: 1.2, opacity: 1, rotation: 0 },
-          {
-            x: "40%",
-            y: "-50%",
-            scale: 4.5,
-            opacity: 0,
-            rotation: -20,
-            duration: 4.5,
-            ease: "power1.inOut",
-          },
-          0,
-        );
-
-      tl.fromTo(
-        canvasRef.current,
-        { y: "100vh" },
-        { y: "0vh", duration: 2, ease: "power1.inOut" },
-        0,
-      );
-
-      // --- ФАЗА 2: Анімація кадрів ---
-      tl.to(
-        [darkGradientRef.current, serverBacklightRef.current],
-        { opacity: 1, duration: 1.5, ease: "power1.inOut" },
-        2,
-      )
-        .to(
-          serverBacklightRef.current,
-          { scale: 1.2, duration: 5, ease: "none" },
-          2,
-        )
-        .to(
-          currentFrame.current,
-          {
-            frame: frameCount - 1,
-            ease: "none",
-            duration: 5,
-            onUpdate: () => {
-              let frameIndex = Math.round(currentFrame.current.frame);
-              if (!allLoadedRef.current) frameIndex = 0;
-              if (
-                frameIndex !== lastRenderedFrame.current &&
-                imagesRef.current[frameIndex]
-              ) {
-                renderFrame(frameIndex);
-                lastRenderedFrame.current = frameIndex;
-              }
-            },
-          },
-          2,
-        );
-
-      // --- ФАЗА 3: Тексти ---
-      featureRefs.current.forEach((ref, index) => {
-        if (!ref) return;
-        const startTime = 2.2 + index * 0.6;
-
-        if (isMobile) {
-          tl.fromTo(
-            ref,
-            { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" },
-            startTime,
-          ).to(
-            ref,
-            { opacity: 0, y: -15, duration: 0.15, ease: "power2.in" },
-            startTime + 0.25,
-          );
-        } else {
-          tl.fromTo(
-            ref,
-            { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-            startTime,
-          ).to(
-            ref,
-            { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" },
-            startTime + 0.8,
-          );
-        }
-      });
-    }, sectionRef);
-
-    let resizeTimer: NodeJS.Timeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        updateCanvasSize();
-
-        let frameIndex = Math.round(currentFrame.current.frame);
-        if (!allLoadedRef.current) frameIndex = 0;
-        if (imagesRef.current[frameIndex]) renderFrame(frameIndex);
-      }, 150);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      ctxGsap.revert();
-      window.removeEventListener("resize", handleResize);
-      clearTimeout(resizeTimer);
-    };
-  }, [currentFrameImage]);
-
-  const featuresData = [
-    {
-      title: "Надійність 99.9%",
-      desc: "Безперебійна робота бізнесу",
-      pos: "featureLeft",
-      top: "featureTop",
-    },
-    {
-      title: "DDoS Захист",
-      desc: "Ваша інформація в безпеці",
-      pos: "featureRight",
-      top: "featureTop",
-    },
-    {
-      title: "NVMe Сховище",
-      desc: "Блискавична швидкість даних",
-      pos: "featureLeft",
-      top: "featureMiddle",
-    },
-    {
-      title: "Масштабованість",
-      desc: "Ресурси ростуть разом з вами",
-      pos: "featureRight",
-      top: "featureMiddle",
-    },
-    {
-      title: "Резервне копіювання",
-      desc: "Щоденні бекапи важливого",
-      pos: "featureLeft",
-      top: "featureBottom",
-    },
-    {
-      title: "Апаратний RAID",
-      desc: "Максимальна відмовостійкість",
-      pos: "featureRight",
-      top: "featureBottom",
-    },
-  ];
+  if (features.length === 0) {
+    return null;
+  }
 
   return (
-    <section className={styles.serverSectionWrapper} ref={sectionRef}>
-      <div className={styles.server__glow} aria-hidden="true">
-        <div
-          ref={(el) => {
-            glowRefs.current[0] = el;
-          }}
-          className={styles.server__glowGreen}
-        />
-        <div
-          ref={(el) => {
-            glowRefs.current[1] = el;
-          }}
-          className={styles.server__glowBlue}
-        />
-        <div
-          ref={(el) => {
-            glowRefs.current[2] = el;
-          }}
-          className={styles.server__glowPurple}
-        />
-        <div
-          ref={(el) => {
-            glowRefs.current[3] = el;
-          }}
-          className={styles.server__glowOrange}
-        />
-        <div
-          ref={(el) => {
-            glowRefs.current[4] = el;
-          }}
-          className={styles.server__glowCyan}
-        />
-      </div>
-
-      <div className={styles.smokeContainer} aria-hidden="true">
-        <div
-          ref={(el) => {
-            smokeRefs.current[0] = el;
-          }}
-          className={`${styles.smokeLayer} ${styles.smoke1}`}
-        />
-        <div
-          ref={(el) => {
-            smokeRefs.current[1] = el;
-          }}
-          className={`${styles.smokeLayer} ${styles.smoke2}`}
-        />
-        <div
-          ref={(el) => {
-            smokeRefs.current[2] = el;
-          }}
-          className={`${styles.smokeLayer} ${styles.smoke3}`}
-        />
-        <div
-          ref={(el) => {
-            smokeRefs.current[3] = el;
-          }}
-          className={`${styles.smokeLayer} ${styles.smoke4}`}
-        />
-      </div>
-
-      <div
-        ref={darkGradientRef}
-        className={styles.darkGradientBg}
-        aria-hidden="true"
-      />
-      <div
-        ref={serverBacklightRef}
-        className={styles.serverBacklight}
-        aria-hidden="true"
-      />
-
-      <canvas ref={canvasRef} className={styles.canvasContainer} />
-
-      <div className={styles.featuresContainer}>
-        {featuresData.map((feature, i) => (
-          <div
-            key={i}
-            ref={(el) => {
-              featureRefs.current[i] = el;
-            }}
-            className={`${styles.featureItem} ${styles[feature.pos]} ${styles[feature.top]}`}
+    <section className={styles.section} aria-labelledby={titleId}>
+      <div className={styles.content}>
+        <div className={styles.navControls}>
+          <button
+            type="button"
+            className={styles.navControlButton}
+            onClick={goPrev}
+            disabled={!canGoPrev}
+            aria-label="Попередня функція"
           >
-            <div className={styles.featureContent}>
-              <h4>{feature.title}</h4>
-              <p>{feature.desc}</p>
-            </div>
-            <div className={styles.featureLine}></div>
-          </div>
-        ))}
-      </div>
+            <ChevronIcon direction="up" />
+          </button>
+          <button
+            type="button"
+            className={styles.navControlButton}
+            onClick={goNext}
+            disabled={!canGoNext}
+            aria-label="Наступна функція"
+          >
+            <ChevronIcon direction="down" />
+          </button>
+        </div>
 
-      <div className={styles.overlayContent}></div>
+        <div className={styles.grid}>
+          <div className={styles.leftPanel}>
+            <ul className={styles.list}>
+              {features.map((feature, index) => {
+                const isActive = index === activeIndex;
+
+                return (
+                  <li
+                    key={feature.id}
+                    className={`${styles.featureItem} ${isActive ? styles.active : ""}`}
+                    onClick={() => goTo(index)}
+                  >
+                    <button
+                      type="button"
+                      className={styles.cardHeader}
+                      aria-expanded={isActive}
+                    >
+                      <div className={styles.plusIconWrapper}>
+                        <PlusIcon />
+                      </div>
+                      <span className={styles.cardTitle}>{feature.title}</span>
+                    </button>
+
+                    <div className={styles.descWrapper}>
+                      <div className={styles.descInner}>
+                        <p className={styles.descText}>{feature.description}</p>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className={styles.rightPanel}>
+            <div className={styles.imageWrapper}>
+              {features.map((feature, index) => {
+                const isActive = index === activeIndex;
+                return (
+                  <Image
+                    key={feature.id}
+                    src={feature.imageSrc}
+                    alt={feature.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className={`${styles.image} ${isActive ? styles.activeImage : ""}`}
+                    priority={index === 0}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+  );
+}
+
+export default ServerSection;
+
+function PlusIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M12 4V20M4 12H20"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronIcon({ direction }: { direction: "up" | "down" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      aria-hidden="true"
+      focusable="false"
+      style={{ transform: direction === "down" ? "rotate(180deg)" : undefined }}
+    >
+      <path
+        d="M6 15L12 9L18 15"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
