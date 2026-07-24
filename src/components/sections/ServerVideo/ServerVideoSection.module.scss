@@ -1,0 +1,225 @@
+/* ==========================================
+   СТИЛІ СЕКЦІЇ З ГРАДІЄНТОМ ТА ВІДЕО
+   ========================================== */
+$color-bg-light: #f5f5f7;
+$color-bg-dark: #060608;
+$font-family-base:
+  -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif;
+
+$radius-xl: 24px;
+$transition-fast: 0.3s ease;
+
+.section,
+.section * {
+  box-sizing: border-box;
+}
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: 120px 0;
+
+  /* ВИПРАВЛЕНИЙ ГРАДІЄНТ:
+     Без прозоростей (rgba), тільки чисті кольори.
+     Зверху 35% займає глибокий темний (для ідеального читання тексту),
+     а потім йде дуже довгий, плавний перехід аж до 90% висоти блоку. */
+  background: linear-gradient(
+    to bottom,
+    $color-bg-dark 0%,
+    $color-bg-dark 35%,
+    $color-bg-light 90%,
+    $color-bg-light 100%
+  );
+
+  font-family: $font-family-base;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 768px) {
+    padding: 80px 0;
+  }
+}
+
+.container {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 60px;
+
+  @media (max-width: 768px) {
+    padding: 0 24px;
+    gap: 40px;
+  }
+}
+
+.textWrapper {
+  max-width: 800px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  /* Анімація м'якої появи тексту */
+  animation: fadeUpText 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.title {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.1;
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+  }
+}
+
+.description {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+
+  @media (max-width: 768px) {
+    font-size: 17px;
+  }
+}
+
+/* ==========================================
+   КОНТЕЙНЕР ВІДЕО ТА ЕЛЕМЕНТИ КЕРУВАННЯ
+   ========================================== */
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 36px;
+  overflow: hidden;
+  /* М'яка тінь, щоб відділити відео від фону */
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.12),
+    0 10px 20px rgba(0, 0, 0, 0.05);
+  background: #000;
+
+  /* Відео повільно "випливає" знизу */
+  animation: fadeUpVideo 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  animation: subtleZoom 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.videoGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 40%
+  );
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================
+   КНОПКА PLAY / PAUSE / REPLAY
+   ========================================== */
+.controlButton {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    bottom: 16px;
+    right: 16px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+/* ==========================================
+   АНІМАЦІЇ
+   ========================================== */
+@keyframes fadeUpText {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUpVideo {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtleZoom {
+  0% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .textWrapper,
+  .videoWrapper,
+  .video {
+    animation-duration: 0.01ms !important;
+  }
+}

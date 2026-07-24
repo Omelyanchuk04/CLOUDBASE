@@ -1,12 +1,15 @@
-$color-bg-content: #060608;
-$color-text-primary: #ffffff;
-$color-text-secondary: rgba(255, 255, 255, 0.7);
-$color-accent: #8b5cf6;
-$color-accent-hover: #9c73f7;
-$color-card-bg: rgba(20, 25, 35, 0.4);
-$color-card-bg-hover: rgba(30, 35, 50, 0.6);
-$color-control-bg: rgba(255, 255, 255, 0.1);
-$color-control-bg-hover: rgba(255, 255, 255, 0.2);
+/* ==========================================
+   СВІТЛА ТЕМА (ПРЕМІУМ ОФІСНИЙ СТИЛЬ)
+   ========================================== */
+$color-bg-content: #f5f5f7; /* М'який світло-сірий фон, як на сайті Apple */
+$color-text-primary: #1d1d1f; /* Глибокий темно-сірий (комфортний для читання) */
+$color-text-secondary: #6e6e73; /* Приємний сірий для неактивних елементів */
+$color-accent: #8b5cf6; /* Твій фіолетовий акцент залишаємо (гарно контрастує) */
+$color-accent-hover: #7c3aed;
+$color-card-bg: rgba(255, 255, 255, 0.5); /* Напівпрозорий білий для кнопок */
+$color-card-bg-hover: rgba(255, 255, 255, 0.9);
+$color-control-bg: rgba(0, 0, 0, 0.04); /* Ледь помітні кнопки навігації */
+$color-control-bg-hover: rgba(0, 0, 0, 0.08);
 
 $font-family-base:
   -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
@@ -63,7 +66,7 @@ $transition-fast: 0.4s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05); /* Ледь помітна рамочка */
   border-radius: 50%;
   background: $color-control-bg;
   color: $color-text-primary;
@@ -122,7 +125,7 @@ $transition-fast: 0.4s ease;
 }
 
 /* ==========================================
-   АКОРДЕОН-КАРТКИ (ДУЖЕ ПЛАВНІ)
+   АКОРДЕОН-КАРТКИ (СВІТЛІ ТА ПЛАВНІ)
    ========================================== */
 .featureItem {
   width: 100%;
@@ -130,8 +133,8 @@ $transition-fast: 0.4s ease;
   background: $color-card-bg;
   border: 1px solid transparent;
   padding: 16px 20px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   cursor: pointer;
 
   /* Плавна трансформація фону і відступів */
@@ -139,15 +142,14 @@ $transition-fast: 0.4s ease;
 
   &:hover {
     background: $color-card-bg-hover;
+    border-color: rgba(0, 0, 0, 0.02);
   }
 
   &.active {
-    background: linear-gradient(
-      135deg,
-      rgba(35, 45, 60, 0.6) 0%,
-      rgba(15, 20, 30, 0.6) 100%
-    );
-    border-color: rgba(255, 255, 255, 0.05);
+    /* Білосніжний фон для відкритої картки з м'якою тінню */
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.04);
     padding: 24px 20px;
     cursor: default;
   }
@@ -176,7 +178,8 @@ $transition-fast: 0.4s ease;
 }
 
 .active .cardTitle {
-  color: #fff;
+  /* Головний акцентний колір для відкритого заголовка */
+  color: $color-text-primary;
   font-size: 18px;
   font-weight: 600;
 }
@@ -187,9 +190,9 @@ $transition-fast: 0.4s ease;
   justify-content: center;
   width: 24px;
   height: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.15); /* Темна рамочка на світлому фоні */
   border-radius: 50%;
-  color: #fff;
+  color: $color-text-primary;
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   overflow: hidden;
 }
@@ -198,11 +201,10 @@ $transition-fast: 0.4s ease;
   width: 0;
   opacity: 0;
   border-width: 0;
-  margin-right: -14px; /* Ховаємо відступ, щоб текст став на місце */
+  margin-right: -14px;
   transform: scale(0);
 }
 
-/* Трюк з Grid для плавного розгортання висоти */
 .descWrapper {
   display: grid;
   grid-template-rows: 0fr;
@@ -217,13 +219,11 @@ $transition-fast: 0.4s ease;
   min-height: 0;
   overflow: hidden;
   opacity: 0;
-  /* Швидке зникнення тексту при закритті */
   transition: opacity 0.3s ease;
 }
 
 .active .descInner {
   opacity: 1;
-  /* М'яка затримка при появі, щоб спочатку розсунулась картка */
   transition: opacity 0.8s ease 0.3s;
 }
 
@@ -232,7 +232,8 @@ $transition-fast: 0.4s ease;
   padding-top: 12px;
   font-size: 16px;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
+  /* Темно-сірий текст, що легко читається на білому фоні */
+  color: #424245;
 }
 
 /* ==========================================
@@ -251,9 +252,10 @@ $transition-fast: 0.4s ease;
   max-width: 750px;
   aspect-ratio: 1 / 1;
   border-radius: $radius-lg;
+  /* Залишив дуже ніжну фіолетову підсвітку під картинкою, на білому це виглядає розкішно */
   background: radial-gradient(
     circle closest-side,
-    rgba(139, 92, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0.08) 0%,
     transparent 100%
   );
 }
@@ -262,10 +264,8 @@ $transition-fast: 0.4s ease;
   object-fit: contain;
   opacity: 0;
   pointer-events: none;
-  /* Спочатку сервер трішки зменшений */
   transform: scale(1.1);
 
-  /* Повільне розчинення, коли картинка ховається */
   transition:
     opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1),
     transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -273,11 +273,9 @@ $transition-fast: 0.4s ease;
   &.activeImage {
     opacity: 1;
     pointer-events: auto;
-    /* Плавно наїжджає на користувача */
     transform: scale(1.35);
     z-index: 2;
 
-    /* Доооооовга кінематографічна поява */
     transition:
       opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
       transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);
