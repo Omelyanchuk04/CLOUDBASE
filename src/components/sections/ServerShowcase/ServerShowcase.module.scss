@@ -1,0 +1,70 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.fixedCta {
+  position: fixed;
+  bottom: 40px; /* Відстань від низу екрану */
+  left: 50%;
+  z-index: 100;
+
+  /* Кнопка виїжджає знизу вгору */
+  transform: translateX(-50%) translateY(50px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+
+  &.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+.pillButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 8px 8px 24px;
+  background-color: rgba(
+    29,
+    29,
+    31,
+    0.85
+  ); /* Фірмовий напівпрозорий темний (Apple) */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.95);
+    transform: scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.pillIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background-color: #0071e3;
+  border-radius: 50%;
+  color: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+.pillButton:hover .pillIcon {
+  transform: scale(1.05);
+}

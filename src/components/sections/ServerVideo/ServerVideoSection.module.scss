@@ -183,6 +183,57 @@ $transition-fast: 0.3s ease;
 }
 
 /* ==========================================
+   КНОПКА CTA (APPLE STYLE)
+   ========================================== */
+.ctaContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: -20px; /* Підтягуємо ближче до відео */
+  padding-bottom: 20px;
+  /* Анімація появи разом з усім контентом */
+  animation: fadeUpVideo 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pillButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 8px 8px 24px;
+  background-color: #1d1d1f;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #000000;
+    transform: scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.pillIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background-color: #0071e3; /* Фірмовий синій Apple */
+  border-radius: 50%;
+  color: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+.pillButton:hover .pillIcon {
+  transform: scale(1.05);
+}
+
+/* ==========================================
    АНІМАЦІЇ
    ========================================== */
 @keyframes fadeUpText {
@@ -219,7 +270,8 @@ $transition-fast: 0.3s ease;
 @media (prefers-reduced-motion: reduce) {
   .textWrapper,
   .videoWrapper,
-  .video {
+  .video,
+  .ctaContainer {
     animation-duration: 0.01ms !important;
   }
 }

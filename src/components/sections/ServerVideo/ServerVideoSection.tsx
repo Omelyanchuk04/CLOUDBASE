@@ -19,17 +19,13 @@ export function ServerVideoSection({
   const baseId = useId();
   const titleId = `${baseId}-title`;
 
-  // Відстежуємо стан відео
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true); // autoPlay за замовчуванням
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isEnded, setIsEnded] = useState(false);
 
-  // Логіка перемикання (Плей / Пауза / Повторити)
   const handleTogglePlay = () => {
     if (!videoRef.current) return;
-
     if (isEnded) {
-      // Якщо закінчилось - починаємо спочатку
       videoRef.current.currentTime = 0;
       videoRef.current.play();
     } else if (isPlaying) {
@@ -51,7 +47,6 @@ export function ServerVideoSection({
 
         <div className={styles.videoWrapper}>
           <div className={styles.videoGlow} />
-
           <video
             ref={videoRef}
             className={styles.video}
@@ -60,7 +55,6 @@ export function ServerVideoSection({
             autoPlay
             muted
             playsInline
-            // Прибираємо loop, щоб воно зупинялось
             onEnded={() => setIsEnded(true)}
             onPlay={() => {
               setIsPlaying(true);
@@ -70,8 +64,6 @@ export function ServerVideoSection({
           >
             Ваш браузер не підтримує відтворення відео.
           </video>
-
-          {/* Преміальна кнопка керування в стилі Apple */}
           <button
             className={styles.controlButton}
             onClick={handleTogglePlay}
@@ -93,11 +85,6 @@ export function ServerVideoSection({
   );
 }
 
-export default ServerVideoSection;
-
-/* ==========================================
-   ІКОНКИ КЕРУВАННЯ
-   ========================================== */
 function PlayIcon() {
   return (
     <svg
@@ -111,7 +98,6 @@ function PlayIcon() {
     </svg>
   );
 }
-
 function PauseIcon() {
   return (
     <svg
@@ -125,7 +111,6 @@ function PauseIcon() {
     </svg>
   );
 }
-
 function ReplayIcon() {
   return (
     <svg

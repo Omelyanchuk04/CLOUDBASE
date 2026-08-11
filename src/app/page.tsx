@@ -8,16 +8,17 @@ import { HowWeWork } from "@/components/sections/HowWeWork/HowWeWork";
 import { Pricing } from "@/components/sections/Pricing/Pricing";
 import { ServerSection } from "@/components/sections/Server/ServerSection";
 import { ServerVideoSection } from "@/components/sections/ServerVideo/ServerVideoSection";
+import { ServerShowcase } from "@/components/sections/ServerShowcase/ServerShowcase";
 
 export default function HomePage() {
   return (
     <>
-      {/* 1. Хто ми і що робимо */}s
+      {/* 1. Хто ми і що робимо */}
       <Hero />
-      <ServerVideoSection />
-      <ServerSection />
-      {/* 5. MacBook-скрол — показуємо хмарну версію */}
       <MacbookSection />
+
+      <ServerShowcase />
+      {/* 5. MacBook-скрол — показуємо хмарну версію */}
       {/* 2. Проблеми клієнтів — дзеркало болю */}
       {/* <Problem /> */}
       {/* <Services />

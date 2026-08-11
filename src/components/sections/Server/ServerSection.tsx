@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import Image from "next/image";
-
 import styles from "./ServerSection.module.scss";
 
 export interface Feature {
@@ -78,17 +77,16 @@ export function ServerSection({
   const canGoPrev = activeIndex > 0;
   const canGoNext = activeIndex < features.length - 1;
 
-  const goPrev = useCallback(() => {
-    setActiveIndex((current) => Math.max(0, current - 1));
-  }, []);
-
-  const goNext = useCallback(() => {
-    setActiveIndex((current) => Math.min(features.length - 1, current + 1));
-  }, [features.length]);
-
-  const goTo = useCallback((index: number) => {
-    setActiveIndex(index);
-  }, []);
+  const goPrev = useCallback(
+    () => setActiveIndex((current) => Math.max(0, current - 1)),
+    [],
+  );
+  const goNext = useCallback(
+    () =>
+      setActiveIndex((current) => Math.min(features.length - 1, current + 1)),
+    [features.length],
+  );
+  const goTo = useCallback((index: number) => setActiveIndex(index), []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -101,14 +99,11 @@ export function ServerSection({
         goNext();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [goPrev, goNext]);
 
-  if (features.length === 0) {
-    return null;
-  }
+  if (features.length === 0) return null;
 
   return (
     <section className={styles.section} aria-labelledby={titleId}>
@@ -139,7 +134,6 @@ export function ServerSection({
             <ul className={styles.list}>
               {features.map((feature, index) => {
                 const isActive = index === activeIndex;
-
                 return (
                   <li
                     key={feature.id}
@@ -156,7 +150,6 @@ export function ServerSection({
                       </div>
                       <span className={styles.cardTitle}>{feature.title}</span>
                     </button>
-
                     <div className={styles.descWrapper}>
                       <div className={styles.descInner}>
                         <p className={styles.descText}>{feature.description}</p>
@@ -167,23 +160,19 @@ export function ServerSection({
               })}
             </ul>
           </div>
-
           <div className={styles.rightPanel}>
             <div className={styles.imageWrapper}>
-              {features.map((feature, index) => {
-                const isActive = index === activeIndex;
-                return (
-                  <Image
-                    key={feature.id}
-                    src={feature.imageSrc}
-                    alt={feature.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className={`${styles.image} ${isActive ? styles.activeImage : ""}`}
-                    priority={index === 0}
-                  />
-                );
-              })}
+              {features.map((feature, index) => (
+                <Image
+                  key={feature.id}
+                  src={feature.imageSrc}
+                  alt={feature.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className={`${styles.image} ${index === activeIndex ? styles.activeImage : ""}`}
+                  priority={index === 0}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -191,8 +180,6 @@ export function ServerSection({
     </section>
   );
 }
-
-export default ServerSection;
 
 function PlusIcon() {
   return (
