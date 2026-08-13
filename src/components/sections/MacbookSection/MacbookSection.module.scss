@@ -4,8 +4,27 @@ $color-bg: #060608;
   position: relative;
   width: 100%;
   background-color: $color-bg;
-  /* ПОВЕРНУВ ЯК БУЛО: це необхідно для нормальної роботи MacbookScroll */
   overflow: hidden;
+
+  /* ПОСИЛЕНИЙ ГРАДІЄНТ: довший і щільніший зверху */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 400px; /* Збільшена висота для м'якшого переходу */
+    /* Затримуємо 100% колір фону довше (до 15%), потім плавно розчиняємо */
+    background: linear-gradient(
+      to bottom,
+      $color-bg 0%,
+      $color-bg 15%,
+      rgba(6, 6, 8, 0.7) 40%,
+      transparent 100%
+    );
+    z-index: 5; /* Гарантовано перекриває кульки (z-index: 0), але під текстом (z-index: 10) */
+    pointer-events: none;
+  }
 }
 
 /* ==========================================
@@ -20,7 +39,8 @@ $color-bg: #060608;
 
 .glowPurple {
   position: absolute;
-  top: -5%;
+  /* ЗМІНЕНО: Опущено нижче (було -5%, стало 5%), щоб зменшити різкість зрізу */
+  top: 5%;
   left: -5%;
   width: 50vw;
   height: 50vw;

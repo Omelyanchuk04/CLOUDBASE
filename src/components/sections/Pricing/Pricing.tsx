@@ -3,22 +3,24 @@ import styles from "./Pricing.module.scss";
 
 export function Pricing() {
   return (
-    <section className={`section ${styles.pricing}`}>
-      <div className="container">
-        {/* Header */}
+    <section className={styles.pricing}>
+      {/* Великі розмиті плями на фоні (Apple Music style) */}
+      <div className={styles.blobContainer} aria-hidden="true">
+        <div className={styles.blobPink} />
+        <div className={styles.blobPurple} />
+        <div className={styles.blobBlue} />
+      </div>
+
+      <div className={styles.container}>
         <header className={styles.pricing__header}>
-          <p className="t-label">Тарифи</p>
-          <h2 className={`t-headline ${styles.pricing__title}`}>
-            Прозора ціна.
-          </h2>
-          <p className={`t-body-lg ${styles.pricing__sub}`}>
-            Абонентське обслуговування або разові роботи — погоджуємо вартість
-            до початку, без сюрпризів.
+          <h2 className={styles.pricing__title}>Вартість послуг</h2>
+          <p className={styles.pricing__sub}>
+            Прозорі умови на впровадження, підтримку та хмарний хостинг. Без
+            прихованих платежів.
           </p>
         </header>
 
-        {/* Cards — 4 columns */}
-        <div className={`stagger ${styles.pricing__grid}`}>
+        <div className={styles.pricing__grid}>
           {PRICING_TIERS.map((tier) => (
             <article
               key={tier.id}
@@ -27,20 +29,27 @@ export function Pricing() {
               }`}
             >
               {tier.highlight && (
-                <div className={styles.pricingCard__badge}>Популярний</div>
+                <div className={styles.pricingCard__badge}>Популярно</div>
               )}
 
               <div className={styles.pricingCard__header}>
-                <h3 className={`${styles.pricingCard__name}`}>{tier.name}</h3>
+                <h3 className={styles.pricingCard__name}>{tier.name}</h3>
+
+                <p className={styles.pricingCard__desc}>{tier.description}</p>
 
                 <div className={styles.pricingCard__price}>
                   {tier.price !== null ? (
                     <>
+                      {tier.prefix && (
+                        <span className={styles.pricingCard__pricePrefix}>
+                          {tier.prefix}
+                        </span>
+                      )}
                       <span className={styles.pricingCard__priceNum}>
                         {tier.price.toLocaleString("uk-UA")}
                       </span>
                       <span className={styles.pricingCard__pricePer}>
-                        грн / {tier.period}
+                        грн {tier.period ? `/ ${tier.period}` : ""}
                       </span>
                     </>
                   ) : (
@@ -49,44 +58,38 @@ export function Pricing() {
                     </span>
                   )}
                 </div>
-
-                <p className={`t-caption ${styles.pricingCard__desc}`}>
-                  {tier.description}
-                </p>
               </div>
 
               <ul className={styles.pricingCard__features}>
-                {tier.features.map((f) => (
-                  <li key={f} className={styles.pricingCard__feature}>
-                    <span
+                {tier.features.map((f, index) => (
+                  <li key={index} className={styles.pricingCard__feature}>
+                    <svg
                       className={styles.pricingCard__check}
-                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      ✓
-                    </span>
-                    <span className="t-caption">{f}</span>
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
 
               <a
                 href={`/contacts?plan=${tier.id}`}
-                className={`btn w-full ${
-                  tier.highlight ? "btn--primary" : "btn--outline"
-                } ${styles.pricingCard__cta}`}
+                className={`${styles.pricingCard__cta} ${
+                  tier.highlight ? styles.btnPrimary : styles.btnSecondary
+                }`}
               >
                 {tier.cta}
               </a>
             </article>
           ))}
         </div>
-
-        <p className={`t-caption text-center ${styles.pricing__note}`}>
-          Потрібна кастомна конфігурація або разова робота?{" "}
-          <a href="/contacts" className={styles.pricing__noteLink}>
-            Напишіть нам →
-          </a>
-        </p>
       </div>
     </section>
   );

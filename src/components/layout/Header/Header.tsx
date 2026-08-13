@@ -13,7 +13,7 @@ interface INavItem {
 const navList: INavItem[] = [
   { label: "Хмара", href: "!#" },
   { label: "BAS", href: "!#" },
-  { label: "Послуги", href: "!#" },
+  // { label: "Послуги", href: "!#" },
   { label: "Про нас", href: "!#" },
   { label: "Контакти", href: "!#" },
 ];
