@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header/Header";
+import { Footer } from "@/components/layout/Footer/Footer";
 import "./global.scss";
 
 const geistSans = Geist({
@@ -47,24 +48,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main style={{ paddingTop: "var(--header-h)" }}>{children}</main>
-        <footer className="footer">
-          <div className="container footer__inner">
-            <span className="t-caption">
-              © {new Date().getFullYear()} CloudBASe. Усі права захищені.
-            </span>
-            <nav className="footer__nav" aria-label="Footer navigation">
-              <a href="/privacy" className="t-caption footer__link">
-                Конфіденційність
-              </a>
-              <a href="/terms" className="t-caption footer__link">
-                Умови
-              </a>
-              <a href="/contacts" className="t-caption footer__link">
-                Контакти
-              </a>
-            </nav>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );
