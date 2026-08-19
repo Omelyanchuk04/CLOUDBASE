@@ -166,8 +166,8 @@
   /* ОРИГІНАЛЬНА КНОПКА CTA В ШАПЦІ */
   &__button {
     padding: 6px 18px;
-    background: rgba(255, 255, 255, 0.85);
-    color: #3b3b3b;
+    background: #fa243c;
+    color: rgba(255, 255, 255, 0.85);
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -180,7 +180,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 1);
+      background: #ff1d37;
       box-shadow: 0 8px 24px rgba(255, 255, 255, 0.5);
       filter: brightness(105%);
     }
