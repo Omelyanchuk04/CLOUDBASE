@@ -15,9 +15,9 @@ export default function BasPage() {
   return (
     <>
       <div className={styles.fixedBackground} aria-hidden="true">
-        <div className={styles.blobCyan} />
+        <div className={styles.blobPink} />
+        <div className={styles.blobPurple} />
         <div className={styles.blobBlue} />
-        <div className={styles.blobLightBlue} />
       </div>
 
       <main className={styles.mainContent}>

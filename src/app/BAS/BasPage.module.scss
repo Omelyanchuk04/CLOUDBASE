@@ -1,27 +1,25 @@
-/* Фіксований фон на весь екран, який перекриває чорний колір сайту */
 .fixedBackground {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #f5f5f7; /* Фірмовий світлий фон Apple */
-  z-index: -1; /* Ховаємо під контент */
+  background-color: #f5f5f7; /* Світлий фон */
+  z-index: -1;
   overflow: hidden;
   pointer-events: none;
 }
 
-/* Розмиті плями тепер на всю сторінку і не рухаються при скролі (дуже крутий ефект) */
 .blobPink {
   position: absolute;
   top: -10%;
   left: -5%;
   width: 60vw;
   height: 60vw;
-  background: #fa243c;
+  background: #fa243c; /* Червоний */
   border-radius: 50%;
-  filter: blur(160px);
-  opacity: 0.15;
+  filter: blur(140px);
+  opacity: 0.15; /* Легка прозорість для світлого фону */
 }
 
 .blobPurple {
@@ -30,9 +28,9 @@
   right: -10%;
   width: 70vw;
   height: 70vw;
-  background: #7a00ff;
+  background: #7a00ff; /* Фіолетовий */
   border-radius: 50%;
-  filter: blur(180px);
+  filter: blur(160px);
   opacity: 0.12;
 }
 
@@ -42,16 +40,15 @@
   left: 10%;
   width: 60vw;
   height: 60vw;
-  background: #007aff;
+  background: #007aff; /* Синій */
   border-radius: 50%;
-  filter: blur(160px);
+  filter: blur(150px);
   opacity: 0.15;
 }
 
-/* Обгортка для контенту */
 .mainContent {
   position: relative;
-  z-index: 1; /* Контент іде поверх фіксованого фону */
+  z-index: 1;
   min-height: 100vh;
-  color: #1d1d1f;
+  color: #1d1d1f; /* Темний текст для всієї сторінки */
 }

@@ -34,16 +34,14 @@
 }
 
 .card {
-  /* Світле матове скло */
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.65); /* Біле напівпрозоре скло */
   backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
   border-radius: 28px;
   padding: 3rem;
   transition:
-    transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.3s ease,
     box-shadow 0.3s ease;
 
   &:hover {
@@ -84,7 +82,7 @@
 .check {
   width: 22px;
   height: 22px;
-  color: #fa243c;
+  color: #fa243c; /* Червона галочка */
   flex-shrink: 0;
   margin-top: 1px;
 }

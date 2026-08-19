@@ -1,9 +1,7 @@
 .hero {
   position: relative;
-  padding: 12rem 1rem 6rem; /* 12rem робить відступ зверху, щоб контент не наліз на шапку */
-  font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+  padding: 12rem 1rem 6rem;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
 .container {
@@ -41,12 +39,12 @@
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.1;
-  color: #1d1d1f;
+  color: #1d1d1f; /* Темний заголовок */
   margin: 0;
 }
 
 .subtitle {
-  color: #86868b;
+  color: #86868b; /* Сірий підзаголовок */
   font-size: 1.25rem;
   line-height: 1.5;
   margin: 0;
@@ -62,7 +60,7 @@
 }
 
 .btnPrimary {
-  background: #fa243c;
+  background: #fa243c; /* Червона кнопка */
   color: #ffffff;
   padding: 1rem 2rem;
   font-size: 1.05rem;
@@ -72,7 +70,7 @@
   transition:
     transform 0.2s ease,
     background 0.2s ease;
-  box-shadow: 0 8px 20px rgba(250, 36, 60, 0.2);
+  box-shadow: 0 8px 20px rgba(250, 36, 60, 0.25);
 
   &:hover {
     background: #d91c30;

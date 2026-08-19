@@ -8,7 +8,6 @@ export const BasHero = () => {
       {/* Плями звідси ПРИБРАНО, вони тепер глобальні у page.tsx */}
       <div className={styles.container}>
         <div className={styles.content}>
-          <span className={styles.badge}>Комплексна автоматизація</span>
           <h1 className={styles.title}>
             Впровадження та доопрацювання систем BAS
           </h1>
