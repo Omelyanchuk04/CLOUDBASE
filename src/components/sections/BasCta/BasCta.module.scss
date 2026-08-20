@@ -6,17 +6,35 @@
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1200px; /* Привели до тієї ж ширини, що й інші блоки */
   margin: 0 auto;
 }
 
+/* ==========================================
+   ВЕЛИКА СКЛЯНА ОБГОРТКА
+   ========================================== */
+.glassWrapper {
+  background: rgba(255, 255, 255, 0.15); /* Прозора скляна основа */
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 40px; /* Зовнішній радіус */
+  padding: 1rem; /* Відступ до внутрішнього блоку (16px) */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    border-radius: 28px;
+  }
+}
+
+/* ==========================================
+   ВНУТРІШНІЙ БЛОК (Сама картка)
+   ========================================== */
 .box {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 1);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.7); /* Більш щільний білий фон */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px; /* Внутрішній радіус = 40px (зовн) - 16px (padding) */
   padding: 4rem;
   display: flex;
   align-items: center;
@@ -27,6 +45,10 @@
     flex-direction: column;
     text-align: center;
     padding: 3rem 2rem;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 20px;
   }
 }
 
@@ -43,10 +65,9 @@
 
   p {
     font-size: 1.125rem;
-    color: #475569;
+    color: #555555;
     line-height: 1.5;
     margin: 0;
-    font-weight: 500;
   }
 }
 
@@ -54,7 +75,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #007aff;
+  background: #007aff; /* Синя кнопка */
   color: #ffffff;
   padding: 1.25rem 2.5rem;
   font-size: 1.1rem;
@@ -64,8 +85,8 @@
   white-space: nowrap;
   box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
   transition:
-    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-    background 0.2s;
+    transform 0.2s ease,
+    background 0.2s ease;
 
   &:hover {
     background: #005bb5;
