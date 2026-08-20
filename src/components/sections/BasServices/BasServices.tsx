@@ -65,30 +65,33 @@ export const BasServices = () => {
           <h2>Можливості доопрацювання</h2>
         </div>
 
-        <div className={styles.grid}>
-          {SERVICES_CATEGORIES.map((category) => (
-            <div key={category.id} className={styles.card}>
-              <h3 className={styles.cardTitle}>{category.title}</h3>
-              <ul className={styles.list}>
-                {category.features.map((feature, idx) => (
-                  <li key={idx} className={styles.feature}>
-                    <svg
-                      className={styles.check}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        {/* НОВИЙ СКЛЯНИЙ КОНТЕЙНЕР-ОБГОРТКА */}
+        <div className={styles.glassWrapper}>
+          <div className={styles.grid}>
+            {SERVICES_CATEGORIES.map((category) => (
+              <div key={category.id} className={styles.card}>
+                <h3 className={styles.cardTitle}>{category.title}</h3>
+                <ul className={styles.list}>
+                  {category.features.map((feature, idx) => (
+                    <li key={idx} className={styles.feature}>
+                      <svg
+                        className={styles.check}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

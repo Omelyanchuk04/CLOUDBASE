@@ -1,12 +1,12 @@
 .steps {
   position: relative;
-  padding: 4rem 1rem 6rem;
   z-index: 10;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
 .container {
-  max-width: 1100px;
+  padding-top: 120px;
+  max-width: 1200px; /* Трохи розширив для скляної обгортки */
   margin: 0 auto;
 }
 
@@ -16,7 +16,26 @@
   font-weight: 700;
   color: #1d1d1f;
   letter-spacing: -0.02em;
-  margin: 0 0 4rem 0;
+  margin: 0 0 3rem 0; /* Зменшив відступ, бо обгортка має свій padding */
+}
+
+/* ==========================================
+   ВЕЛИКА СКЛЯНА ОБГОРТКА
+   ========================================== */
+.glassWrapper {
+  background: rgba(255, 255, 255, 0.15); /* Дуже прозора основа */
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.5); /* Світлі краї */
+  border-radius: 40px; /* Заокруглені кути */
+  padding: 3rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+
+  /* Адаптив під мобільні екрани */
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    border-radius: 24px;
+  }
 }
 
 .grid {
@@ -32,42 +51,49 @@
   }
 }
 
+/* ==========================================
+   ВНУТРІШНІ КАРТКИ ЕТАПІВ
+   ========================================== */
 .stepCard {
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  border-radius: 24px;
-  padding: 2.5rem 2rem;
-  transition: transform 0.3s ease;
+  border-radius: 24px; /* Внутрішній радіус */
+  padding: 3rem 1.5rem;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 
   &:hover {
-    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.85); /* Світлішає при наведенні */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   }
 
   h3 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: #1d1d1f;
     margin: 0 0 0.75rem 0;
-  }
-
-  p {
-    color: #86868b;
-    line-height: 1.5;
-    font-size: 0.95rem;
-    margin: 0;
-    font-weight: 500;
   }
 }
 
 .num {
   font-size: 3rem;
   font-weight: 800;
-  color: #7a00ff;
+  color: #009ee2;
   line-height: 1;
   margin-bottom: 1.5rem;
   opacity: 0.9;
+}
+
+.text {
+  color: #555555;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  margin: 0;
 }

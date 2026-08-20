@@ -2,11 +2,107 @@
   position: relative;
   padding: 12rem 1rem 6rem;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  overflow: hidden;
 }
 
+/* ==========================================
+   СТАТИЧНІ КАРТИНКИ
+   ========================================== */
+/* ==========================================
+   СТАТИЧНІ КАРТИНКИ
+   ========================================== */
+.imagesContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floatingImg {
+  position: absolute;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  /* Додаємо padding, щоб картинка мала "повітря" до рамок скла */
+  padding: 4px;
+}
+
+.image {
+  /* ГОЛОВНА ЗМІНА: contain гарантує, що картинка влізе повністю і не обріжеться */
+  object-fit: contain;
+  /* Оскільки ми додали padding на батьківський елемент, 
+     треба трохи зменшити розмір самої картинки всередині */
+  width: calc(100% - 8px) !important;
+  height: calc(100% - 8px) !important;
+  margin: 4px;
+}
+
+/* РОЗТАШУВАННЯ 6 КАРТИНОК (3 зліва, 3 справа) */
+/* Якщо картинки все ще виглядають стиснутими, ти можеш погратися з width та height тут, 
+   підігнавши їх під реальні пропорції твоїх скриншотів */
+.img1 {
+  top: 15%;
+  left: 5%;
+  width: 150px;
+  height: 110px;
+}
+.img3 {
+  top: 45%;
+  left: -2%;
+  width: 200px;
+  height: 140px;
+}
+.img5 {
+  bottom: 10%;
+  left: 10%;
+  width: 160px;
+  height: 120px;
+}
+
+.img2 {
+  top: 15%;
+  right: 5%;
+  width: 180px;
+  height: 130px;
+}
+.img4 {
+  top: 45%;
+  right: -2%;
+  width: 160px;
+  height: 120px;
+}
+.img6 {
+  bottom: 10%;
+  right: 10%;
+  width: 190px;
+  height: 140px;
+}
+
+/* Ховаємо або зменшуємо картинки на менших екранах */
+@media (max-width: 1200px) {
+  .floatingImg {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 768px) {
+  .imagesContainer {
+    display: none;
+  }
+}
+
+/* ==========================================
+   ОСНОВНИЙ КОНТЕНТ
+   ========================================== */
 .container {
+  position: relative;
   max-width: 1100px;
   margin: 0 auto;
+  z-index: 10;
 }
 
 .content {
@@ -14,37 +110,26 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto;
   gap: 1.5rem;
 }
 
-.badge {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 0.5rem 1.25rem;
-  border-radius: 100px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #1d1d1f;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-}
-
 .title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(
+    2.2rem,
+    4.5vw,
+    3.8rem
+  ); /* Трохи зменшені мінімальний, гнучкий та максимальний розміри */
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.1;
-  color: #1d1d1f; /* Темний заголовок */
+  color: #1d1d1f;
   margin: 0;
 }
 
 .subtitle {
-  color: #86868b; /* Сірий підзаголовок */
+  color: #86868b;
   font-size: 1.25rem;
   line-height: 1.5;
   margin: 0;
@@ -60,7 +145,7 @@
 }
 
 .btnPrimary {
-  background: #fa243c; /* Червона кнопка */
+  background: #009ee2;
   color: #ffffff;
   padding: 1rem 2rem;
   font-size: 1.05rem;
@@ -73,13 +158,13 @@
   box-shadow: 0 8px 20px rgba(250, 36, 60, 0.25);
 
   &:hover {
-    background: #d91c30;
+    background: #007eb5;
     transform: scale(1.03);
   }
 }
 
 .btnSecondary {
-  background: rgba(255, 255, 255, 0.7);
+  background: #004f8c;
   color: #1d1d1f;
   border: 1px solid rgba(0, 0, 0, 0.05);
   padding: 1rem 2rem;

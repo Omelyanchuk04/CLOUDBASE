@@ -1,11 +1,60 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./BasHero.module.scss";
 
 export const BasHero = () => {
+  // Масив з 6 картинками
+  const floatingImages = [
+    {
+      src: "/bas/bas-img-1.png",
+      className: styles.img1,
+      alt: "BAS interface 1",
+    },
+    {
+      src: "/bas/bas-img-2.png",
+      className: styles.img2,
+      alt: "BAS interface 2",
+    },
+    {
+      src: "/bas/bas-img-3.png",
+      className: styles.img3,
+      alt: "BAS interface 3",
+    },
+    {
+      src: "/bas/bas-img-4.png",
+      className: styles.img4,
+      alt: "BAS interface 4",
+    },
+    {
+      src: "/bas/bas-img-5.png",
+      className: styles.img5,
+      alt: "BAS interface 5",
+    },
+    {
+      src: "/bas/bas-img-6.png",
+      className: styles.img6,
+      alt: "BAS interface 6",
+    },
+  ];
+
   return (
     <section className={styles.hero}>
-      {/* Плями звідси ПРИБРАНО, вони тепер глобальні у page.tsx */}
+      {/* Контейнер для статичних картинок (позаду тексту) */}
+      <div className={styles.imagesContainer} aria-hidden="true">
+        {floatingImages.map((img, index) => (
+          <div key={index} className={`${styles.floatingImg} ${img.className}`}>
+            <Image
+              src={img.src}
+              alt={img.alt}
+              fill
+              sizes="(max-width: 768px) 0px, 200px"
+              className={styles.image}
+            />
+          </div>
+        ))}
+      </div>
+
       <div className={styles.container}>
         <div className={styles.content}>
           <h1 className={styles.title}>
@@ -19,9 +68,6 @@ export const BasHero = () => {
           <div className={styles.actions}>
             <Link href="/contacts" className={styles.btnPrimary}>
               Замовити консультацію
-            </Link>
-            <Link href="#services" className={styles.btnSecondary}>
-              Переглянути послуги
             </Link>
           </div>
         </div>
