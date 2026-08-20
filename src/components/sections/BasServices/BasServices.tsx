@@ -62,7 +62,7 @@ export const BasServices = () => {
     <section id="services" className={styles.services}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2>Можливості доопрацювання</h2>
+          <h2>Готові рішення та доопрацювання</h2>
         </div>
 
         {/* НОВИЙ СКЛЯНИЙ КОНТЕЙНЕР-ОБГОРТКА */}
