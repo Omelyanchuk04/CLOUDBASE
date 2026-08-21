@@ -14,7 +14,7 @@ const navList: INavItem[] = [
   { label: "Хмара", href: "!#" },
   { label: "BAS", href: "/BAS" },
   // { label: "Послуги", href: "!#" },
-  { label: "Про нас", href: "!#" },
+  { label: "Про нас", href: "/about" },
   { label: "Контакти", href: "!#" },
 ];
 
