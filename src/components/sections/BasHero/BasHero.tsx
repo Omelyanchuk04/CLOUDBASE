@@ -58,7 +58,7 @@ export const BasHero = () => {
       <div className={styles.container}>
         <div className={styles.content}>
           <h1 className={styles.title}>
-            Впровадження, оренда та доопрацювання BAS і КБС
+            Впровадження, оренда та доопрацювання BAS і KBS
           </h1>
           <p className={styles.subtitle}>
             Адаптуємо типові конфігурації під специфіку вашого бізнесу.
