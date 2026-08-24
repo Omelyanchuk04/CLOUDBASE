@@ -31,19 +31,18 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text-primary);
+
+  /* Змінено на Nexa */
   font-family:
-    var(--font-geist-sans),
+    var(--font-nexa),
     "SF Pro Display",
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
+
   font-size: v.$text-base;
   line-height: 1.6;
   min-height: 100vh;
-
-  /* Замість hidden використовуємо clip. 
-     Він обрізає зайве, але НЕ блокує backdrop-filter! */
-  // overflow: clip;
 }
 
 img,

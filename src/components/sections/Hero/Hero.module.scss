@@ -210,10 +210,8 @@
 
 .hero__heading,
 .hero__headingAlt {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
-  font-size: clamp(2.5rem, 4vw, 4.5rem);
+  font-family: "Nexa", "Montserrat", "Poppins", sans-serif;
+  font-size: clamp(30px, 4vw, 50px);
   line-height: 1.15;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -227,10 +225,8 @@
 
 .hero__sub,
 .hero__subAlt {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
-  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  font-family: "Nexa", "Montserrat", "Poppins", sans-serif;
+  font-size: 16px;
   line-height: 1.5;
   color: #94a3b8;
   max-width: 700px;

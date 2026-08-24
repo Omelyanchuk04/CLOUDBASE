@@ -78,17 +78,15 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-
-              <a
-                href={`/contacts?plan=${tier.id}`}
-                className={`${styles.pricingCard__cta} ${
-                  tier.highlight ? styles.btnPrimary : styles.btnSecondary
-                }`}
-              >
-                {tier.cta}
-              </a>
             </article>
           ))}
+        </div>
+
+        {/* НОВА ЗАГАЛЬНА КНОПКА ПІД КАРТКАМИ */}
+        <div className={styles.pricing__footer}>
+          <a href="/contacts" className={styles.pricing__globalBtn}>
+            Залишити заявку
+          </a>
         </div>
       </div>
     </section>

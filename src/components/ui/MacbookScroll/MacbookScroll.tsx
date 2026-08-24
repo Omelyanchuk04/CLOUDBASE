@@ -1,6 +1,12 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { MotionValue, motion, useScroll, useTransform } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  MotionValue,
+  motion,
+  useScroll,
+  useSpring, // Додали useSpring
+  useTransform,
+} from "framer-motion";
 import { cn } from "../../../lib/utils/utils";
 
 import {
@@ -50,30 +56,43 @@ export const MacbookScroll = ({
     }
   }, []);
 
+  // ГОЛОВНИЙ ФІКС ДЛЯ SAFARI:
+  // Пружина інтерполює значення на кожному кадрі незалежно від того,
+  // як рідко приходить сирий scroll-евент.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 300,
+    damping: 40,
+    restDelta: 0.001,
+  });
+
+  // Замінили scrollYProgress на smoothProgress всюди:
   const scaleX = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.3],
     [1.2, isMobile ? 1 : 1.5],
   );
   const scaleY = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.3],
     [0.6, isMobile ? 1 : 1.5],
   );
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
-  const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
-  const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const translate = useTransform(smoothProgress, [0, 1], [0, 1500]);
+  const rotate = useTransform(smoothProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
+  const textTransform = useTransform(smoothProgress, [0, 0.3], [0, 100]);
+  const textOpacity = useTransform(smoothProgress, [0, 0.2], [1, 0]);
 
   return (
     <div
       ref={ref}
+      // Прибрали willChange та contain, як рекомендувалося, залишили тільки Tailwind-класи
       className="flex min-h-[200vh] shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-100 md:py-40"
     >
       <motion.h2
         style={{
           translateY: textTransform,
           opacity: textOpacity,
+          translateZ: 0,
+          WebkitFontSmoothing: "antialiased",
         }}
         className="mb-20 text-center text-3xl font-bold text-neutral-800 dark:text-white"
       >
@@ -148,7 +167,7 @@ export const Lid = ({
           }}
           className="absolute inset-0 flex items-center justify-center rounded-lg bg-[#010101]"
         >
-          <span className="text-white">{/* <AceternityLogo /> */}</span>
+          <span className="text-white"></span>
         </div>
       </div>
       <motion.div
@@ -159,6 +178,9 @@ export const Lid = ({
           translateY: translate,
           transformStyle: "preserve-3d",
           transformOrigin: "top",
+          translateZ: 0,
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
         }}
         className="absolute inset-0 h-96 w-[32rem] rounded-2xl bg-[#010101] p-2"
       >
@@ -187,7 +209,6 @@ export const Trackpad = () => {
 export const Keypad = () => {
   return (
     <div className="mx-1 h-full [transform:translateZ(0)] rounded-md bg-[#050505] p-1 [will-change:transform]">
-      {/* First Row */}
       <div className="mb-[2px] flex w-full shrink-0 gap-[2px]">
         <KBtn
           className="w-10 items-end justify-start pb-[2px] pl-[4px]"
@@ -250,7 +271,6 @@ export const Keypad = () => {
         </KBtn>
       </div>
 
-      {/* Second row */}
       <div className="mb-[2px] flex w-full shrink-0 gap-[2px]">
         <KBtn>
           <span className="block">~</span>
@@ -312,7 +332,6 @@ export const Keypad = () => {
         </KBtn>
       </div>
 
-      {/* Third row */}
       <div className="mb-[2px] flex w-full shrink-0 gap-[2px]">
         <KBtn
           className="w-10 items-end justify-start pb-[2px] pl-[4px]"
@@ -364,7 +383,6 @@ export const Keypad = () => {
         </KBtn>
       </div>
 
-      {/* Fourth Row */}
       <div className="mb-[2px] flex w-full shrink-0 gap-[2px]">
         <KBtn
           className="w-[2.8rem] items-end justify-start pb-[2px] pl-[4px]"
@@ -415,7 +433,6 @@ export const Keypad = () => {
         </KBtn>
       </div>
 
-      {/* Fifth Row */}
       <div className="mb-[2px] flex w-full shrink-0 gap-[2px]">
         <KBtn
           className="w-[3.65rem] items-end justify-start pb-[2px] pl-[4px]"
@@ -464,7 +481,6 @@ export const Keypad = () => {
         </KBtn>
       </div>
 
-      {/* sixth Row */}
       <div className="mb-[2px] flex w-full shrink-0 gap-[2px]">
         <KBtn className="" childrenClassName="h-full justify-between py-[4px]">
           <div className="flex w-full justify-end pr-1">
@@ -589,9 +605,9 @@ export const SpeakerGrid = () => {
     <div
       className="mt-2 flex h-40 gap-[2px] px-[0.5px]"
       style={{
-        backgroundImage:
-          "radial-gradient(circle, #08080A 0.5px, transparent 0.5px)",
-        backgroundSize: "3px 3px",
+        background:
+          "repeating-linear-gradient(0deg, transparent, transparent 2px, #08080A 2px, #08080A 3px)",
+        opacity: 0.5,
       }}
     ></div>
   );
@@ -626,27 +642,6 @@ export const OptionKey = ({ className }: { className: string }) => {
         width="32"
         height="32"
         stroke="none"
-      />
-    </svg>
-  );
-};
-
-const AceternityLogo = () => {
-  return (
-    <svg
-      width="66"
-      height="65"
-      viewBox="0 0 66 65"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-3 w-3 text-white"
-    >
-      <path
-        d="M8 8.05571C8 8.05571 54.9009 18.1782 57.8687 30.062C60.8365 41.9458 9.05432 57.4696 9.05432 57.4696"
-        stroke="currentColor"
-        strokeWidth="15"
-        strokeMiterlimit="3.86874"
-        strokeLinecap="round"
       />
     </svg>
   );

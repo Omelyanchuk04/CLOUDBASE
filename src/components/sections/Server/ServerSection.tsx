@@ -107,6 +107,11 @@ export function ServerSection({
 
   return (
     <section className={styles.section} aria-labelledby={titleId}>
+      {/* ФІРМОВІ ПЛЯМИ */}
+      <div className={styles.blobPink} aria-hidden="true" />
+      <div className={styles.blobPurple} aria-hidden="true" />
+      <div className={styles.blobBlue} aria-hidden="true" />
+
       <div className={styles.content}>
         <div className={styles.navControls}>
           <button

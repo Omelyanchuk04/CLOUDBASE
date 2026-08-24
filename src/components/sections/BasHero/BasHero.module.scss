@@ -1,6 +1,6 @@
 .hero {
   position: relative;
-  padding: 12rem 1rem 6rem;
+  padding: 160px 20px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
   overflow: hidden;
 }
@@ -13,6 +13,7 @@
    ========================================== */
 .imagesContainer {
   position: absolute;
+  padding-bottom: 20px;
   inset: 0;
   pointer-events: none;
   z-index: 1;
@@ -40,43 +41,41 @@
   margin: 4px;
 }
 
-/* РОЗТАШУВАННЯ 6 КАРТИНОК (3 зліва, 3 справа) */
-/* Якщо картинки все ще виглядають стиснутими, ти можеш погратися з width та height тут, 
-   підігнавши їх під реальні пропорції твоїх скриншотів */
+/* РОЗТАШУВАННЯ 6 КАРТИНОК (Ідеальний баланс) */
 .img1 {
-  top: 15%;
-  left: 5%;
+  top: 12%;
+  left: 10%;
   width: 150px;
   height: 110px;
 }
 .img3 {
   top: 45%;
-  left: -2%;
+  left: 3%;
   width: 200px;
   height: 140px;
 }
 .img5 {
-  bottom: 10%;
-  left: 10%;
+  bottom: 2%;
+  left: 16%;
   width: 160px;
   height: 120px;
 }
 
 .img2 {
-  top: 15%;
-  right: 5%;
+  top: 12%;
+  right: 8%;
   width: 180px;
   height: 130px;
 }
 .img4 {
-  top: 45%;
-  right: -2%;
+  top: 48%;
+  right: 4%;
   width: 160px;
   height: 120px;
 }
 .img6 {
-  bottom: 10%;
-  right: 10%;
+  bottom: 1%;
+  right: 14%;
   width: 190px;
   height: 140px;
 }
@@ -110,7 +109,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 850px;
+  max-width: 760px; /* Звузили текстовий блок, щоб звільнити місце по боках */
   margin: 0 auto;
   gap: 1.5rem;
 }
@@ -148,38 +147,14 @@
   background: #009ee2;
   color: #ffffff;
   padding: 1rem 2rem;
-  font-size: 1.05rem;
+  font-size: 16px;
   font-weight: 600;
-  border-radius: 100px;
+  border-radius: 4px;
   text-decoration: none;
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
-  box-shadow: 0 8px 20px rgba(250, 36, 60, 0.25);
+  // transition: background 0.3s;
+  // box-shadow: 0 8px 20px rgba(250, 36, 60, 0.25);
 
   &:hover {
-    background: #007eb5;
-    transform: scale(1.03);
-  }
-}
-
-.btnSecondary {
-  background: #004f8c;
-  color: #1d1d1f;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 1rem 2rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  border-radius: 100px;
-  text-decoration: none;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.9);
-    transform: scale(1.03);
+    background: #fa243c;
   }
 }

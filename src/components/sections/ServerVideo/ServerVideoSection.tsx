@@ -37,6 +37,11 @@ export function ServerVideoSection({
 
   return (
     <section className={styles.section} aria-labelledby={titleId}>
+      {/* ФІРМОВІ ПЛЯМИ ЯК НА СТОРІНЦІ "ПРО НАС" */}
+      <div className={styles.blobPink} aria-hidden="true" />
+      <div className={styles.blobPurple} aria-hidden="true" />
+      <div className={styles.blobBlue} aria-hidden="true" />
+
       <div className={styles.container}>
         <div className={styles.textWrapper}>
           <h2 id={titleId} className={styles.title}>

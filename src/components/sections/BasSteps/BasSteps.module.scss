@@ -27,8 +27,8 @@
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.5); /* Світлі краї */
-  border-radius: 40px; /* Заокруглені кути */
-  padding: 3rem;
+  border-radius: 54px; /* Заокруглені кути */
+  padding: 26px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
 
   /* Адаптив під мобільні екрани */
@@ -41,7 +41,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  gap: 26px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -57,7 +57,7 @@
 .stepCard {
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px; /* Внутрішній радіус */
+  border-radius: 28px; /* Внутрішній радіус */
   padding: 3rem 1.5rem;
   transition:
     transform 0.3s ease,

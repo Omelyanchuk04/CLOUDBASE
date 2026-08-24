@@ -1,5 +1,5 @@
 /* ==========================================
-   ФОН ТА ПЛЯМИ
+   ОСНОВНИЙ ФОН ТА ПЛЯМИ (ЯК НА ВЬОМУ САЙТІ)
    ========================================== */
 .fixedBackground {
   position: fixed;
@@ -12,6 +12,7 @@
   overflow: hidden;
   pointer-events: none;
 }
+
 .blobPink {
   position: absolute;
   top: -10%;
@@ -23,6 +24,7 @@
   filter: blur(140px);
   opacity: 0.15;
 }
+
 .blobPurple {
   position: absolute;
   top: 40%;
@@ -34,6 +36,7 @@
   filter: blur(160px);
   opacity: 0.12;
 }
+
 .blobBlue {
   position: absolute;
   bottom: -20%;
@@ -46,246 +49,203 @@
   opacity: 0.15;
 }
 
-.mainContent {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  color: #1d1d1f;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-}
-
 /* ==========================================
-   ШАПКА
+   ОСНОВНИЙ КОНТЕНТ ТА ШРИФТ
    ========================================== */
-.hero {
+.mainContent {
+  background: transparent;
+  color: #111111;
+  font-family: "Nexa", "Montserrat", "Poppins", sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
   padding: 10rem 1rem 6rem;
 }
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.header {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 4rem auto;
-}
-.badge {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 0.5rem 1.25rem;
-  border-radius: 100px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #009ee2;
-  backdrop-filter: blur(20px);
-  margin-bottom: 1.5rem;
-}
-.title {
-  font-size: clamp(2.5rem, 4.5vw, 4rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin: 0 0 1.5rem 0;
-}
-.subtitle {
-  color: #555555;
-  font-size: 1.125rem;
-  line-height: 1.6;
-  margin: 0;
+  position: relative;
+  z-index: 10;
 }
 
 /* ==========================================
-   СІТКА КАРТОК
+   ВЕРХНІЙ БЛОК (ТЕКСТ + ЛІНІЯ)
    ========================================== */
-.glassWrapper {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 40px;
-  padding: 2rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
-  @media (max-width: 768px) {
-    padding: 1rem;
-    border-radius: 28px;
+.heroSection {
+  display: flex;
+  align-items: stretch; /* Щоб лінія тягнулася на всю висоту тексту */
+  justify-content: space-between;
+  gap: 4rem;
+  margin-bottom: 8rem;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    margin-bottom: 5rem;
   }
 }
 
-.grid {
+.heroLeft {
+  flex: 1;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #111111;
+}
+
+.heroDivider {
+  width: 3px;
+  background-color: #111111;
+  border-radius: 2px;
+  flex-shrink: 0;
+
+  @media (max-width: 900px) {
+    width: 100px;
+    height: 3px;
+    margin: 0 auto;
+  }
+}
+
+.heroRight {
+  flex: 1;
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: #111111;
+  padding-top: 0.5rem; /* Візуальне вирівнювання лівого і правого блоку */
+}
+
+/* ==========================================
+   НИЖНІЙ БЛОК (3 КОЛОНКИ ТА ІКОНКИ)
+   ========================================== */
+.featuresSection {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 4rem;
+  text-align: center;
+
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
   }
+
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
 }
 
-.card {
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
-  padding: 2.5rem;
-  transition:
-    transform 0.3s ease,
-    background 0.3s ease;
+.feature {
   display: flex;
   flex-direction: column;
+  align-items: center;
 
-  &:hover {
-    transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.85);
-  }
-  .icon {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-  }
   h3 {
     font-size: 1.25rem;
-    font-weight: 600;
-    color: #1d1d1f;
-    margin: 0 0 1rem 0;
-  }
-  p {
-    color: #555555;
-    line-height: 1.6;
-    font-size: 1rem;
-    margin: 0;
-  }
-}
-
-/* Акцентна картка (2 колонки) */
-.highlightCard {
-  background: #009ee2;
-  border: none;
-  grid-column: span 2;
-  justify-content: center;
-
-  @media (max-width: 600px) {
-    grid-column: span 1;
-  }
-  &:hover {
-    background: #0084bd;
-  }
-  h3 {
-    color: #ffffff;
-    font-size: 1.75rem;
-  }
-  p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.125rem;
-  }
-}
-
-/* ==========================================
-   КОНТАКТИ В СЕРЕДИНІ КАРТКИ
-   ========================================== */
-.contactsList {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.contactLink {
-  color: #1d1d1f;
-  text-decoration: none;
-  font-size: 1.05rem;
-  font-weight: 500;
-  span {
-    color: #86868b;
-    font-size: 0.9rem;
-    display: block;
-    margin-bottom: 0.2rem;
-  }
-  &:hover {
-    color: #009ee2;
-  }
-}
-.socials {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-.socialBtn {
-  background: rgba(0, 158, 226, 0.1);
-  color: #009ee2;
-  padding: 0.5rem 1rem;
-  border-radius: 100px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s;
-  &:hover {
-    background: #009ee2;
-    color: #ffffff;
-  }
-}
-
-/* ==========================================
-   СВІЙ БЛОК CTA (ЗАМІСТЬ СТАРОГО)
-   ========================================== */
-.cta {
-  margin-top: 4rem; /* Відступ вниз від блоку послуг */
-}
-
-.ctaBox {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px; /* Внутрішній радіус, ідеально під glassWrapper */
-  padding: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 3rem;
-
-  @media (max-width: 900px) {
-    flex-direction: column;
-    text-align: center;
-    padding: 3rem 2rem;
-  }
-}
-
-.ctaContent {
-  max-width: 600px;
-  h2 {
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
     font-weight: 700;
-    color: #1d1d1f;
-    letter-spacing: -0.02em;
     margin: 0 0 1rem 0;
+    color: #111111;
   }
+
   p {
-    font-size: 1.125rem;
-    color: #555555;
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444444;
     margin: 0;
+    max-width: 320px;
   }
 }
 
-.ctaBtn {
-  display: inline-flex;
+.iconWrapper {
+  color: #009ee2; /* Синій колір іконок */
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.5); /* Ефект скла */
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  padding: 1.2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: #007aff;
-  color: #ffffff;
-  padding: 1.25rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 100px;
-  text-decoration: none;
-  white-space: nowrap;
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+}
 
-  &:hover {
-    background: #005bb5;
-    transform: scale(1.05);
-  }
+/* ==========================================
+   ГЕОМЕТРИЧНИЙ ДЕКОР (ФІГУРКИ)
+   ========================================== */
+.bgDecorations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pillYellow {
+  position: absolute;
+  top: 40%;
+  right: 15%;
+  width: 60px;
+  height: 20px;
+  background-color: #ffe6a0;
+  border-radius: 20px;
+  transform: rotate(-15deg);
+}
+
+.dotRed {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  width: 25px;
+  height: 25px;
+  background-color: #ffb3b3;
+  border-radius: 50%;
+}
+
+.dotGreen {
+  position: absolute;
+  bottom: 25%;
+  right: 25%;
+  width: 30px;
+  height: 30px;
+  background-color: #bdf0d9;
+  border-radius: 50%;
+}
+
+.dotBlue {
+  position: absolute;
+  bottom: 15%;
+  right: 18%;
+  width: 40px;
+  height: 40px;
+  background-color: #d1d8ff;
+  border-radius: 50%;
+}
+
+/* ДОДАТКОВІ ФІГУРКИ */
+.ringPurple {
+  position: absolute;
+  top: 18%;
+  left: 10%;
+  width: 40px;
+  height: 40px;
+  border: 6px solid #e1c4ff;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+.triangleOrange {
+  position: absolute;
+  bottom: 30%;
+  left: 15%;
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 25px solid #ffd4a3;
+  transform: rotate(25deg);
 }

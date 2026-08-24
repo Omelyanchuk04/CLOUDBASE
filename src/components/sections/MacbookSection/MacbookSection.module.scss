@@ -1,131 +1,243 @@
-$color-bg: #060608;
+$color-bg: #0d0e15; /* Глибокий преміальний темний фон */
 
 .section {
   position: relative;
   width: 100%;
   background-color: $color-bg;
   overflow: hidden;
+  font-family: "Nexa", "Montserrat", "Poppins", sans-serif;
 
-  /* ПОСИЛЕНИЙ ГРАДІЄНТ: довший і щільніший зверху */
+  /* ==========================================
+     ІДЕАЛЬНИЙ ПЕРЕХІД БЕЗ СТИКІВ
+     ========================================== */
   &::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 400px; /* Збільшена висота для м'якшого переходу */
-    /* Затримуємо 100% колір фону довше (до 15%), потім плавно розчиняємо */
+    height: 300px; /* Збільшив висоту для дуже м'якого бленду */
     background: linear-gradient(
       to bottom,
-      $color-bg 0%,
-      $color-bg 15%,
-      rgba(6, 6, 8, 0.7) 40%,
-      transparent 100%
+      #000000 0%,
+      /* Повністю чорний на стику з верхньою секцією */ transparent 100%
+        /* Плавно розчиняється, показуючи наш $color-bg */
     );
-    z-index: 5; /* Гарантовано перекриває кульки (z-index: 0), але під текстом (z-index: 10) */
+    z-index: 5;
     pointer-events: none;
   }
 }
 
 /* ==========================================
-   ГРАДІЄНТНІ КУЛЬКИ (ГЛОУ ЕФЕКТ)
+   ФІРМОВІ ПЛЯМИ (На темному фоні виглядають як неон)
    ========================================== */
-.glowContainer {
+.blobContainer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
+
+  /* Додаємо для контейнера */
+  transform: translateZ(0);
+  will-change: transform;
 }
 
-.glowPurple {
+.blobPink {
   position: absolute;
-  /* ЗМІНЕНО: Опущено нижче (було -5%, стало 5%), щоб зменшити різкість зрізу */
   top: 5%;
   left: -5%;
   width: 50vw;
   height: 50vw;
-  background: radial-gradient(
-    circle,
-    rgba(139, 92, 246, 0.4) 0%,
-    rgba(139, 92, 246, 0) 70%
-  );
+  background: #fa243c;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(140px);
+  opacity: 0.25;
+  mix-blend-mode: screen;
+
+  /* Хак для Safari: змушує використовувати GPU */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-.glowBlue {
+.blobPurple {
   position: absolute;
-  top: 15%;
+  top: 30%;
   right: -10%;
   width: 60vw;
   height: 60vw;
-  background: radial-gradient(
-    circle,
-    rgba(59, 130, 246, 0.35) 0%,
-    rgba(59, 130, 246, 0) 70%
-  );
+  background: #7a00ff;
   border-radius: 50%;
-  filter: blur(100px);
+  filter: blur(160px);
+  opacity: 0.25;
+  mix-blend-mode: screen;
+
+  /* Хак для Safari */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-.glowCyan {
+.blobBlue {
   position: absolute;
   bottom: -10%;
   left: 15%;
   width: 50vw;
   height: 50vw;
-  background: radial-gradient(
-    circle,
-    rgba(6, 182, 212, 0.25) 0%,
-    rgba(6, 182, 212, 0) 70%
-  );
+  background: #007aff;
   border-radius: 50%;
-  filter: blur(90px);
-}
+  filter: blur(150px);
+  opacity: 0.25;
+  mix-blend-mode: screen;
 
-.glowPink {
-  position: absolute;
-  bottom: 5%;
-  right: 20%;
-  width: 40vw;
-  height: 40vw;
-  background: radial-gradient(
-    circle,
-    rgba(236, 72, 153, 0.25) 0%,
-    rgba(236, 72, 153, 0) 70%
-  );
-  border-radius: 50%;
-  filter: blur(100px);
+  /* Хак для Safari */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* ==========================================
-   ПРОСТІ СТИЛІ ТЕКСТУ БЕЗ ВІДСТУПІВ
+   ГЕОМЕТРИЧНИЙ ДЕКОР
+   ========================================== */
+// .bgDecorations {
+//   position: absolute;
+//   inset: 0;
+//   pointer-events: none;
+//   z-index: 1;
+// }
+
+// .pillYellow {
+//   position: absolute;
+//   top: 15%;
+//   left: 10%;
+//   width: 60px;
+//   height: 20px;
+//   background-color: #ffe6a0;
+//   border-radius: 20px;
+//   transform: rotate(-15deg);
+//   opacity: 0.8;
+// }
+
+// .dotRed {
+//   position: absolute;
+//   top: 25%;
+//   right: 15%;
+//   width: 25px;
+//   height: 25px;
+//   background-color: #ffb3b3;
+//   border-radius: 50%;
+//   opacity: 0.8;
+// }
+
+// .dotGreen {
+//   position: absolute;
+//   bottom: 40%;
+//   right: 10%;
+//   width: 30px;
+//   height: 30px;
+//   background-color: #bdf0d9;
+//   border-radius: 50%;
+//   opacity: 0.8;
+// }
+
+// .dotBlue {
+//   position: absolute;
+//   bottom: 20%;
+//   left: 8%;
+//   width: 40px;
+//   height: 40px;
+//   background-color: #d1d8ff;
+//   border-radius: 50%;
+//   opacity: 0.8;
+// }
+
+// .ringPurple {
+//   position: absolute;
+//   top: 45%;
+//   left: 18%;
+//   width: 40px;
+//   height: 40px;
+//   border: 6px solid #e1c4ff;
+//   border-radius: 50%;
+//   opacity: 0.6;
+// }
+
+// .triangleOrange {
+//   position: absolute;
+//   bottom: 15%;
+//   right: 25%;
+//   width: 0;
+//   height: 0;
+//   border-left: 15px solid transparent;
+//   border-right: 15px solid transparent;
+//   border-bottom: 25px solid #ffd4a3;
+//   transform: rotate(25deg);
+//   opacity: 0.8;
+// }
+
+/* ==========================================
+   СТИЛІ ТЕКСТУ
    ========================================== */
 .titleWrapper {
   text-align: center;
   position: relative;
   z-index: 10;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
 }
 
 .title {
-  color: white;
-  font-size: 2.5rem;
+  color: #ffffff;
+  font-size: clamp(32px, 4vw, 40px);
   line-height: 1.2;
   font-weight: 700;
   display: inline-block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 1.125rem;
-  line-height: 1.5;
-  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 500;
   display: inline-block;
   max-width: 800px;
+}
+
+/* ==========================================
+   КНОПКА "ДІЗНАТИСЯ БІЛЬШЕ"
+   ========================================== */
+.learnMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+
+  /* Ефект напівпрозорого скла */
+  background: rgb(255, 96, 96);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px; /* Круглі краї */
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  .arrow {
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+
+    /* Стрілочка від'їжджає вправо при наведенні */
+    .arrow {
+      transform: translateX(4px);
+    }
+  }
 }
 
 @media (max-width: 768px) {
@@ -134,5 +246,8 @@ $color-bg: #060608;
   }
   .subtitle {
     font-size: 1rem;
+  }
+  .learnMoreBtn {
+    margin-top: 1rem;
   }
 }

@@ -17,7 +17,7 @@ export default function HomePage() {
       <Hero />
       <MacbookSection />
 
-      <ServerShowcase />
+      {/* <ServerShowcase /> */}
       {/* 5. MacBook-скрол — показуємо хмарну версію */}
       {/* 2. Проблеми клієнтів — дзеркало болю */}
       {/* <Problem /> */}

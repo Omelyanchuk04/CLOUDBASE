@@ -1,14 +1,13 @@
 /* ==========================================
-   СВІТЛА ТЕМА (ПРЕМІУМ ОФІСНИЙ СТИЛЬ)
+   СВІТЛА ТЕМА З ФІРМОВИМИ ПЛЯМАМИ
    ========================================== */
-$color-bg-content: #f5f5f7; /* М'який світло-сірий фон, як на сайті Apple */
-$color-text-primary: #1d1d1f; /* Глибокий темно-сірий (комфортний для читання) */
-$color-text-secondary: #6e6e73; /* Приємний сірий для неактивних елементів */
-$color-accent: #8b5cf6; /* Твій фіолетовий акцент залишаємо (гарно контрастує) */
-$color-accent-hover: #7c3aed;
-$color-card-bg: rgba(255, 255, 255, 0.5); /* Напівпрозорий білий для кнопок */
+$color-bg-content: #f5f5f7;
+$color-text-primary: #1d1d1f;
+$color-text-secondary: #6e6e73;
+$color-accent: #009ee2;
+$color-card-bg: rgba(255, 255, 255, 0.5);
 $color-card-bg-hover: rgba(255, 255, 255, 0.9);
-$color-control-bg: rgba(0, 0, 0, 0.04); /* Ледь помітні кнопки навігації */
+$color-control-bg: rgba(0, 0, 0, 0.04);
 $color-control-bg-hover: rgba(0, 0, 0, 0.08);
 
 $font-family-base:
@@ -16,8 +15,6 @@ $font-family-base:
   Helvetica, Arial, sans-serif;
 
 $radius-lg: 18px;
-
-/* Глобальні налаштування швидкості */
 $transition-fast: 0.4s ease;
 
 @mixin focus-ring {
@@ -37,16 +34,85 @@ $transition-fast: 0.4s ease;
   width: 100%;
   display: flex;
   flex-direction: column;
-  background: $color-bg-content;
+
+  background-color: $color-bg-content;
+  /* ЗАМІНА ДЛЯ ПРОДУКТИВНОСТІ: clip замість hidden */
+  overflow: clip;
+  z-index: 1;
+
   font-family: $font-family-base;
   color: $color-text-primary;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ==========================================
+   ФІРМОВІ ПЛЯМИ (ОПТИМІЗОВАНІ)
+   ========================================== */
+.blobPink {
+  position: absolute;
+  top: 5%;
+  left: -5%;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+
+  /* ЗАМІНА BLUR НА РАДІАЛЬНИЙ ГРАДІЄНТ */
+  background: radial-gradient(
+    closest-side,
+    rgba(250, 36, 60, 0.25) 0%,
+    rgba(250, 36, 60, 0) 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(0); /* Safari GPU Hack */
+}
+
+.blobPurple {
+  position: absolute;
+  top: 40%;
+  right: -5%;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+
+  /* ЗАМІНА BLUR НА РАДІАЛЬНИЙ ГРАДІЄНТ */
+  background: radial-gradient(
+    closest-side,
+    rgba(122, 0, 255, 0.2) 0%,
+    rgba(122, 0, 255, 0) 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(0); /* Safari GPU Hack */
+}
+
+.blobBlue {
+  position: absolute;
+  bottom: 0%;
+  left: 20%;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+
+  /* ЗАМІНА BLUR НА РАДІАЛЬНИЙ ГРАДІЄНТ */
+  background: radial-gradient(
+    closest-side,
+    rgba(0, 122, 255, 0.25) 0%,
+    rgba(0, 122, 255, 0) 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(0); /* Safari GPU Hack */
+}
+
+/* ==========================================
+   КОНТЕНТ
+   ========================================== */
 .content {
   position: relative;
   flex: 1;
+  z-index: 2; /* Текст і картки поверх плям */
 }
 
 .navControls {
@@ -66,7 +132,7 @@ $transition-fast: 0.4s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.05); /* Ледь помітна рамочка */
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 50%;
   background: $color-control-bg;
   color: $color-text-primary;
@@ -124,9 +190,6 @@ $transition-fast: 0.4s ease;
   gap: 12px;
 }
 
-/* ==========================================
-   АКОРДЕОН-КАРТКИ (СВІТЛІ ТА ПЛАВНІ)
-   ========================================== */
 .featureItem {
   width: 100%;
   border-radius: $radius-lg;
@@ -137,8 +200,14 @@ $transition-fast: 0.4s ease;
   -webkit-backdrop-filter: blur(8px);
   cursor: pointer;
 
-  /* Плавна трансформація фону і відступів */
-  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  /* Ізоляція для backdrop-filter в Safari */
+  transform: translateZ(0);
+
+  /* ОПТИМІЗАЦІЯ АНІМАЦІЇ: Виключено padding з transition (щоб уникнути Layout Reflow) */
+  transition:
+    background-color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 
   &:hover {
     background: $color-card-bg-hover;
@@ -146,10 +215,11 @@ $transition-fast: 0.4s ease;
   }
 
   &.active {
-    /* Білосніжний фон для відкритої картки з м'якою тінню */
     background: #ffffff;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
     border-color: rgba(0, 0, 0, 0.04);
+
+    /* Зміна відступів відбудеться миттєво, що набагато легше для Safari */
     padding: 24px 20px;
     cursor: default;
   }
@@ -178,7 +248,6 @@ $transition-fast: 0.4s ease;
 }
 
 .active .cardTitle {
-  /* Головний акцентний колір для відкритого заголовка */
   color: $color-text-primary;
   font-size: 18px;
   font-weight: 600;
@@ -190,7 +259,7 @@ $transition-fast: 0.4s ease;
   justify-content: center;
   width: 24px;
   height: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.15); /* Темна рамочка на світлому фоні */
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 50%;
   color: $color-text-primary;
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
@@ -232,13 +301,9 @@ $transition-fast: 0.4s ease;
   padding-top: 12px;
   font-size: 16px;
   line-height: 1.5;
-  /* Темно-сірий текст, що легко читається на білому фоні */
-  color: #424245;
+  color: #444444;
 }
 
-/* ==========================================
-   CROSS-FADE ЗОБРАЖЕННЯ
-   ========================================== */
 .rightPanel {
   display: flex;
   align-items: center;
@@ -252,12 +317,6 @@ $transition-fast: 0.4s ease;
   max-width: 750px;
   aspect-ratio: 1 / 1;
   border-radius: $radius-lg;
-  /* Залишив дуже ніжну фіолетову підсвітку під картинкою, на білому це виглядає розкішно */
-  background: radial-gradient(
-    circle closest-side,
-    rgba(139, 92, 246, 0.08) 0%,
-    transparent 100%
-  );
 }
 
 .image {
@@ -265,7 +324,6 @@ $transition-fast: 0.4s ease;
   opacity: 0;
   pointer-events: none;
   transform: scale(1.1);
-
   transition:
     opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1),
     transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -275,7 +333,6 @@ $transition-fast: 0.4s ease;
     pointer-events: auto;
     transform: scale(1.35);
     z-index: 2;
-
     transition:
       opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
       transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);

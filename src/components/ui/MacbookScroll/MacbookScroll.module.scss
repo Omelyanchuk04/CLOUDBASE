@@ -1,8 +1,31 @@
+//$color-bg: #0d0e15; /* Глибокий преміальний темний фон */
+
 .section {
-  height: 300vh;
   position: relative;
-  background-color: var(--background, #0a0a0a); // Темний фон секції
+  width: 100%;
+  background-color: var(--background, #0a0a0a);
+
+  /* ЗАМІНА ДЛЯ SAFARI: замість hidden, щоб не ламати position: sticky */
+  overflow: clip;
+
+  font-family: "Nexa", "Montserrat", "Poppins", sans-serif;
+  height: 300vh;
   color: white;
+
+  /* ==========================================
+     ІДЕАЛЬНИЙ ПЕРЕХІД БЕЗ СТИКІВ
+     ========================================== */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 300px;
+    background: linear-gradient(to bottom, #000000 0%, transparent 100%);
+    z-index: 5;
+    pointer-events: none;
+  }
 }
 
 .stickyContainer {
@@ -13,8 +36,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  perspective: 1500px; // Важливо для 3D
+  overflow: hidden; /* Можна залишити тут, бо stickyContainer не є sticky-нащадком для себе самого */
+  perspective: 1500px;
 }
 
 .textBlock {
@@ -33,28 +56,211 @@
   }
 }
 
-/* --- САМ МАКБУК --- */
+/* ==========================================
+   ФІРМОВІ ПЛЯМИ
+   ========================================== */
+.blobContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateZ(0);
+
+  /* НОВЕ ДОДАНО: ізолюємо mix-blend-mode від решти сторінки */
+  isolation: isolate;
+}
+
+.blobPink {
+  position: absolute;
+  top: 5%;
+  left: -5%;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  /* Оптимізовано під radial-gradient */
+  background: radial-gradient(
+    closest-side,
+    rgba(250, 36, 60, 0.25) 0%,
+    rgba(250, 36, 60, 0) 100%
+  );
+}
+
+.blobPurple {
+  position: absolute;
+  top: 30%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    closest-side,
+    rgba(122, 0, 255, 0.25) 0%,
+    rgba(122, 0, 255, 0) 100%
+  );
+}
+
+.blobBlue {
+  position: absolute;
+  bottom: -10%;
+  left: 15%;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    closest-side,
+    rgba(0, 122, 255, 0.25) 0%,
+    rgba(0, 122, 255, 0) 100%
+  );
+}
+
+/* ==========================================
+   ГЕОМЕТРИЧНИЙ ДЕКОР
+   ========================================== */
+.bgDecorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pillYellow {
+  position: absolute;
+  top: 15%;
+  left: 10%;
+  width: 60px;
+  height: 20px;
+  background-color: #ffe6a0;
+  border-radius: 20px;
+  transform: rotate(-15deg);
+  opacity: 0.8;
+}
+
+.dotRed {
+  position: absolute;
+  top: 25%;
+  right: 15%;
+  width: 25px;
+  height: 25px;
+  background-color: #ffb3b3;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+.dotGreen {
+  position: absolute;
+  bottom: 40%;
+  right: 10%;
+  width: 30px;
+  height: 30px;
+  background-color: #bdf0d9;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+.dotBlue {
+  position: absolute;
+  bottom: 20%;
+  left: 8%;
+  width: 40px;
+  height: 40px;
+  background-color: #d1d8ff;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+.ringPurple {
+  position: absolute;
+  top: 45%;
+  left: 18%;
+  width: 40px;
+  height: 40px;
+  border: 6px solid #e1c4ff;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.triangleOrange {
+  position: absolute;
+  bottom: 15%;
+  right: 25%;
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 25px solid #ffd4a3;
+  transform: rotate(25deg);
+  opacity: 0.8;
+}
+
+/* ==========================================
+   СТИЛІ ТЕКСТУ
+   ========================================== */
+.titleWrapper {
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.title {
+  color: #ffffff;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.2;
+  font-weight: 800;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  font-weight: 500;
+  display: inline-block;
+  max-width: 800px;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.875rem;
+  }
+  .subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* ==========================================
+   САМ МАКБУК
+   ========================================== */
 .macbook {
   position: relative;
   width: 85vw;
   max-width: 1000px;
-  transform-style: preserve-3d; // Дозволяє дітям бути в 3D просторі
+  transform-style: preserve-3d;
   will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform-style: preserve-3d;
 }
 
-/* 1. Кришка з екраном */
 .macbookLid {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  background: #111; // Рамка
+  background: #111;
   border-radius: 20px 20px 0 0;
-  border: 4px solid #6b7280; // Срібний обідок корпусу
+  border: 4px solid #6b7280;
   border-bottom: none;
-  padding: 3% 3% 5% 3%; // Товщина рамки екрана
+  padding: 3% 3% 5% 3%;
   display: flex;
   flex-direction: column;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .camera {
@@ -77,7 +283,6 @@
   position: relative;
 }
 
-/* Тимчасова заглушка замість картинки */
 .screenPlaceholder {
   width: 100%;
   height: 100%;
@@ -98,31 +303,27 @@
   }
 }
 
-/* 2. Нижня частина (корпус) */
 .macbookBase {
   position: absolute;
-  top: 100%; // Починається рівно під екраном
-  left: -2%; // Трохи ширше за екран для реалізму
+  top: 100%;
+  left: -2%;
   width: 104%;
-  height: 65%; // Глибина клавіатури
-  background-color: #9ca3af; // Світло-сірий метал
+  height: 65%;
+  background-color: #9ca3af;
   transform-origin: top center;
-  transform: rotateX(-90deg); // Відгинаємо від екрана як відкритий ноут
+  transform: rotateX(-90deg);
   border-radius: 0 0 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 4%;
-
-  // Передня товста кромка Макбука
   border-bottom: 8px solid #6b7280;
 }
 
-/* Деталі клавіатури */
 .keyboard {
   width: 85%;
   height: 55%;
-  background: #374151; // Заглиблення для клавіатури
+  background: #374151;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -132,7 +333,7 @@
 
 .keysRow {
   flex: 1;
-  background: rgba(0, 0, 0, 0.3); // Імітація ряду клавіш
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 4px;
 }
 .spaceBar {
@@ -147,7 +348,7 @@
   margin-top: 3%;
   width: 30%;
   height: 25%;
-  background: #d1d5db; // Трохи світліший за корпус
+  background: #d1d5db;
   border-radius: 6px;
   box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
 }

@@ -27,10 +27,14 @@ export function ServerShowcase() {
 
   return (
     <div ref={wrapperRef} className={styles.wrapper}>
+      {/* ФІРМОВІ ПЛЯМИ (Тепер вони розтягнуті на обидві секції) */}
+      <div className={styles.blobPink} aria-hidden="true" />
+      <div className={styles.blobPurple} aria-hidden="true" />
+      <div className={styles.blobBlue} aria-hidden="true" />
+
       {/* Рендеримо обидві секції */}
       <ServerVideoSection />
-
-      <ServerSection />
+      {/* <ServerSection /> */}
 
       {/* Фіксована плаваюча кнопка */}
       <div className={`${styles.fixedCta} ${isVisible ? styles.visible : ""}`}>
