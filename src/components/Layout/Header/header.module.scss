@@ -1,0 +1,331 @@
+.hero-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  /* =======================================================
+     ТЕМНА ТЕМА (За замовчуванням - для темного фону)
+     ======================================================= */
+  --header-bg: rgba(0, 0, 0, 0.45);
+  --text-color: #ffffff;
+  --btn-bg: transparent;
+  --btn-border: rgba(255, 255, 255, 0.25);
+  --btn-bg-hover: rgba(255, 255, 255, 0.08);
+  --btn-border-hover: rgba(255, 255, 255, 0.4);
+  --btn-active-bg: #ffffff;
+  --btn-active-border: #ffffff;
+  --btn-active-text: #000000;
+  --border-line: rgba(255, 255, 255, 0.08);
+  --fade-rgb: 0, 0, 0; /* Темний градієнт для стрілочок скролу */
+
+  /* =======================================================
+     СВІТЛА ТЕМА (Для білих/світлих секцій)
+     ======================================================= */
+  &--light {
+    --header-bg: rgba(255, 255, 255, 0.65); /* Світле скло */
+    --text-color: #1d1d1f; /* Темно-сірий текст Apple */
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-bg-hover: rgba(0, 0, 0, 0.05);
+    --btn-border-hover: rgba(0, 0, 0, 0.3);
+    --btn-active-bg: #000000; /* Чорна активна кнопка */
+    --btn-active-border: #000000;
+    --btn-active-text: #ffffff;
+    --border-line: rgba(0, 0, 0, 0.08);
+    --fade-rgb: 255, 255, 255; /* Чисто білий градієнт для стрілочок */
+  }
+
+  color: var(--text-color);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  transition: color 0.4s ease;
+
+  /* --- КРОСПЛАТФОРМЕННИЙ GLASSMORPHISM --- */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--header-bg);
+
+    transform: translateZ(0);
+    will-change: backdrop-filter, background-color;
+
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+
+    transition:
+      background-color 0.4s ease,
+      border-color 0.4s ease;
+  }
+
+  &__top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__global {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 62px;
+    padding: 0 20px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__logo-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  &__logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  &__logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-left: 10px;
+    color: var(--text-color);
+  }
+
+  &__actions-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__contact-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--btn-border);
+    border-radius: 30px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: var(--btn-border-hover);
+      background-color: var(--btn-bg-hover);
+    }
+  }
+
+  &__local {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__nav-list {
+    display: flex;
+    align-items: center;
+    justify-content: safe center; /* ЗАВЖДИ ПО ЦЕНТРУ, але безпечно для скролу */
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    flex-wrap: wrap;
+  }
+
+  &__nav-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--btn-bg);
+    color: var(--text-color);
+    border: 1px solid var(--btn-border);
+    border-radius: 30px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: var(--btn-bg-hover);
+      border-color: var(--btn-border-hover);
+    }
+
+    &--active {
+      background-color: var(--btn-active-bg);
+      color: var(--btn-active-text);
+      border-color: var(--btn-active-border);
+      font-weight: 500;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+  }
+
+  &__nav-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* --- СТАН ПРИ СКРОЛІ (ТІЛЬКИ МОБАЙЛ) --- */
+.hero-header--hidden-top {
+  @media (max-width: 1024px) {
+    .hero-header__global {
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+}
+
+/* --- АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ТА ПЛАНШЕТІВ --- */
+@media (max-width: 1024px) {
+  .hero-header {
+    &__local {
+      padding-top: max(12px, env(safe-area-inset-top));
+      padding-bottom: 15px;
+      padding-left: 0;
+      padding-right: 0;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    &__nav-list {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      margin: 0;
+      padding: 0 20px;
+      scrollbar-width: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      @media (max-width: 650px) {
+        /* Додаємо пусті блоки по краях, щоб контент можна було доскролити до кінця з обох боків */
+        &::before,
+        &::after {
+          content: "";
+          display: block;
+          flex: 0 0 40px;
+        }
+      }
+    }
+
+    &__nav-item {
+      flex-shrink: 0;
+    }
+
+    /* ПОВЕРНУТІ ТА ПОКРАЩЕНІ СТРІЛОЧКИ ДЛЯ СКРОЛУ МЕНЮ */
+    &__scroll-indicator {
+      display: none;
+
+      @media (max-width: 650px) {
+        display: flex;
+        position: absolute;
+        top: 0; /* Тінь тепер починається від самого верху екрана */
+        bottom: 0; /* І йде до самого низу шапки */
+        width: 80px;
+
+        /* Вирівнюємо саму стрілочку по центру кнопок, враховуючи відступи шапки */
+        padding-top: max(12px, env(safe-area-inset-top));
+        padding-bottom: 15px;
+
+        align-items: center;
+        color: var(--text-color);
+        opacity: 0.85;
+        cursor: pointer;
+        pointer-events: auto;
+        z-index: 5;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        svg {
+          width: 16px;
+          height: 20px;
+        }
+
+        &--left {
+          left: 0;
+          padding-left: 15px;
+          justify-content: flex-start;
+          /* Темна з краю, плавно розсіюється до центру */
+          background: linear-gradient(
+            90deg,
+            rgba(var(--fade-rgb), 1) 0%,
+            rgba(var(--fade-rgb), 1) 35%,
+            rgba(var(--fade-rgb), 0) 100%
+          );
+        }
+
+        &--right {
+          right: 0;
+          padding-right: 15px;
+          justify-content: flex-end;
+          background: linear-gradient(
+            270deg,
+            rgba(var(--fade-rgb), 1) 0%,
+            rgba(var(--fade-rgb), 1) 35%,
+            rgba(var(--fade-rgb), 0) 100%
+          );
+        }
+      }
+    }
+  }
+}
+
+/* --- ДЕСКТОП --- */
+@media (min-width: 1025px) {
+  .hero-header {
+    &__top {
+      flex-direction: row;
+      justify-content: center;
+      padding: 10px 20px;
+      position: relative;
+    }
+    &__global {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 20px;
+      pointer-events: none;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      height: auto;
+      overflow: visible;
+    }
+    &__logo-wrapper,
+    &__actions-wrapper {
+      pointer-events: auto;
+    }
+    &__local {
+      padding: 0 20px;
+      max-width: 1200px;
+      z-index: 1;
+    }
+    &__scroll-indicator {
+      display: none;
+    }
+  }
+}
