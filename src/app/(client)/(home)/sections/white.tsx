@@ -6,118 +6,128 @@ import { motion, useScroll, useTransform } from "framer-motion";
 const White = () => {
   const ref = useRef<HTMLElement>(null);
 
-  // 1. Анімація виїзду картинки знизу
   const { scrollYProgress: enterProgress } = useScroll({
     target: ref,
     offset: ["start 122%", "start start"],
   });
 
   const yEnter = useTransform(enterProgress, [0, 1], ["-100vh", "0vh"]);
-  const scaleEnter = useTransform(enterProgress, [0, 1], [0.9, 1]);
 
-  // 2. Трекер для плавної зміни текстів (без useSpring, щоб нічого не дьоргалось)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
-  const opacity1 = useTransform(scrollYProgress, [0, 0.15, 0.25], [1, 1, 0]);
-  const opacity2 = useTransform(
-    scrollYProgress,
-    [0.15, 0.25, 0.48, 0.58],
-    [0, 1, 1, 0],
-  );
-  const opacity3 = useTransform(
-    scrollYProgress,
-    [0.48, 0.58, 0.81, 0.91],
-    [0, 1, 1, 0],
-  );
-  const opacity4 = useTransform(scrollYProgress, [0.81, 0.91, 1], [0, 1, 1]);
+  const clip2Val = useTransform(scrollYProgress, [0.15, 0.3], [100, 0]);
+  const clip3Val = useTransform(scrollYProgress, [0.45, 0.6], [100, 0]);
+  const clip4Val = useTransform(scrollYProgress, [0.75, 0.9], [100, 0]);
+
+  const clip2 = useTransform(clip2Val, (v) => `inset(${v}% 0 0 0)`);
+  const clip3 = useTransform(clip3Val, (v) => `inset(${v}% 0 0 0)`);
+  const clip4 = useTransform(clip4Val, (v) => `inset(${v}% 0 0 0)`);
+
+  const layerClasses =
+    "absolute inset-0 w-full h-full flex flex-col items-center justify-center pt-28 pb-10 px-4 md:px-10";
+
+  const textWrapperClasses =
+    "flex flex-col items-center text-center mb-8 md:mb-12 max-w-3xl z-20 pointer-events-auto";
+  const titleClasses =
+    "text-3xl md:text-5xl font-bold text-black tracking-tight";
+  const descClasses =
+    "mt-3 md:mt-4 text-base md:text-lg text-black/70 font-medium leading-relaxed";
+
+  // Змінили ширину на max-w-[960px]
+  const wrapperClasses =
+    "relative w-full max-w-[960px] aspect-video rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 z-10 pointer-events-auto";
+
+  const imgClasses = "w-full h-full object-fill block absolute inset-0";
 
   return (
-    // Висота 400vh визначає тривалість скролу.
     <section
       ref={ref}
       data-theme="light"
-      className="relative w-full h-[400vh] z-20"
+      className="relative w-full h-[500vh] z-20"
     >
-      {/* === ШАР 1: КОЛЬОРОВІ БЛОКИ (ФОН) === */}
-      {/* Вони розтягнуті на 4 екрани вниз. Коли ти скролиш, вони природно їдуть вгору. */}
-      <div className="absolute top-0 left-0 w-full h-full z-0">
-        <div className="h-screen w-full bg-[#f5f5f7]"></div>
-        <div className="h-screen w-full bg-[#d1fae5]"></div>
-        <div className="h-screen w-full bg-[#fef08a]"></div>
-        <div className="h-screen w-full bg-[#fee2e2]"></div>
-      </div>
-
-      {/* === ШАР 2: ЗАФІКСОВАНИЙ КОНТЕНТ === */}
-      {/* sticky top-0 фіксує цей блок на екрані. Він СТРОГО нерухомий. */}
-      <div className="sticky top-0 left-0 flex h-screen w-full flex-col items-center justify-center overflow-hidden z-10 pointer-events-none">
-        {/* КОНТЕЙНЕР ТЕКСТІВ */}
-        <div className="absolute top-24 md:top-32 left-0 right-0 z-10 px-4 pointer-events-auto h-40">
-          <motion.div
-            style={{ opacity: opacity1 }}
-            className="absolute inset-x-0 top-0 flex flex-col items-center text-center"
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-black tracking-tight">
-              Інтерфейс, який ви знаєте
-            </h2>
-            <p className="mt-4 text-lg md:text-xl text-gray-500 font-medium max-w-2xl mx-auto">
-              Зручна робота з документами, звітами та налаштуваннями у звичному
-              середовищі BAS.
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        {/* ШАР 1 (БАЗОВИЙ) */}
+        <div className={`${layerClasses} bg-[#f5f5f7] z-0`}>
+          <div className={textWrapperClasses}>
+            <h2 className={titleClasses}>BAS Бухгалтерія</h2>
+            <p className={descClasses}>
+              Налаштування, оновлення та підтримка стабільної роботи головної
+              програми для ведення бухгалтерського та податкового обліку.
             </p>
-          </motion.div>
-
-          <motion.div
-            style={{ opacity: opacity2 }}
-            className="absolute inset-x-0 top-0 flex flex-col items-center text-center"
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-black tracking-tight">
-              Хмарна надійність
-            </h2>
-            <p className="mt-4 text-lg md:text-xl text-gray-500 font-medium max-w-2xl mx-auto">
-              Безпечний доступ до вашої бази 24/7. Автоматичне резервне
-              копіювання та захист від втрати даних.
-            </p>
-          </motion.div>
-
-          <motion.div
-            style={{ opacity: opacity3 }}
-            className="absolute inset-x-0 top-0 flex flex-col items-center text-center"
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-black tracking-tight">
-              Максимальна швидкість
-            </h2>
-            <p className="mt-4 text-lg md:text-xl text-gray-500 font-medium max-w-2xl mx-auto">
-              Система працює без затримок навіть при великій кількості
-              користувачів та об'ємних базах даних.
-            </p>
-          </motion.div>
-
-          <motion.div
-            style={{ opacity: opacity4 }}
-            className="absolute inset-x-0 top-0 flex flex-col items-center text-center"
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-black tracking-tight">
-              Підтримка завжди поруч
-            </h2>
-            <p className="mt-4 text-lg md:text-xl text-gray-500 font-medium max-w-2xl mx-auto">
-              Ми беремо на себе всі оновлення та допрацювання. Ви фокусуєтесь
-              виключно на своєму бізнесі.
-            </p>
+          </div>
+          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
+            <img
+              src="/main/BAS-img.jpg"
+              alt="BAS Бухгалтерія"
+              className={imgClasses}
+            />
           </motion.div>
         </div>
 
-        {/* САМА КАРТИНКА */}
+        {/* ШАР 2: ЗЕЛЕНИЙ ФОН */}
         <motion.div
-          style={{ y: yEnter, scale: scaleEnter }}
-          className="relative z-20 mt-32 md:mt-40 w-full max-w-5xl rounded-xl md:rounded-2xl overflow-hidden shadow-2xl border border-gray-200/60 bg-white pointer-events-auto"
+          style={{ clipPath: clip2 }}
+          className={`${layerClasses} bg-[#6ee7b7] z-10`}
         >
-          <img
-            src="/main/BAS-img.jpg"
-            alt="BAS Interface"
-            className="w-full h-auto object-cover block"
-          />
+          <div className={textWrapperClasses}>
+            <h2 className={titleClasses}>BAS Малий бізнес</h2>
+            <p className={descClasses}>
+              Комплексне рішення для управління продажами, закупівлями,
+              виробництвом та фінансами. Інтеграція з іншими сервісами.
+            </p>
+          </div>
+          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
+            <img
+              src="/main/BAS-img2.jpg"
+              alt="BAS Малий бізнес"
+              className={imgClasses}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* ШАР 3: ЖОВТИЙ ФОН */}
+        <motion.div
+          style={{ clipPath: clip3 }}
+          className={`${layerClasses} bg-[#fde047] z-20`}
+        >
+          <div className={textWrapperClasses}>
+            <h2 className={titleClasses}>BAS Управління торгівлею</h2>
+            <p className={descClasses}>
+              Оптимізація складського обліку, ціноутворення, автоматизація
+              торгових операцій та підключення торгового обладнання.
+            </p>
+          </div>
+          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
+            <img
+              src="/main/BAS-img3.jpg"
+              alt="BAS Управління торгівлею"
+              className={imgClasses}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* ШАР 4: ЧЕРВОНИЙ ФОН */}
+        <motion.div
+          style={{ clipPath: clip4 }}
+          className={`${layerClasses} bg-[#fca5a5] z-30`}
+        >
+          <div className={textWrapperClasses}>
+            <h2 className={titleClasses}>Звіти та друковані форми</h2>
+            <p className={descClasses}>
+              Розробка індивідуальних друкованих форм, специфічних звітів та
+              нестандартних обробок чітко під потреби вашого бізнесу.
+            </p>
+          </div>
+          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
+            <img
+              src="/main/BAS-img4.jpg"
+              alt="Кастомні модулі та друковані форми"
+              className={imgClasses}
+            />
+          </motion.div>
         </motion.div>
       </div>
     </section>

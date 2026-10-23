@@ -21,7 +21,7 @@ const navItems: NavItem[] = [
 const Header: React.FC = () => {
   const [activeItem, setActiveItem] = useState<string>("home");
   const [showTop, setShowTop] = useState<boolean>(true);
-  const [isLightTheme, setIsLightTheme] = useState<boolean>(false); // Стан теми
+  const [isLightTheme, setIsLightTheme] = useState<boolean>(false);
 
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
@@ -47,22 +47,24 @@ const Header: React.FC = () => {
 
   // 2. ІНТЕЛЕКТУАЛЬНА ЗМІНА КОЛЬОРІВ (ЯК В APPLE)
   useEffect(() => {
-    // Шукаємо всі секції на сторінці, які мають атрибут data-theme
     const sections = document.querySelectorAll("[data-theme]");
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          // Якщо верх секції доходить до шапки (rootMargin зміщує зону сканування на верх екрана)
-          if (entry.isIntersecting) {
-            const theme = entry.target.getAttribute("data-theme");
-            setIsLightTheme(theme === "light");
-          }
-        });
+        // Фільтруємо всі секції, які зараз перетинають "лінію" шапки
+        const intersecting = entries.filter((e) => e.isIntersecting);
+
+        if (intersecting.length > 0) {
+          // Беремо останню активну секцію, щоб уникнути конфліктів при швидкому гортанні
+          const currentSection = intersecting[intersecting.length - 1];
+          const theme = currentSection.target.getAttribute("data-theme");
+          setIsLightTheme(theme === "light");
+        }
       },
       {
-        // Зона перетину: спрацьовує, коли секція торкається шапки
-        rootMargin: "-62px 0px -90% 0px",
+        // Вузька смужка сканування рівно на висоті 65px від верху
+        rootMargin: "-65px 0px -99% 0px",
+        threshold: 0,
       },
     );
 
@@ -106,7 +108,6 @@ const Header: React.FC = () => {
       <div className={styles["hero-header__top"]}>
         <div className={styles["hero-header__global"]}>
           <div className={styles["hero-header__logo-wrapper"]}>
-            {/* Опціонально: якщо логотип білий, його можна інвертувати через CSS в чорний при світлій темі */}
             <img
               src="/logo.png"
               alt="Cloudbase Logo"

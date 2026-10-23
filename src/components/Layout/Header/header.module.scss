@@ -19,6 +19,7 @@
   --btn-active-text: #000000;
   --border-line: rgba(255, 255, 255, 0.08);
   --fade-rgb: 0, 0, 0; /* Темний градієнт для стрілочок скролу */
+  --logo-filter: invert(0) brightness(1); /* Базовий фільтр логотипа */
 
   /* =======================================================
      СВІТЛА ТЕМА (Для білих/світлих секцій)
@@ -34,6 +35,7 @@
     --btn-active-text: #ffffff;
     --border-line: rgba(0, 0, 0, 0.08);
     --fade-rgb: 255, 255, 255; /* Чисто білий градієнт для стрілочок */
+    --logo-filter: invert(1) brightness(0); /* Інверсія логотипа для світлої теми */
   }
 
   color: var(--text-color);
@@ -87,6 +89,7 @@
     height: 32px;
     width: auto;
     object-fit: contain;
+    transition: filter 0.4s ease; /* Плавний перехід кольору логотипа */
   }
 
   &__logo-text {
