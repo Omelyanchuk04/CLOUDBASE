@@ -8,7 +8,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { cn } from "../../../lib/utils/utils"; // Переконайся, що шлях правильний для твого проєкту
+import { cn } from "../../../lib/utils/utils";
 
 import {
   IconBrightnessDown,
@@ -55,7 +55,6 @@ export const MacbookScroll = ({
     restDelta: 0.001,
   });
 
-  // ЗМІНЕНО: Прибрано isMobile. Тепер екран завжди пропорційно збільшується до 1.5 відносно клавіатури, як на десктопі.
   const scaleX = useTransform(smoothProgress, [0, 0.3], [1.2, 1.5]);
   const scaleY = useTransform(smoothProgress, [0, 0.3], [0.6, 1.5]);
   const translate = useTransform(smoothProgress, [0, 1], [0, 1500]);
@@ -66,7 +65,8 @@ export const MacbookScroll = ({
   return (
     <div
       ref={ref}
-      className="flex min-h-[150vh] md:min-h-[200vh] w-full shrink-0 flex-col items-center justify-start pt-32 pb-10 md:py-40 [perspective:800px]"
+      // ЗМЕНШЕНА ВИСОТА СКРОЛУ (min-h-[110vh] замість 150vh)
+      className="flex min-h-[110vh] md:min-h-[160vh] w-full shrink-0 flex-col items-center justify-start pt-32 pb-10 md:py-40 overflow-hidden [perspective:800px]"
     >
       <motion.div
         style={{
@@ -84,17 +84,22 @@ export const MacbookScroll = ({
         )}
       </motion.div>
 
-      {/* Адаптив всього макбука цілком (екран + клавіатура) */}
+      {/* 
+        ВІДКАЛІБРОВАНІ МАСШТАБИ:
+        Збільшено scale на мобільних для точного співпадіння з 92vw з наступної секції
+      */}
       <div
         className="transform origin-top mt-4 flex flex-col items-center 
-          scale-[0.55] mb-[-12rem] 
+          scale-[0.45] mb-[-15rem] 
+          min-[390px]:scale-[0.47] min-[390px]:mb-[-14rem]
+          min-[428px]:scale-[0.51] min-[428px]:mb-[-13rem]
+          min-[458px]:scale-[0.55] min-[458px]:mb-[-11rem] 
           sm:scale-[0.7] sm:mb-[-5rem] 
           md:scale-[0.9] md:mb-[3rem] 
           lg:scale-[1.1] lg:mb-[10rem] 
           xl:scale-[1.3] xl:mb-[18rem] 
           2xl:scale-[1.5] 2xl:mb-[28rem]"
       >
-        {/* Lid */}
         <Lid
           src={src}
           scaleX={scaleX}
@@ -102,7 +107,6 @@ export const MacbookScroll = ({
           rotate={rotate}
           translate={translate}
         />
-        {/* Base area */}
         <div className="relative -z-10 h-[22rem] w-[32rem] overflow-hidden rounded-2xl bg-gray-200 dark:bg-[#272729]">
           <div className="relative h-10 w-full">
             <div className="absolute inset-x-0 mx-auto h-4 w-[80%] bg-[#050505]" />

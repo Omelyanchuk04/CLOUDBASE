@@ -69,7 +69,7 @@ const White = () => {
 
   // Контейнер тексту
   const textLayerClasses =
-    "sticky top-0 h-screen w-full flex flex-col max-[899px]:justify-center max-[899px]:pt-[45vh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
+    "sticky top-0 h-screen w-full flex flex-col max-[899px]:justify-center max-[899px]:pt-[50vh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
 
   // ВИПРАВЛЕНО: Тепер текстовий блок масштабується разом з картинкою на планшетах (640-899px), щоб лівий край завжди співпадав!
   const textWrapperClasses =
@@ -82,7 +82,8 @@ const White = () => {
 
   // Шрифт
   const paragraphClasses =
-    "text-[28px] min-[900px]:text-xl lg:text-3xl font-semibold tracking-tight leading-snug";
+    "text-[24px] min-[900px]:text-xl lg:text-3xl font-semibold tracking-tight leading-snug";
+
   const inlineTitleClasses = "text-black";
   const inlineDescClasses = "text-black/60";
 
@@ -106,8 +107,7 @@ const White = () => {
 
   // Контейнер картинок
   const imgLayerClasses =
-    "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[12vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
-
+    "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
   // ВИПРАВЛЕНО: Прибрано блокування max-[899px]:w-[422px]. Тепер каскад Tailwind працює ідеально.
   const wrapperClasses =
     "relative aspect-video rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
