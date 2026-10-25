@@ -28,7 +28,7 @@ const Header: React.FC = () => {
 
   const navListRef = useRef<HTMLUListElement>(null);
 
-  // 1. ОПТИМІЗОВАНА ЛОГІКА ХОВАННЯ ЛОГОТИПА НА МОБАЙЛІ (БЕЗ ЛАГІВ)
+  // ЄДИНА, НАДІЙНА І ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ (Ховання лого + зміна теми)
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ticking = false;
@@ -38,13 +38,31 @@ const Header: React.FC = () => {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
 
+          // 1. Логіка ховання верхньої панелі
           if (currentScrollY > lastScrollY && currentScrollY > 60) {
-            setShowTop((prev) => (prev ? false : prev)); // Оновлюємо стан тільки якщо він змінився
+            setShowTop((prev) => (prev ? false : prev));
           } else {
             setShowTop((prev) => (!prev ? true : prev));
           }
-
           lastScrollY = currentScrollY;
+
+          // 2. Залізобетонна логіка зміни кольору шапки
+          const sections = document.querySelectorAll("[data-theme]");
+          let foundLight = false;
+
+          sections.forEach((sec) => {
+            const rect = sec.getBoundingClientRect();
+            // Перевіряємо, чи лінія під шапкою (65px від верху) перетинає секцію
+            if (rect.top <= 65 && rect.bottom >= 65) {
+              if (sec.getAttribute("data-theme") === "light") {
+                foundLight = true;
+              }
+            }
+          });
+
+          // Оновлюємо стан тільки якщо колір реально змінився
+          setIsLightTheme((prev) => (prev !== foundLight ? foundLight : prev));
+
           ticking = false;
         });
         ticking = true;
@@ -52,41 +70,14 @@ const Header: React.FC = () => {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Викликаємо один раз при монтуванні, щоб шапка одразу зрозуміла, де вона знаходиться
+    handleScroll();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. ІНТЕЛЕКТУАЛЬНА ЗМІНА КОЛЬОРІВ (ТОЧНИЙ ТАЙМІНГ)
-  useEffect(() => {
-    const sections = document.querySelectorAll("[data-theme]");
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const theme = entry.target.getAttribute("data-theme");
-            // Оновлюємо стан лише якщо тема дійсно змінилася (уникаємо зайвих рендерів)
-            setIsLightTheme((prev) => {
-              const isLight = theme === "light";
-              return prev !== isLight ? isLight : prev;
-            });
-          }
-        });
-      },
-      {
-        // ВИПРАВЛЕНО: Скануємо тонку смужку рівно під шапкою (-70px зверху, -80% знизу)
-        // Тепер тема змінюється ТОЧНО коли блок торкається шапки, а не завчасно!
-        rootMargin: "-70px 0px -80% 0px",
-        threshold: 0,
-      },
-    );
-
-    sections.forEach((section) => observer.observe(section));
-    return () => {
-      sections.forEach((section) => observer.unobserve(section));
-    };
-  }, []);
-
-  // 3. ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
+  // ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
   const checkNavScroll = useCallback(() => {
     if (navListRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = navListRef.current;
@@ -95,7 +86,6 @@ const Header: React.FC = () => {
       const newCanScrollRight =
         Math.ceil(scrollLeft + clientWidth) < scrollWidth - 10;
 
-      // Оновлюємо стани тільки якщо вони реально змінилися (прибирає лаги при скролі меню)
       setCanScrollLeft((prev) =>
         prev !== newCanScrollLeft ? newCanScrollLeft : prev,
       );
