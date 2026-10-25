@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./header.module.scss";
 
 interface NavItem {
@@ -28,43 +28,54 @@ const Header: React.FC = () => {
 
   const navListRef = useRef<HTMLUListElement>(null);
 
-  // 1. ЛОГІКА ХОВАННЯ ЛОГОТИПА НА МОБАЙЛІ
+  // 1. ОПТИМІЗОВАНА ЛОГІКА ХОВАННЯ ЛОГОТИПА НА МОБАЙЛІ (БЕЗ ЛАГІВ)
   useEffect(() => {
     let lastScrollY = window.scrollY;
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 60) {
-        setShowTop(false);
-      } else {
-        setShowTop(true);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+
+          if (currentScrollY > lastScrollY && currentScrollY > 60) {
+            setShowTop((prev) => (prev ? false : prev)); // Оновлюємо стан тільки якщо він змінився
+          } else {
+            setShowTop((prev) => (!prev ? true : prev));
+          }
+
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
       }
-      lastScrollY = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. ІНТЕЛЕКТУАЛЬНА ЗМІНА КОЛЬОРІВ (ЯК В APPLE)
+  // 2. ІНТЕЛЕКТУАЛЬНА ЗМІНА КОЛЬОРІВ (ТОЧНИЙ ТАЙМІНГ)
   useEffect(() => {
     const sections = document.querySelectorAll("[data-theme]");
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Фільтруємо всі секції, які зараз перетинають "лінію" шапки
-        const intersecting = entries.filter((e) => e.isIntersecting);
-
-        if (intersecting.length > 0) {
-          // Беремо останню активну секцію, щоб уникнути конфліктів при швидкому гортанні
-          const currentSection = intersecting[intersecting.length - 1];
-          const theme = currentSection.target.getAttribute("data-theme");
-          setIsLightTheme(theme === "light");
-        }
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const theme = entry.target.getAttribute("data-theme");
+            // Оновлюємо стан лише якщо тема дійсно змінилася (уникаємо зайвих рендерів)
+            setIsLightTheme((prev) => {
+              const isLight = theme === "light";
+              return prev !== isLight ? isLight : prev;
+            });
+          }
+        });
       },
       {
-        // ВИПРАВЛЕНО: Надійна зона сканування, яка не ламається на мобільних.
-        // Відступаємо 90px зверху (оминаємо саму шапку) і скануємо до середини екрана (-50%)
-        rootMargin: "-90px 0px -50% 0px",
+        // ВИПРАВЛЕНО: Скануємо тонку смужку рівно під шапкою (-70px зверху, -80% знизу)
+        // Тепер тема змінюється ТОЧНО коли блок торкається шапки, а не завчасно!
+        rootMargin: "-70px 0px -80% 0px",
         threshold: 0,
       },
     );
@@ -75,20 +86,30 @@ const Header: React.FC = () => {
     };
   }, []);
 
-  // 3. ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
-  const checkNavScroll = () => {
+  // 3. ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
+  const checkNavScroll = useCallback(() => {
     if (navListRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = navListRef.current;
-      setCanScrollLeft(scrollLeft > 10);
-      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth - 10);
+
+      const newCanScrollLeft = scrollLeft > 10;
+      const newCanScrollRight =
+        Math.ceil(scrollLeft + clientWidth) < scrollWidth - 10;
+
+      // Оновлюємо стани тільки якщо вони реально змінилися (прибирає лаги при скролі меню)
+      setCanScrollLeft((prev) =>
+        prev !== newCanScrollLeft ? newCanScrollLeft : prev,
+      );
+      setCanScrollRight((prev) =>
+        prev !== newCanScrollRight ? newCanScrollRight : prev,
+      );
     }
-  };
+  }, []);
 
   useEffect(() => {
     setTimeout(checkNavScroll, 100);
     window.addEventListener("resize", checkNavScroll);
     return () => window.removeEventListener("resize", checkNavScroll);
-  }, []);
+  }, [checkNavScroll]);
 
   const scrollNav = (direction: "left" | "right") => {
     if (navListRef.current) {
