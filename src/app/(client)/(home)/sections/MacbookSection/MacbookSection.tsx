@@ -5,7 +5,6 @@ import Link from "next/link";
 import { MacbookScroll } from "@/components/UI/MacbookScroll/MacbookScroll";
 import styles from "./MacbookSection.module.scss";
 
-// Звичайний const
 const MacbookSection = () => {
   return (
     <section className={styles.section} data-theme="dark">
@@ -13,15 +12,6 @@ const MacbookSection = () => {
         <div className={styles.blobPink} />
         <div className={styles.blobPurple} />
         <div className={styles.blobBlue} />
-      </div>
-
-      <div className={styles.bgDecorations} aria-hidden="true">
-        <div className={styles.pillYellow}></div>
-        <div className={styles.dotRed}></div>
-        <div className={styles.dotGreen}></div>
-        <div className={styles.dotBlue}></div>
-        <div className={styles.ringPurple}></div>
-        <div className={styles.triangleOrange}></div>
       </div>
 
       <MacbookScroll
@@ -49,5 +39,4 @@ const MacbookSection = () => {
   );
 };
 
-// Експорт за замовчуванням
 export default MacbookSection;

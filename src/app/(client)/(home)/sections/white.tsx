@@ -5,12 +5,19 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 const White = () => {
   const ref = useRef<HTMLElement>(null);
+
+  // ОПТИМІЗАЦІЯ 1: Зберігаємо ширину екрана в стейт, щоб не смикати DOM під час скролу
   const [isMobile, setIsMobile] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(1200);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 900);
+    const handleResize = () => {
+      const w = window.innerWidth;
+      setIsMobile(w < 900);
+      setWindowWidth(w);
+    };
     handleResize();
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -25,57 +32,50 @@ const White = () => {
     offset: ["start start", "end end"],
   });
 
+  // ОПТИМІЗАЦІЯ 2: Використовуємо кешоване значення isMobile, а не window.innerWidth
   const xProgress = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
   const xEnter = useTransform(xProgress, (v) => {
-    const isMob = typeof window !== "undefined" && window.innerWidth < 900;
-    if (isMob) return `0px`;
+    if (isMobile) return `0px`;
     return `calc(${v * 50}vw - ${v * 50}% - ${v * 32}px)`;
   });
 
   const scaleEnter = useTransform(scrollYProgress, (v) => {
-    const isMob = typeof window !== "undefined" && window.innerWidth < 900;
-    if (isMob) return 1;
+    if (isMobile) return 1;
 
-    let target = 0.75;
-    if (typeof window !== "undefined") {
-      const w = window.innerWidth;
-      const minW = 900,
-        maxW = 1600;
-      const minT = 0.55,
-        maxT = 0.85;
-      const boundedW = Math.min(Math.max(w, minW), maxW);
-      target = minT + ((boundedW - minW) / (maxW - minW)) * (maxT - minT);
-    }
+    // Математика працює з кешованим windowWidth (0 лагів)
+    const minW = 900,
+      maxW = 1600;
+    const minT = 0.55,
+      maxT = 0.85;
+    const boundedW = Math.min(Math.max(windowWidth, minW), maxW);
+    const target = minT + ((boundedW - minW) / (maxW - minW)) * (maxT - minT);
+
     const p = Math.min(Math.max(v / 0.25, 0), 1);
     return 1 - p * (1 - target);
   });
 
   const opacity1 = useTransform(scrollYProgress, (v) => {
-    const isMob = typeof window !== "undefined" && window.innerWidth < 900;
-    if (isMob) return 1;
+    if (isMobile) return 1;
     if (v < 0.05) return 0;
     if (v > 0.25) return 1;
     return (v - 0.05) / (0.25 - 0.05);
   });
 
   const clip2Val = useTransform(scrollYProgress, (v) => {
-    const isMob = typeof window !== "undefined" && window.innerWidth < 900;
-    const start = isMob ? 0 : 0.25;
-    const end = isMob ? 0.3333 : 0.5;
+    const start = isMobile ? 0 : 0.25;
+    const end = isMobile ? 0.3333 : 0.5;
     const p = Math.min(Math.max((v - start) / (end - start), 0), 1);
     return 100 - p * 100;
   });
   const clip3Val = useTransform(scrollYProgress, (v) => {
-    const isMob = typeof window !== "undefined" && window.innerWidth < 900;
-    const start = isMob ? 0.3333 : 0.5;
-    const end = isMob ? 0.6666 : 0.75;
+    const start = isMobile ? 0.3333 : 0.5;
+    const end = isMobile ? 0.6666 : 0.75;
     const p = Math.min(Math.max((v - start) / (end - start), 0), 1);
     return 100 - p * 100;
   });
   const clip4Val = useTransform(scrollYProgress, (v) => {
-    const isMob = typeof window !== "undefined" && window.innerWidth < 900;
-    const start = isMob ? 0.6666 : 0.75;
-    const end = isMob ? 1.0 : 1.0;
+    const start = isMobile ? 0.6666 : 0.75;
+    const end = isMobile ? 1.0 : 1.0;
     const p = Math.min(Math.max((v - start) / (end - start), 0), 1);
     return 100 - p * 100;
   });
@@ -85,7 +85,6 @@ const White = () => {
   const clip4 = useTransform(clip4Val, (v) => `inset(${v}% 0 0 0)`);
 
   // === ВЕРТИКАЛЬНЕ ВИРІВНЮВАННЯ ТЕКСТІВ ===
-  // Для всіх секцій на мобайлі текст притиснутий донизу (pb-[10svh])
   const textLayerClasses =
     "sticky top-0 h-[100svh] w-full flex flex-col max-[899px]:justify-end max-[899px]:pb-[10svh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
 
@@ -123,11 +122,9 @@ const White = () => {
     </svg>
   );
 
-  // Картинка опущена нижче (pt-[18svh]), щоб обійти шапку
   const imgLayerClasses =
     "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18svh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
 
-  // Додано max-[899px]:rounded-none для вимкнення заокруглення на мобільних
   const wrapperClasses =
     "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
     "max-[899px]:origin-top min-[900px]:origin-right " +
@@ -247,52 +244,104 @@ const White = () => {
         <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
           <div className={imgLayerClasses}>
             <motion.div
-              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              style={{
+                y: yEnter,
+                x: xEnter,
+                scale: scaleEnter,
+                willChange: "transform",
+              }}
               className={wrapperClasses}
             >
               <img
                 src="/main/BAS-img.jpg"
                 alt="Підтримка BAS"
                 className={imgClasses}
+                decoding="async"
+                fetchPriority="high"
               />
             </motion.div>
           </div>
 
-          <motion.div style={{ clipPath: clip2 }} className={imgLayerClasses}>
+          <motion.div
+            style={{
+              clipPath: clip2,
+              WebkitClipPath: clip2,
+              transform: "translateZ(0)",
+              willChange: "clip-path",
+            }}
+            className={imgLayerClasses}
+          >
             <motion.div
-              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              style={{
+                y: yEnter,
+                x: xEnter,
+                scale: scaleEnter,
+                willChange: "transform",
+              }}
               className={wrapperClasses}
             >
               <img
                 src="/main/BAS-img2.jpg"
                 alt="Системи KBS"
                 className={imgClasses}
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
           </motion.div>
 
-          <motion.div style={{ clipPath: clip3 }} className={imgLayerClasses}>
+          <motion.div
+            style={{
+              clipPath: clip3,
+              WebkitClipPath: clip3,
+              transform: "translateZ(0)",
+              willChange: "clip-path",
+            }}
+            className={imgLayerClasses}
+          >
             <motion.div
-              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              style={{
+                y: yEnter,
+                x: xEnter,
+                scale: scaleEnter,
+                willChange: "transform",
+              }}
               className={wrapperClasses}
             >
               <img
                 src="/main/BAS-img3.jpg"
                 alt="Індивідуальні допрацювання"
                 className={imgClasses}
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
           </motion.div>
 
-          <motion.div style={{ clipPath: clip4 }} className={imgLayerClasses}>
+          <motion.div
+            style={{
+              clipPath: clip4,
+              WebkitClipPath: clip4,
+              transform: "translateZ(0)",
+              willChange: "clip-path",
+            }}
+            className={imgLayerClasses}
+          >
             <motion.div
-              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              style={{
+                y: yEnter,
+                x: xEnter,
+                scale: scaleEnter,
+                willChange: "transform",
+              }}
               className={wrapperClasses}
             >
               <img
                 src="/main/BAS-img4.jpg"
                 alt="Хмара для бухгалтерії"
                 className={imgClasses}
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
           </motion.div>
