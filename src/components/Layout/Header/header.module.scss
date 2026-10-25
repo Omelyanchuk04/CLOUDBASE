@@ -6,7 +6,7 @@
   z-index: 100;
 
   /* =======================================================
-     ТЕМНА ТЕМА (За замовчуванням - для темного фону)
+     ТЕМНА ТЕМА
      ======================================================= */
   --header-bg: rgba(0, 0, 0, 0.45);
   --text-color: #ffffff;
@@ -17,25 +17,21 @@
   --btn-active-bg: #ffffff;
   --btn-active-border: #ffffff;
   --btn-active-text: #000000;
-  --border-line: rgba(255, 255, 255, 0.08);
-  --fade-rgb: 0, 0, 0; /* Темний градієнт для стрілочок скролу */
-  --logo-filter: invert(0) brightness(1); /* Базовий фільтр логотипа */
+  --logo-filter: invert(0) brightness(1);
 
   /* =======================================================
-     СВІТЛА ТЕМА (Для білих/світлих секцій)
+     СВІТЛА ТЕМА
      ======================================================= */
   &--light {
-    --header-bg: rgba(255, 255, 255, 0.65); /* Світле скло */
-    --text-color: #1d1d1f; /* Темно-сірий текст Apple */
+    --header-bg: rgba(255, 255, 255, 0.65);
+    --text-color: #1d1d1f;
     --btn-border: rgba(0, 0, 0, 0.15);
     --btn-bg-hover: rgba(0, 0, 0, 0.05);
     --btn-border-hover: rgba(0, 0, 0, 0.3);
-    --btn-active-bg: #000000; /* Чорна активна кнопка */
+    --btn-active-bg: #000000;
     --btn-active-border: #000000;
     --btn-active-text: #ffffff;
-    --border-line: rgba(0, 0, 0, 0.08);
-    --fade-rgb: 255, 255, 255; /* Чисто білий градієнт для стрілочок */
-    --logo-filter: invert(1) brightness(0); /* Інверсія логотипа для світлої теми */
+    --logo-filter: invert(1) brightness(0);
   }
 
   color: var(--text-color);
@@ -51,13 +47,10 @@
     inset: 0;
     z-index: -1;
     background-color: var(--header-bg);
-
     transform: translateZ(0);
     will-change: backdrop-filter, background-color;
-
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     backdrop-filter: saturate(180%) blur(20px);
-
     transition:
       background-color 0.4s ease,
       border-color 0.4s ease;
@@ -89,7 +82,7 @@
     height: 32px;
     width: auto;
     object-fit: contain;
-    transition: filter 0.4s ease; /* Плавний перехід кольору логотипа */
+    transition: filter 0.4s ease;
   }
 
   &__logo-text {
@@ -131,16 +124,19 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: 15px;
   }
 
   &__nav-list {
     display: flex;
     align-items: center;
-    justify-content: safe center; /* ЗАВЖДИ ПО ЦЕНТРУ, але безпечно для скролу */
     gap: 10px;
     list-style: none;
     margin: 0;
     flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
   }
 
   &__nav-button {
@@ -174,11 +170,6 @@
       }
     }
   }
-
-  &__nav-icon {
-    width: 16px;
-    height: 16px;
-  }
 }
 
 /* --- СТАН ПРИ СКРОЛІ (ТІЛЬКИ МОБАЙЛ) --- */
@@ -196,13 +187,68 @@
 @media (max-width: 1024px) {
   .hero-header {
     &__local {
-      padding-top: max(12px, env(safe-area-inset-top));
-      padding-bottom: 15px;
       padding-left: 0;
       padding-right: 0;
       display: flex;
-      justify-content: center;
       width: 100%;
+
+      /* НОВА МАГІЯ: Використовуємо CSS маску. Самі кнопки плавно стають прозорими по краях */
+      &:has(.hero-header__scroll-indicator--left):has(
+          .hero-header__scroll-indicator--right
+        ) {
+        .hero-header__nav-list {
+          -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 40px,
+            black calc(100% - 40px),
+            transparent 100%
+          );
+          mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 40px,
+            black calc(100% - 40px),
+            transparent 100%
+          );
+        }
+      }
+      &:has(.hero-header__scroll-indicator--left):not(
+          :has(.hero-header__scroll-indicator--right)
+        ) {
+        .hero-header__nav-list {
+          -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 40px,
+            black 100%
+          );
+          mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 40px,
+            black 100%
+          );
+        }
+      }
+      &:not(:has(.hero-header__scroll-indicator--left)):has(
+          .hero-header__scroll-indicator--right
+        ) {
+        .hero-header__nav-list {
+          -webkit-mask-image: linear-gradient(
+            to right,
+            black 0%,
+            black calc(100% - 40px),
+            transparent 100%
+          );
+          mask-image: linear-gradient(
+            to right,
+            black 0%,
+            black calc(100% - 40px),
+            transparent 100%
+          );
+        }
+      }
     }
 
     &__nav-list {
@@ -210,22 +256,14 @@
       flex-wrap: nowrap;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      width: 100%;
-      margin: 0;
-      padding: 0 20px;
       scrollbar-width: none;
+
+      width: 100%;
+      padding: 0 20px;
+      justify-content: safe center;
+
       &::-webkit-scrollbar {
         display: none;
-      }
-
-      @media (max-width: 650px) {
-        /* Додаємо пусті блоки по краях, щоб контент можна було доскролити до кінця з обох боків */
-        &::before,
-        &::after {
-          content: "";
-          display: block;
-          flex: 0 0 40px;
-        }
       }
     }
 
@@ -233,62 +271,36 @@
       flex-shrink: 0;
     }
 
-    /* ПОВЕРНУТІ ТА ПОКРАЩЕНІ СТРІЛОЧКИ ДЛЯ СКРОЛУ МЕНЮ */
     &__scroll-indicator {
-      display: none;
+      display: flex;
+      position: absolute;
+      top: max(12px, env(safe-area-inset-top));
+      bottom: 15px;
+      width: 40px;
+      padding: 0;
+      align-items: center;
+      color: var(--text-color);
+      cursor: pointer;
+      pointer-events: auto;
+      z-index: 10;
+      transition: opacity 0.2s ease;
 
-      @media (max-width: 650px) {
-        display: flex;
-        position: absolute;
-        top: 0; /* Тінь тепер починається від самого верху екрана */
-        bottom: 0; /* І йде до самого низу шапки */
-        width: 80px;
+      /* ПОВНІСТЮ ПРИБРАНО ТІНЬ-ГРАДІЄНТ! Стрілочка просто висить у повітрі */
+      background: transparent;
 
-        /* Вирівнюємо саму стрілочку по центру кнопок, враховуючи відступи шапки */
-        padding-top: max(12px, env(safe-area-inset-top));
-        padding-bottom: 15px;
+      svg {
+        width: 16px;
+        height: 20px;
+      }
 
-        align-items: center;
-        color: var(--text-color);
-        opacity: 0.85;
-        cursor: pointer;
-        pointer-events: auto;
-        z-index: 5;
-        transition: opacity 0.2s ease;
+      &--left {
+        left: 0;
+        justify-content: center;
+      }
 
-        &:hover {
-          opacity: 1;
-        }
-
-        svg {
-          width: 16px;
-          height: 20px;
-        }
-
-        &--left {
-          left: 0;
-          padding-left: 15px;
-          justify-content: flex-start;
-          /* Темна з краю, плавно розсіюється до центру */
-          background: linear-gradient(
-            90deg,
-            rgba(var(--fade-rgb), 1) 0%,
-            rgba(var(--fade-rgb), 1) 35%,
-            rgba(var(--fade-rgb), 0) 100%
-          );
-        }
-
-        &--right {
-          right: 0;
-          padding-right: 15px;
-          justify-content: flex-end;
-          background: linear-gradient(
-            270deg,
-            rgba(var(--fade-rgb), 1) 0%,
-            rgba(var(--fade-rgb), 1) 35%,
-            rgba(var(--fade-rgb), 0) 100%
-          );
-        }
+      &--right {
+        right: 0;
+        justify-content: center;
       }
     }
   }

@@ -65,8 +65,8 @@ export const MacbookScroll = ({
   return (
     <div
       ref={ref}
-      // ЗМЕНШЕНА ВИСОТА СКРОЛУ (min-h-[110vh] замість 150vh)
-      className="flex min-h-[110vh] md:min-h-[160vh] w-full shrink-0 flex-col items-center justify-start pt-32 pb-10 md:py-40 overflow-hidden [perspective:800px]"
+      // ЗМЕНШЕНА ВИСОТА СКРОЛУ (min-h-[85vh] для мобільних, 130vh для десктопа)
+      className="flex min-h-[85vh] md:min-h-[130vh] w-full shrink-0 flex-col items-center justify-start pt-32 pb-10 md:py-40 overflow-hidden [perspective:800px]"
     >
       <motion.div
         style={{
@@ -85,15 +85,15 @@ export const MacbookScroll = ({
       </motion.div>
 
       {/* 
-        ВІДКАЛІБРОВАНІ МАСШТАБИ:
-        Збільшено scale на мобільних для точного співпадіння з 92vw з наступної секції
+        ІДЕАЛЬНО ВІДКАЛІБРОВАНІ МАСШТАБИ ДЛЯ 100% ЗБІГУ:
+        На екранах 393px працює min-[390px]:scale-[0.49], що дає рівно 376 пікселів ширини!
       */}
       <div
         className="transform origin-top mt-4 flex flex-col items-center 
-          scale-[0.45] mb-[-15rem] 
-          min-[390px]:scale-[0.47] min-[390px]:mb-[-14rem]
-          min-[428px]:scale-[0.51] min-[428px]:mb-[-13rem]
-          min-[458px]:scale-[0.55] min-[458px]:mb-[-11rem] 
+          scale-[0.47] mb-[-14rem] 
+          min-[390px]:scale-[0.49] min-[390px]:mb-[-13rem]
+          min-[428px]:scale-[0.53] min-[428px]:mb-[-12rem]
+          min-[458px]:scale-[0.57] min-[458px]:mb-[-10rem] 
           sm:scale-[0.7] sm:mb-[-5rem] 
           md:scale-[0.9] md:mb-[3rem] 
           lg:scale-[1.1] lg:mb-[10rem] 
