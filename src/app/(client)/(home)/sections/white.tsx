@@ -1,134 +1,283 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const White = () => {
   const ref = useRef<HTMLElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Відстежуємо ширину екрана для плавного адаптиву (< 900px)
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Виїзд макбука знизу при появі секції
   const { scrollYProgress: enterProgress } = useScroll({
     target: ref,
-    offset: ["start 122%", "start start"],
+    offset: ["start 170%", "start start"],
   });
-
   const yEnter = useTransform(enterProgress, [0, 1], ["-100vh", "0vh"]);
 
+  // Основний трекер для всієї секції (500vh)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
-  const clip2Val = useTransform(scrollYProgress, [0.15, 0.3], [100, 0]);
-  const clip3Val = useTransform(scrollYProgress, [0.45, 0.6], [100, 0]);
-  const clip4Val = useTransform(scrollYProgress, [0.75, 0.9], [100, 0]);
+  // 1. Рух картинки вправо (вимикаємо на мобільних пристроях)
+  const xProgress = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
+  const xEnter = useTransform(xProgress, (v) => {
+    if (isMobile) return `0px`; // На мобільних стоїть по центру
+    return `calc(${v * 50}vw - ${v * 50}% - ${v * 32}px)`;
+  });
+
+  // 2. ДИНАМІЧНЕ МАСШТАБУВАННЯ (Без скачків)
+  const scaleEnter = useTransform(scrollYProgress, (v) => {
+    if (isMobile) return 1; // На мобільних картинка тримає фіксований розмір
+
+    let target = 0.75;
+    if (typeof window !== "undefined") {
+      const w = window.innerWidth;
+      const minW = 900,
+        maxW = 1600;
+      const minT = 0.55,
+        maxT = 0.85;
+      const boundedW = Math.min(Math.max(w, minW), maxW);
+      target = minT + ((boundedW - minW) / (maxW - minW)) * (maxT - minT);
+    }
+
+    const p = Math.min(Math.max(v / 0.25, 0), 1);
+    return 1 - p * (1 - target);
+  });
+
+  const opacity1 = useTransform(scrollYProgress, [0, 0.05, 0.25], [0, 0, 1]);
+
+  // 3. ІДЕАЛЬНИЙ ЗРІЗ (Wipe) КАРТИНОК, СИНХРОНІЗОВАНИЙ З ФОНАМИ
+  const clip2Val = useTransform(scrollYProgress, [0.25, 0.5], [100, 0]);
+  const clip3Val = useTransform(scrollYProgress, [0.5, 0.75], [100, 0]);
+  const clip4Val = useTransform(scrollYProgress, [0.75, 1.0], [100, 0]);
 
   const clip2 = useTransform(clip2Val, (v) => `inset(${v}% 0 0 0)`);
   const clip3 = useTransform(clip3Val, (v) => `inset(${v}% 0 0 0)`);
   const clip4 = useTransform(clip4Val, (v) => `inset(${v}% 0 0 0)`);
 
-  const layerClasses =
-    "absolute inset-0 w-full h-full flex flex-col items-center justify-center pt-28 pb-10 px-4 md:px-10";
+  // === ОНОВЛЕНІ КЛАСИ ===
 
+  // Контейнер тексту
+  const textLayerClasses =
+    "sticky top-0 h-screen w-full flex flex-col max-[899px]:justify-center max-[899px]:pt-[45vh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
+
+  // ВИПРАВЛЕНО: Тепер текстовий блок масштабується разом з картинкою на планшетах (640-899px), щоб лівий край завжди співпадав!
   const textWrapperClasses =
-    "flex flex-col items-center text-center mb-8 md:mb-12 max-w-3xl z-20 pointer-events-auto";
-  const titleClasses =
-    "text-3xl md:text-5xl font-bold text-black tracking-tight";
-  const descClasses =
-    "mt-3 md:mt-4 text-base md:text-lg text-black/70 font-medium leading-relaxed";
+    "flex flex-col items-start text-left z-20 pointer-events-auto " +
+    "max-[899px]:mx-auto w-[422px] max-w-[92vw] sm:w-[538px] md:w-[691px] " +
+    "min-[900px]:w-full min-[900px]:max-w-[340px] lg:max-w-[380px] xl:max-w-[440px]";
 
-  // Змінили ширину на max-w-[960px]
+  // Логотипи
+  const baseLogoClasses = "w-auto mb-5 md:mb-6 object-contain object-left";
+
+  // Шрифт
+  const paragraphClasses =
+    "text-[28px] min-[900px]:text-xl lg:text-3xl font-semibold tracking-tight leading-snug";
+  const inlineTitleClasses = "text-black";
+  const inlineDescClasses = "text-black/60";
+
+  const linkClasses =
+    "mt-5 md:mt-6 inline-flex items-center text-[#0066cc] font-semibold text-[22px] min-[900px]:text-lg lg:text-xl hover:opacity-80 transition-opacity group cursor-pointer tracking-tight";
+  const chevronIcon = (
+    <svg
+      className="ml-1 w-6 h-6 min-[900px]:w-4 min-[900px]:h-4 lg:w-5 lg:h-5 transition-transform group-hover:translate-x-1"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 5l7 7-7 7"
+      ></path>
+    </svg>
+  );
+
+  // Контейнер картинок
+  const imgLayerClasses =
+    "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[12vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
+
+  // ВИПРАВЛЕНО: Прибрано блокування max-[899px]:w-[422px]. Тепер каскад Tailwind працює ідеально.
   const wrapperClasses =
-    "relative w-full max-w-[960px] aspect-video rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 z-10 pointer-events-auto";
+    "relative aspect-video rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
+    "max-[899px]:origin-top min-[900px]:origin-right " +
+    "w-[422px] max-w-[92vw] sm:w-[538px] md:w-[691px] lg:w-[845px] xl:w-[998px] 2xl:w-[1152px]";
 
   const imgClasses = "w-full h-full object-fill block absolute inset-0";
 
   return (
-    <section
-      ref={ref}
-      data-theme="light"
-      className="relative w-full h-[500vh] z-20"
-    >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* ШАР 1 (БАЗОВИЙ) */}
-        <div className={`${layerClasses} bg-[#f5f5f7] z-0`}>
-          <div className={textWrapperClasses}>
-            <h2 className={titleClasses}>BAS Бухгалтерія</h2>
-            <p className={descClasses}>
-              Налаштування, оновлення та підтримка стабільної роботи головної
-              програми для ведення бухгалтерського та податкового обліку.
-            </p>
+    <section ref={ref} data-theme="light" className="relative w-full">
+      <div className="relative w-full z-0">
+        {/* ШАР 1 */}
+        <div className="h-[200vh] w-full bg-[#f5f5f7]">
+          <div className={textLayerClasses}>
+            <motion.div
+              style={{ opacity: opacity1 }}
+              className={textWrapperClasses}
+            >
+              <img
+                src="/main/BAS-logo.png"
+                alt="BAS Logo"
+                className={`h-14 max-[899px]:h-16 lg:h-16 ${baseLogoClasses}`}
+              />
+              <div className={paragraphClasses}>
+                <span className={inlineTitleClasses}>
+                  Супровід та підтримка BAS.{" "}
+                </span>
+                <span className={inlineDescClasses}>
+                  Професійне обслуговування, регулярні оновлення та тонке
+                  налаштування конфігурацій для безперебійної роботи вашого
+                  бізнесу.
+                </span>
+              </div>
+              <a href="#" className={linkClasses}>
+                Дізнатись більше {chevronIcon}
+              </a>
+            </motion.div>
           </div>
-          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
-            <img
-              src="/main/BAS-img.jpg"
-              alt="BAS Бухгалтерія"
-              className={imgClasses}
-            />
-          </motion.div>
         </div>
 
-        {/* ШАР 2: ЗЕЛЕНИЙ ФОН */}
-        <motion.div
-          style={{ clipPath: clip2 }}
-          className={`${layerClasses} bg-[#6ee7b7] z-10`}
-        >
-          <div className={textWrapperClasses}>
-            <h2 className={titleClasses}>BAS Малий бізнес</h2>
-            <p className={descClasses}>
-              Комплексне рішення для управління продажами, закупівлями,
-              виробництвом та фінансами. Інтеграція з іншими сервісами.
-            </p>
+        {/* ШАР 2 */}
+        <div className="h-screen w-full bg-[#6ee7b7]">
+          <div className={textLayerClasses}>
+            <div className={textWrapperClasses}>
+              <img
+                src="/main/KBS-logo.png"
+                alt="KBS Logo"
+                className={`h-14 max-[899px]:h-16 lg:h-16 ${baseLogoClasses}`}
+              />
+              <div className={paragraphClasses}>
+                <span className={inlineTitleClasses}>
+                  Обслуговування систем KBS.{" "}
+                </span>
+                <span className={inlineDescClasses}>
+                  Надійний супровід програмних продуктів. Гарантуємо
+                  актуальність звітних форм та стабільність роботи ваших баз
+                  даних.
+                </span>
+              </div>
+              <a href="#" className={linkClasses}>
+                Дізнатись більше {chevronIcon}
+              </a>
+            </div>
           </div>
-          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
-            <img
-              src="/main/BAS-img2.jpg"
-              alt="BAS Малий бізнес"
-              className={imgClasses}
-            />
-          </motion.div>
-        </motion.div>
+        </div>
 
-        {/* ШАР 3: ЖОВТИЙ ФОН */}
-        <motion.div
-          style={{ clipPath: clip3 }}
-          className={`${layerClasses} bg-[#fde047] z-20`}
-        >
-          <div className={textWrapperClasses}>
-            <h2 className={titleClasses}>BAS Управління торгівлею</h2>
-            <p className={descClasses}>
-              Оптимізація складського обліку, ціноутворення, автоматизація
-              торгових операцій та підключення торгового обладнання.
-            </p>
+        {/* ШАР 3 */}
+        <div className="h-screen w-full bg-[#fde047]">
+          <div className={textLayerClasses}>
+            <div className={textWrapperClasses}>
+              <img
+                src="/main/extention-logo.png"
+                alt="Extensions Logo"
+                className={`h-20 max-[899px]:h-24 lg:h-24 ${baseLogoClasses}`}
+              />
+              <div className={paragraphClasses}>
+                <span className={inlineTitleClasses}>
+                  Індивідуальні допрацювання.{" "}
+                </span>
+                <span className={inlineDescClasses}>
+                  Розробка нестандартних звітів, специфічних обробок, нових
+                  друкованих форм та розширення функціоналу під ваші процеси.
+                </span>
+              </div>
+              <a href="#" className={linkClasses}>
+                Дізнатись більше {chevronIcon}
+              </a>
+            </div>
           </div>
-          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
-            <img
-              src="/main/BAS-img3.jpg"
-              alt="BAS Управління торгівлею"
-              className={imgClasses}
-            />
-          </motion.div>
-        </motion.div>
+        </div>
 
-        {/* ШАР 4: ЧЕРВОНИЙ ФОН */}
-        <motion.div
-          style={{ clipPath: clip4 }}
-          className={`${layerClasses} bg-[#fca5a5] z-30`}
-        >
-          <div className={textWrapperClasses}>
-            <h2 className={titleClasses}>Звіти та друковані форми</h2>
-            <p className={descClasses}>
-              Розробка індивідуальних друкованих форм, специфічних звітів та
-              нестандартних обробок чітко під потреби вашого бізнесу.
-            </p>
+        {/* ШАР 4 */}
+        <div className="h-screen w-full bg-[#fca5a5]">
+          <div className={textLayerClasses}>
+            <div className={textWrapperClasses}>
+              <img
+                src="/main/rdp-logo.png"
+                alt="RDP Cloud Logo"
+                className={`h-16 max-[899px]:h-20 lg:h-20 ${baseLogoClasses}`}
+              />
+              <div className={paragraphClasses}>
+                <span className={inlineTitleClasses}>Надійна хмара. </span>
+                <span className={inlineDescClasses}>
+                  Безпечний віддалений доступ до ваших баз 24/7. Розгортання,
+                  адміністрування та щоденне резервне копіювання на наших
+                  серверах.
+                </span>
+              </div>
+              <a href="#" className={linkClasses}>
+                Дізнатись більше {chevronIcon}
+              </a>
+            </div>
           </div>
-          <motion.div style={{ y: yEnter }} className={wrapperClasses}>
-            <img
-              src="/main/BAS-img4.jpg"
-              alt="Кастомні модулі та друковані форми"
-              className={imgClasses}
-            />
+        </div>
+      </div>
+
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
+        <div className="sticky top-0 h-screen w-full overflow-hidden">
+          <div className={imgLayerClasses}>
+            <motion.div
+              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              className={wrapperClasses}
+            >
+              <img
+                src="/main/BAS-img.jpg"
+                alt="Підтримка BAS"
+                className={imgClasses}
+              />
+            </motion.div>
+          </div>
+
+          <motion.div style={{ clipPath: clip2 }} className={imgLayerClasses}>
+            <motion.div
+              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              className={wrapperClasses}
+            >
+              <img
+                src="/main/BAS-img2.jpg"
+                alt="Системи KBS"
+                className={imgClasses}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
+
+          <motion.div style={{ clipPath: clip3 }} className={imgLayerClasses}>
+            <motion.div
+              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              className={wrapperClasses}
+            >
+              <img
+                src="/main/BAS-img3.jpg"
+                alt="Індивідуальні допрацювання"
+                className={imgClasses}
+              />
+            </motion.div>
+          </motion.div>
+
+          <motion.div style={{ clipPath: clip4 }} className={imgLayerClasses}>
+            <motion.div
+              style={{ y: yEnter, x: xEnter, scale: scaleEnter }}
+              className={wrapperClasses}
+            >
+              <img
+                src="/main/BAS-img4.jpg"
+                alt="Хмара для бухгалтерії"
+                className={imgClasses}
+              />
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

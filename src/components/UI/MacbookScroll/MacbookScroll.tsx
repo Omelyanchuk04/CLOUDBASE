@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+
+import React, { useRef } from "react";
 import {
   MotionValue,
   motion,
@@ -7,7 +8,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { cn } from "../../../lib/utils/utils";
+import { cn } from "../../../lib/utils/utils"; // Переконайся, що шлях правильний для твого проєкту
 
 import {
   IconBrightnessDown,
@@ -24,12 +25,12 @@ import {
   IconVolume,
   IconVolume2,
   IconVolume3,
+  IconSearch,
+  IconWorld,
+  IconCommand,
+  IconCaretLeftFilled,
+  IconCaretDownFilled,
 } from "@tabler/icons-react";
-import { IconSearch } from "@tabler/icons-react";
-import { IconWorld } from "@tabler/icons-react";
-import { IconCommand } from "@tabler/icons-react";
-import { IconCaretLeftFilled } from "@tabler/icons-react";
-import { IconCaretDownFilled } from "@tabler/icons-react";
 
 export const MacbookScroll = ({
   src,
@@ -48,30 +49,15 @@ export const MacbookScroll = ({
     offset: ["start start", "end start"],
   });
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (window && window.innerWidth < 768) {
-      setIsMobile(true);
-    }
-  }, []);
-
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 300,
     damping: 40,
     restDelta: 0.001,
   });
 
-  const scaleX = useTransform(
-    smoothProgress,
-    [0, 0.3],
-    [1.2, isMobile ? 1 : 1.5],
-  );
-  const scaleY = useTransform(
-    smoothProgress,
-    [0, 0.3],
-    [0.6, isMobile ? 1 : 1.5],
-  );
+  // ЗМІНЕНО: Прибрано isMobile. Тепер екран завжди пропорційно збільшується до 1.5 відносно клавіатури, як на десктопі.
+  const scaleX = useTransform(smoothProgress, [0, 0.3], [1.2, 1.5]);
+  const scaleY = useTransform(smoothProgress, [0, 0.3], [0.6, 1.5]);
   const translate = useTransform(smoothProgress, [0, 1], [0, 1500]);
   const rotate = useTransform(smoothProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
   const textTransform = useTransform(smoothProgress, [0, 0.3], [0, 100]);
@@ -80,30 +66,34 @@ export const MacbookScroll = ({
   return (
     <div
       ref={ref}
-      className="flex min-h-[200vh] shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-100 md:py-40"
+      className="flex min-h-[150vh] md:min-h-[200vh] w-full shrink-0 flex-col items-center justify-start pt-32 pb-10 md:py-40 [perspective:800px]"
     >
-      <motion.h2
+      <motion.div
         style={{
           translateY: textTransform,
           opacity: textOpacity,
           translateZ: 0,
           WebkitFontSmoothing: "antialiased",
         }}
-        className="mb-20 text-center text-3xl font-bold text-neutral-800 dark:text-white"
+        className="mt-12 md:mt-0 mb-8 md:mb-20 text-center w-full px-4 md:px-8"
       >
         {title || (
-          <span>
+          <h2 className="text-3xl font-bold text-neutral-800 dark:text-white">
             This Macbook is built with Tailwindcss. <br /> No kidding.
-          </span>
+          </h2>
         )}
-      </motion.h2>
+      </motion.div>
 
-      {/* 
-        ОСЬ ТЕПЕР ТУТ Є ЦЯ ОБГОРТКА ДЛЯ РЕГУЛЮВАННЯ РОЗМІРУ:
-        Змінюй md:scale-[1.8] на 1.6, 1.9, або 2.0 
-        Якщо макбук налізає на низ, збільшуй mb-[20rem] на mb-[30rem]
-      */}
-      <div className="transform origin-top md:scale-[1.25] mt-4 flex flex-col items-center mb-[35rem]">
+      {/* Адаптив всього макбука цілком (екран + клавіатура) */}
+      <div
+        className="transform origin-top mt-4 flex flex-col items-center 
+          scale-[0.55] mb-[-12rem] 
+          sm:scale-[0.7] sm:mb-[-5rem] 
+          md:scale-[0.9] md:mb-[3rem] 
+          lg:scale-[1.1] lg:mb-[10rem] 
+          xl:scale-[1.3] xl:mb-[18rem] 
+          2xl:scale-[1.5] 2xl:mb-[28rem]"
+      >
         {/* Lid */}
         <Lid
           src={src}

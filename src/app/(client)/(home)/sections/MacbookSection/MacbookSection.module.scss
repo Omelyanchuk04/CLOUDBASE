@@ -16,28 +16,21 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
     top: 0;
     left: 0;
     right: 0;
-    height: 300px; /* Збільшив висоту для дуже м'якого бленду */
-    background: linear-gradient(
-      to bottom,
-      #000000 0%,
-      /* Повністю чорний на стику з верхньою секцією */ transparent 100%
-        /* Плавно розчиняється, показуючи наш $color-bg */
-    );
+    height: 300px;
+    background: linear-gradient(to bottom, #000000 0%, transparent 100%);
     z-index: 5;
     pointer-events: none;
   }
 }
 
 /* ==========================================
-   ФІРМОВІ ПЛЯМИ (На темному фоні виглядають як неон)
+   ФІРМОВІ ПЛЯМИ
    ========================================== */
 .blobContainer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-
-  /* Додаємо для контейнера */
   transform: translateZ(0);
   will-change: transform;
 }
@@ -53,8 +46,6 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
   filter: blur(140px);
   opacity: 0.25;
   mix-blend-mode: screen;
-
-  /* Хак для Safari: змушує використовувати GPU */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   perspective: 1000px;
@@ -71,8 +62,6 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
   filter: blur(160px);
   opacity: 0.25;
   mix-blend-mode: screen;
-
-  /* Хак для Safari */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   perspective: 1000px;
@@ -89,118 +78,71 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
   filter: blur(150px);
   opacity: 0.25;
   mix-blend-mode: screen;
-
-  /* Хак для Safari */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   perspective: 1000px;
 }
 
 /* ==========================================
-   ГЕОМЕТРИЧНИЙ ДЕКОР
-   ========================================== */
-// .bgDecorations {
-//   position: absolute;
-//   inset: 0;
-//   pointer-events: none;
-//   z-index: 1;
-// }
-
-// .pillYellow {
-//   position: absolute;
-//   top: 15%;
-//   left: 10%;
-//   width: 60px;
-//   height: 20px;
-//   background-color: #ffe6a0;
-//   border-radius: 20px;
-//   transform: rotate(-15deg);
-//   opacity: 0.8;
-// }
-
-// .dotRed {
-//   position: absolute;
-//   top: 25%;
-//   right: 15%;
-//   width: 25px;
-//   height: 25px;
-//   background-color: #ffb3b3;
-//   border-radius: 50%;
-//   opacity: 0.8;
-// }
-
-// .dotGreen {
-//   position: absolute;
-//   bottom: 40%;
-//   right: 10%;
-//   width: 30px;
-//   height: 30px;
-//   background-color: #bdf0d9;
-//   border-radius: 50%;
-//   opacity: 0.8;
-// }
-
-// .dotBlue {
-//   position: absolute;
-//   bottom: 20%;
-//   left: 8%;
-//   width: 40px;
-//   height: 40px;
-//   background-color: #d1d8ff;
-//   border-radius: 50%;
-//   opacity: 0.8;
-// }
-
-// .ringPurple {
-//   position: absolute;
-//   top: 45%;
-//   left: 18%;
-//   width: 40px;
-//   height: 40px;
-//   border: 6px solid #e1c4ff;
-//   border-radius: 50%;
-//   opacity: 0.6;
-// }
-
-// .triangleOrange {
-//   position: absolute;
-//   bottom: 15%;
-//   right: 25%;
-//   width: 0;
-//   height: 0;
-//   border-left: 15px solid transparent;
-//   border-right: 15px solid transparent;
-//   border-bottom: 25px solid #ffd4a3;
-//   transform: rotate(25deg);
-//   opacity: 0.8;
-// }
-
-/* ==========================================
-   СТИЛІ ТЕКСТУ
+   СТИЛІ ТЕКСТУ ТА АДАПТИВ (Desktop-First)
    ========================================== */
 .titleWrapper {
   text-align: center;
   position: relative;
   z-index: 10;
+  padding: 0 20px; /* Додано страхувальний відступ для мобільних */
 }
 
 .title {
   color: #ffffff;
+  /* Базовий розмір (для > 1300px) */
   font-size: clamp(32px, 4vw, 40px);
   line-height: 1.2;
   font-weight: 700;
   display: inline-block;
   margin-bottom: 0.75rem;
   letter-spacing: -0.02em;
+
+  /* Плавне зменшення для екранів < 1300px */
+  @media (max-width: 1299px) {
+    font-size: 36px;
+  }
+  @media (max-width: 1024px) {
+    font-size: 32px;
+  }
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
 }
 
 .subtitle {
   color: rgba(255, 255, 255, 0.7);
+  /* Базовий розмір (для > 1300px) */
   font-size: 16px;
   line-height: 1.6;
   font-weight: 500;
   display: inline-block;
   max-width: 800px;
+
+  /* Адаптив для < 1300px */
+  @media (max-width: 1299px) {
+    max-width: 700px;
+    font-size: 15px;
+  }
+  @media (max-width: 1024px) {
+    max-width: 600px;
+  }
+  @media (max-width: 768px) {
+    max-width: 100%;
+    font-size: 14px;
+  }
+  @media (max-width: 480px) {
+    font-size: 13px;
+    line-height: 1.5;
+  }
 }
 
 /* ==========================================
@@ -215,11 +157,9 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
   font-size: 14px;
   font-weight: 600;
   color: #ffffff;
-
-  /* Ефект напівпрозорого скла */
   background: rgb(255, 96, 96);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px; /* Круглі краї */
+  border-radius: 4px;
   text-decoration: none;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -233,46 +173,63 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.3);
 
-    /* Стрілочка від'їжджає вправо при наведенні */
     .arrow {
       transform: translateX(4px);
     }
   }
-}
 
-@media (max-width: 768px) {
-  .title {
-    font-size: 1.875rem;
-  }
-  .subtitle {
-    font-size: 1rem;
-  }
-  .learnMoreBtn {
+  @media (max-width: 768px) {
     margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 13px;
   }
 }
 
 /* ==========================================
-   МАСШТАБУВАННЯ МАКБУКА
+   МАСШТАБУВАННЯ МАКБУКА (Desktop-First)
    ========================================== */
 .macbookWrapper {
   position: relative;
   width: 100%;
   z-index: 10;
-
-  /* На мобільних залишаємо оригінальний розмір */
-  transform: scale(1);
   transform-origin: top center;
 
-  /* На планшетах трохи збільшуємо */
-  @media (min-width: 768px) {
-    transform: scale(1.3);
-    margin-bottom: 10vh; /* Компенсуємо візуальне збільшення висоти */
+  /* 1. БАЗА (Екрани > 1100px): Внутрішній масштаб макбука = 1.0 */
+  transform: scale(1.7);
+  margin-bottom: 25vh;
+
+  /* Починаємо плавно зменшувати саме з 1100px */
+  @media (max-width: 1100px) {
+    transform: scale(1.5);
+    margin-bottom: 18vh;
   }
 
-  /* На десктопах збільшуємо суттєво, щоб зрівняти з 5xl (1024px) */
-  @media (min-width: 1024px) {
-    transform: scale(1.7);
-    margin-bottom: 25vh; /* Даємо додатковий простір знизу, щоб макбук не налізав на білу секцію */
+  @media (max-width: 991px) {
+    transform: scale(1.35);
+    margin-bottom: 12vh;
+  }
+
+  /* 2. ПЛАНШЕТИ (< 768px): Внутрішній компонент різко стає scale(0.5).
+     Тому ми компенсуємо це, збільшуючи масштаб нашої обгортки (2.4 * 0.5 = 1.2 візуально) */
+  @media (max-width: 767px) {
+    transform: scale(2.4);
+    margin-bottom: 8vh;
+  }
+
+  /* 3. МОБІЛЬНІ (< 640px): Внутрішній компонент різко стає scale(0.35).
+     Компенсуємо ще сильніше (2.8 * 0.35 = ~0.98 візуально) */
+  @media (max-width: 639px) {
+    transform: scale(2.8);
+    margin-bottom: 2vh;
+  }
+
+  @media (max-width: 480px) {
+    transform: scale(2.4); /* 2.4 * 0.35 = 0.84 візуально */
+    margin-bottom: -5vh;
+  }
+
+  @media (max-width: 380px) {
+    transform: scale(2); /* 2.0 * 0.35 = 0.7 візуально */
+    margin-bottom: -12vh;
   }
 }
