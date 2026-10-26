@@ -26,7 +26,7 @@
   --btn-active-page-border: #ffffff;
   --btn-active-page-text: #000000;
 
-  /* НОВЕ: Акцентна CTA кнопка "Заявка" (Темна тема -> Біла кнопка) */
+  /* Акцентна CTA кнопка "Заявка" (темна тема -> біла кнопка) */
   --cta-bg: #ffffff;
   --cta-text: #000000;
   --cta-border: #ffffff;
@@ -56,7 +56,7 @@
     --btn-active-page-border: #000000;
     --btn-active-page-text: #ffffff;
 
-    /* НОВЕ: Акцентна CTA кнопка "Заявка" (Світла тема -> Чорна кнопка) */
+    /* Акцентна CTA кнопка "Заявка" (світла тема -> чорна кнопка) */
     --cta-bg: #000000;
     --cta-text: #ffffff;
     --cta-border: #000000;
@@ -72,6 +72,8 @@
     sans-serif;
   transition: color 0.4s ease;
 
+  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (десктоп) ---
+     На телефонах фон перевизначено нижче в медіазапиті */
   &::before {
     content: "";
     position: absolute;
@@ -131,7 +133,7 @@
   }
 
   /* =======================================================
-     ОНОВЛЕНА CTA КНОПКА "ЗАЯВКА"
+     CTA КНОПКА "ЗАЯВКА"
      ======================================================= */
   &__contact-button {
     display: flex;
@@ -142,9 +144,9 @@
     border: 1px solid var(--cta-border);
     box-sizing: border-box;
     border-radius: 30px;
-    padding: 7px 18px; /* Трохи більші відступи для солідності */
+    padding: 7px 18px;
     font-size: 14px;
-    font-weight: 600; /* Жирніший шрифт, щоб текст виділявся */
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     will-change: transform, background-color, border-color, box-shadow;
@@ -153,14 +155,14 @@
       &:hover {
         background-color: var(--cta-hover-bg);
         border-color: var(--cta-hover-bg);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* М'яка тінь */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
     }
 
     &:active {
       background-color: var(--cta-pressed-bg);
       border-color: var(--cta-pressed-bg);
-      transform: scale(0.96); /* Вдавлювання при кліку */
+      transform: scale(0.96);
       box-shadow: none;
       transition: none;
     }
@@ -256,17 +258,55 @@
 /* --- АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ТА ПЛАНШЕТІВ --- */
 @media (max-width: 1024px) {
   .hero-header {
+    /* ПЛАВНА ЗМІНА КОЛЬОРУ БЕЗ НЕЧИТАБЕЛЬНИХ МОМЕНТІВ
+       Фон переходить лінійно за 0.4s. Текст, логотип і кнопки
+       перемикаються рівно посередині, через затримку 0.2s при тривалості 0.
+       У цей момент фон сірий, і контраст для білого та чорного тексту
+       однаковий. Затримка має бути вдвічі меншою за тривалість фону */
+    transition: color 0s linear 0.2s;
+
+    /* Суцільний фон без blur. Колір береться з --header-solid,
+       який header.tsx записує з секції під шапкою. Світла тема трохи
+       темніша за секцію, темна трохи світліша, щоб була видна межа.
+       color-mix працює з iOS 16.2+, перший рядок є запасним варіантом */
     &::before {
       background-color: var(--header-solid);
       background-color: color-mix(in srgb, var(--header-solid), #fff 8%);
       will-change: auto;
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
+      transition: background-color 0.4s linear;
     }
 
     &--light::before {
       background-color: var(--header-solid);
       background-color: color-mix(in srgb, var(--header-solid), #000 8%);
+    }
+
+    /* Логотип і текст перемикаються разом із фоном, без проміжних станів */
+    &__logo {
+      transition: filter 0s linear 0.2s;
+    }
+
+    &__logo-text {
+      transition: color 0s linear 0.2s;
+    }
+
+    &__contact-button {
+      transition:
+        color 0s linear 0.2s,
+        background-color 0s linear 0.2s,
+        border-color 0s linear 0.2s,
+        transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+        box-shadow 0.2s ease;
+    }
+
+    &__nav-button {
+      transition:
+        color 0s linear 0.2s,
+        background-color 0s linear 0.2s,
+        border-color 0s linear 0.2s,
+        transform 0.2s ease;
     }
 
     &__local {
@@ -275,6 +315,7 @@
       display: flex;
       width: 100%;
 
+      /* Маска по краях меню: кнопки плавно зникають до стрілок */
       &:has(.hero-header__scroll-indicator--left):has(
           .hero-header__scroll-indicator--right
         ) {
@@ -364,7 +405,9 @@
       cursor: pointer;
       pointer-events: auto;
       z-index: 10;
-      transition: opacity 0.2s ease;
+      transition:
+        opacity 0.2s ease,
+        color 0s linear 0.2s;
       background: transparent;
 
       svg {

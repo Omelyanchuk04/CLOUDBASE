@@ -18,26 +18,36 @@ const navItems: NavItem[] = [
   { id: "contacts", label: "Контакти" },
 ];
 
-// Колір суцільного фону під шапкою на рівні верхнього краю екрана.
-const getUnderColor = (): string => {
+// Суцільний фон елемента під шапкою на рівні верхнього краю екрана.
+// Повертає колір і те, світлий він чи темний. Якщо колір визначити не можна
+// (градієнт, картинка, напівпрозорий фон або лише body), повертає null
+const getUnderBackground = (): { color: string; isLight: boolean } | null => {
   const x = document.documentElement.clientWidth / 2;
   const elements = document.elementsFromPoint(x, 2);
 
   for (const el of elements) {
+    // Саму шапку пропускаємо, вона лежить зверху
     if (el.closest("header")) continue;
+    // Дійшли до кореня сторінки: суцільного фону під шапкою немає
     if (el === document.documentElement || el === document.body) break;
 
     const style = getComputedStyle(el);
-    if (style.backgroundImage !== "none") return "";
+    if (style.backgroundImage !== "none") return null;
 
     const bg = style.backgroundColor;
     if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") continue;
-    if (/,\s*0?\.\d+\)$/.test(bg)) return "";
+    // Напівпрозорий фон дає змішаний колір, його не беремо
+    if (/,\s*0?\.\d+\)$/.test(bg)) return null;
 
-    return bg;
+    const parts: string[] = bg.match(/\d+(?:\.\d+)?/g) ?? [];
+    const [r, g, b] = parts.map(Number);
+    // Відносна яскравість: 0 — чорний, 1 — білий
+    const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    return { color: bg, isLight: brightness > 0.5 };
   }
 
-  return "";
+  return null;
 };
 
 const Header: React.FC = () => {
@@ -69,7 +79,7 @@ const Header: React.FC = () => {
           }
           lastScrollY = currentScrollY;
 
-          // 2. Зміна теми шапки
+          // 2. Тема за секцією під лінією 65px (для десктопа і як запасний варіант)
           const sections = document.querySelectorAll("[data-theme]");
           let foundLight = false;
 
@@ -82,17 +92,24 @@ const Header: React.FC = () => {
             }
           });
 
-          setIsLightTheme((prev) => (prev !== foundLight ? foundLight : prev));
+          // 3. На телефонах колір і тема беруться з однієї точки під шапкою,
+          // тож фон і текст завжди узгоджені між собою
+          const isMobile = window.matchMedia("(max-width: 1024px)").matches;
+          const under = isMobile ? getUnderBackground() : null;
 
-          // 3. Динамічний колір для мобільних
-          const underColor = getUnderColor();
           if (headerRef.current) {
-            if (underColor) {
-              headerRef.current.style.setProperty("--header-solid", underColor);
+            if (under) {
+              headerRef.current.style.setProperty(
+                "--header-solid",
+                under.color,
+              );
             } else {
               headerRef.current.style.removeProperty("--header-solid");
             }
           }
+
+          const light = under ? under.isLight : foundLight;
+          setIsLightTheme((prev) => (prev !== light ? light : prev));
 
           ticking = false;
         });
@@ -101,9 +118,13 @@ const Header: React.FC = () => {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
     handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   // ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
