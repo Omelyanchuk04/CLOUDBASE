@@ -1,6 +1,6 @@
 .hero-header {
   position: fixed;
-  top: 0;
+  top: env(safe-area-inset-top, 0px); /* було: top: 0; */
   left: 0;
   right: 0;
   z-index: 100;
@@ -124,7 +124,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-top: max(12px, env(safe-area-inset-top));
+    padding-top: 12px; /* було: max(12px, env(safe-area-inset-top)) */
     padding-bottom: 15px;
   }
 
@@ -274,7 +274,7 @@
     &__scroll-indicator {
       display: flex;
       position: absolute;
-      top: max(12px, env(safe-area-inset-top));
+      top: 12px; /* було: max(12px, env(safe-area-inset-top)) */
       bottom: 15px;
       width: 40px;
       padding: 0;
