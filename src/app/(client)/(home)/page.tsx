@@ -6,7 +6,7 @@ import White from "./sections/white";
 export default function Home() {
   return (
     <>
-      {/* <MacbookSection /> */}
+      <MacbookSection />
       <White />
     </>
   );

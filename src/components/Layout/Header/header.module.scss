@@ -1,6 +1,6 @@
 .hero-header {
   position: fixed;
-  top: env(safe-area-inset-top, 0px); /* було: top: 0; */
+  top: 0;
   left: 0;
   right: 0;
   z-index: 100;
@@ -8,7 +8,7 @@
   /* =======================================================
      ТЕМНА ТЕМА
      ======================================================= */
-  --header-bg: rgba(0, 0, 0, 0.45);
+  --header-bg: #000000;
   --text-color: #ffffff;
   --btn-bg: transparent;
   --btn-border: rgba(255, 255, 255, 0.25);
@@ -23,7 +23,7 @@
      СВІТЛА ТЕМА
      ======================================================= */
   &--light {
-    --header-bg: rgba(255, 255, 255, 0.65);
+    --header-bg: #ffffff;
     --text-color: #1d1d1f;
     --btn-border: rgba(0, 0, 0, 0.15);
     --btn-bg-hover: rgba(0, 0, 0, 0.05);
@@ -40,20 +40,16 @@
     sans-serif;
   transition: color 0.4s ease;
 
-  /* --- КРОСПЛАТФОРМЕННИЙ GLASSMORPHISM --- */
+  /* --- СУЦІЛЬНИЙ ФОН ---
+     Без прозорості та backdrop-filter. Інакше Safari змішує
+     колір шапки з контентом під нею, і верхня смуга стає сірою */
   &::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
     background-color: var(--header-bg);
-    transform: translateZ(0);
-    will-change: backdrop-filter, background-color;
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    backdrop-filter: saturate(180%) blur(20px);
-    transition:
-      background-color 0.4s ease,
-      border-color 0.4s ease;
+    transition: background-color 0.4s ease;
   }
 
   &__top {
@@ -124,7 +120,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-top: 12px; /* було: max(12px, env(safe-area-inset-top)) */
+    padding-top: max(12px, env(safe-area-inset-top));
     padding-bottom: 15px;
   }
 
@@ -192,7 +188,7 @@
       display: flex;
       width: 100%;
 
-      /* НОВА МАГІЯ: Використовуємо CSS маску. Самі кнопки плавно стають прозорими по краях */
+      /* Маска по краях меню: кнопки плавно зникають до стрілок */
       &:has(.hero-header__scroll-indicator--left):has(
           .hero-header__scroll-indicator--right
         ) {
@@ -274,7 +270,7 @@
     &__scroll-indicator {
       display: flex;
       position: absolute;
-      top: 12px; /* було: max(12px, env(safe-area-inset-top)) */
+      top: max(12px, env(safe-area-inset-top));
       bottom: 15px;
       width: 40px;
       padding: 0;
@@ -285,7 +281,7 @@
       z-index: 10;
       transition: opacity 0.2s ease;
 
-      /* ПОВНІСТЮ ПРИБРАНО ТІНЬ-ГРАДІЄНТ! Стрілочка просто висить у повітрі */
+      /* Стрілочка без фону, просто висить над меню */
       background: transparent;
 
       svg {
