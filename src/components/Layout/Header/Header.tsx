@@ -19,30 +19,19 @@ const navItems: NavItem[] = [
 ];
 
 // Колір суцільного фону під шапкою на рівні верхнього краю екрана.
-// Якщо колір визначити не можна (градієнт, картинка, напівпрозорий фон,
-// або під шапкою лише body), повертаємо "", і шапка бере колір своєї теми
 const getUnderColor = (): string => {
   const x = document.documentElement.clientWidth / 2;
   const elements = document.elementsFromPoint(x, 2);
 
   for (const el of elements) {
-    // Саму шапку пропускаємо, вона лежить зверху
     if (el.closest("header")) continue;
-
-    // Дійшли до кореня сторінки: суцільного фону під шапкою немає
     if (el === document.documentElement || el === document.body) break;
 
     const style = getComputedStyle(el);
-
-    // Градієнт або картинка на фоні: колір не визначити
     if (style.backgroundImage !== "none") return "";
 
     const bg = style.backgroundColor;
-
-    // Прозорий елемент: шукаємо далі
     if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") continue;
-
-    // Напівпрозорий фон дає змішаний колір, його не беремо
     if (/,\s*0?\.\d+\)$/.test(bg)) return "";
 
     return bg;
@@ -62,7 +51,7 @@ const Header: React.FC = () => {
   const headerRef = useRef<HTMLElement>(null);
   const navListRef = useRef<HTMLUListElement>(null);
 
-  // ЄДИНА, НАДІЙНА І ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ (Ховання лого + зміна теми)
+  // ЄДИНА, НАДІЙНА І ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ticking = false;
@@ -80,13 +69,12 @@ const Header: React.FC = () => {
           }
           lastScrollY = currentScrollY;
 
-          // 2. Зміна теми шапки (світла або темна) за секцією під нею
+          // 2. Зміна теми шапки
           const sections = document.querySelectorAll("[data-theme]");
           let foundLight = false;
 
           sections.forEach((sec) => {
             const rect = sec.getBoundingClientRect();
-            // Перевіряємо, чи лінія під шапкою (65px від верху) перетинає секцію
             if (rect.top <= 65 && rect.bottom >= 65) {
               if (sec.getAttribute("data-theme") === "light") {
                 foundLight = true;
@@ -94,11 +82,9 @@ const Header: React.FC = () => {
             }
           });
 
-          // Оновлюємо стан тільки якщо колір реально змінився
           setIsLightTheme((prev) => (prev !== foundLight ? foundLight : prev));
 
-          // 3. На телефонах шапка суцільна і бере колір секції під собою.
-          // Якщо колір не визначено, прибираємо змінну, і лишається колір теми
+          // 3. Динамічний колір для мобільних
           const underColor = getUnderColor();
           if (headerRef.current) {
             if (underColor) {
@@ -115,8 +101,6 @@ const Header: React.FC = () => {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Викликаємо один раз при монтуванні, щоб шапка одразу зрозуміла, де вона знаходиться
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -177,7 +161,22 @@ const Header: React.FC = () => {
 
           <div className={styles["hero-header__actions-wrapper"]}>
             <button className={styles["hero-header__contact-button"]}>
-              Зв'язатися
+              {/* Іконка гарнітури */}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" />
+                <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
+              </svg>
+              Заявка
+              {/* Стрілочка вниз */}
               <svg
                 width="16"
                 height="16"
@@ -188,8 +187,7 @@ const Header: React.FC = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
+                <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
           </div>

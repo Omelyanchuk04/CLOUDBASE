@@ -11,13 +11,28 @@
   --header-bg: rgba(0, 0, 0, 0.45);
   --header-solid: #000000;
   --text-color: #ffffff;
+
+  /* Звичайні кнопки */
   --btn-bg: transparent;
   --btn-border: rgba(255, 255, 255, 0.25);
   --btn-bg-hover: rgba(255, 255, 255, 0.08);
   --btn-border-hover: rgba(255, 255, 255, 0.4);
-  --btn-active-bg: #ffffff;
-  --btn-active-border: #ffffff;
-  --btn-active-text: #000000;
+  --btn-bg-pressed: rgba(255, 255, 255, 0.15);
+  --btn-border-pressed: rgba(255, 255, 255, 0.5);
+  --btn-text-pressed: #ffffff;
+
+  /* Активна сторінка */
+  --btn-active-page-bg: #ffffff;
+  --btn-active-page-border: #ffffff;
+  --btn-active-page-text: #000000;
+
+  /* НОВЕ: Акцентна CTA кнопка "Заявка" (Темна тема -> Біла кнопка) */
+  --cta-bg: #ffffff;
+  --cta-text: #000000;
+  --cta-border: #ffffff;
+  --cta-hover-bg: #f0f0f0;
+  --cta-pressed-bg: #e0e0e0;
+
   --logo-filter: invert(0) brightness(1);
 
   /* =======================================================
@@ -27,12 +42,27 @@
     --header-bg: rgba(255, 255, 255, 0.65);
     --header-solid: #ffffff;
     --text-color: #1d1d1f;
+
+    /* Звичайні кнопки */
     --btn-border: rgba(0, 0, 0, 0.15);
     --btn-bg-hover: rgba(0, 0, 0, 0.05);
     --btn-border-hover: rgba(0, 0, 0, 0.3);
-    --btn-active-bg: #000000;
-    --btn-active-border: #000000;
-    --btn-active-text: #ffffff;
+    --btn-bg-pressed: rgba(0, 0, 0, 0.1);
+    --btn-border-pressed: rgba(0, 0, 0, 0.4);
+    --btn-text-pressed: #1d1d1f;
+
+    /* Активна сторінка */
+    --btn-active-page-bg: #000000;
+    --btn-active-page-border: #000000;
+    --btn-active-page-text: #ffffff;
+
+    /* НОВЕ: Акцентна CTA кнопка "Заявка" (Світла тема -> Чорна кнопка) */
+    --cta-bg: #000000;
+    --cta-text: #ffffff;
+    --cta-border: #000000;
+    --cta-hover-bg: #222222;
+    --cta-pressed-bg: #333333;
+
     --logo-filter: invert(1) brightness(0);
   }
 
@@ -42,8 +72,6 @@
     sans-serif;
   transition: color 0.4s ease;
 
-  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (десктоп) ---
-     На телефонах фон перевизначено нижче в медіазапиті */
   &::before {
     content: "";
     position: absolute;
@@ -102,26 +130,45 @@
     justify-content: flex-end;
   }
 
+  /* =======================================================
+     ОНОВЛЕНА CTA КНОПКА "ЗАЯВКА"
+     ======================================================= */
   &__contact-button {
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: transparent;
-    color: var(--text-color);
-    border: 1px solid var(--btn-border);
+    background-color: var(--cta-bg);
+    color: var(--cta-text);
+    border: 1px solid var(--cta-border);
+    box-sizing: border-box;
     border-radius: 30px;
-    padding: 6px 16px;
+    padding: 7px 18px; /* Трохи більші відступи для солідності */
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600; /* Жирніший шрифт, щоб текст виділявся */
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform, background-color, border-color, box-shadow;
 
-    &:hover {
-      border-color: var(--btn-border-hover);
-      background-color: var(--btn-bg-hover);
+    @media (hover: hover) {
+      &:hover {
+        background-color: var(--cta-hover-bg);
+        border-color: var(--cta-hover-bg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* М'яка тінь */
+      }
+    }
+
+    &:active {
+      background-color: var(--cta-pressed-bg);
+      border-color: var(--cta-pressed-bg);
+      transform: scale(0.96); /* Вдавлювання при кліку */
+      box-shadow: none;
+      transition: none;
     }
   }
 
+  /* =======================================================
+     МЕНЮ НАВІГАЦІЇ
+     ======================================================= */
   &__local {
     position: relative;
     width: 100%;
@@ -149,27 +196,47 @@
     background-color: var(--btn-bg);
     color: var(--text-color);
     border: 1px solid var(--btn-border);
+    box-sizing: border-box;
     border-radius: 30px;
     padding: 6px 16px;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     white-space: nowrap;
-
-    &:hover {
-      background-color: var(--btn-bg-hover);
-      border-color: var(--btn-border-hover);
-    }
+    will-change: transform, background-color, border-color, opacity;
 
     &--active {
-      background-color: var(--btn-active-bg);
-      color: var(--btn-active-text);
-      border-color: var(--btn-active-border);
-      font-weight: 500;
+      background-color: var(--btn-active-page-bg);
+      color: var(--btn-active-page-text);
+      border-color: var(--btn-active-page-border);
 
-      &:hover {
-        opacity: 0.85;
+      @media (hover: hover) {
+        &:hover {
+          opacity: 0.85;
+        }
+      }
+
+      &:active {
+        transform: scale(0.96);
+        transition: none;
+      }
+    }
+
+    &:not(&--active) {
+      @media (hover: hover) {
+        &:hover {
+          background-color: var(--btn-bg-hover);
+          border-color: var(--btn-border-hover);
+        }
+      }
+
+      &:active {
+        background-color: var(--btn-bg-pressed);
+        color: var(--btn-text-pressed);
+        border-color: var(--btn-border-pressed);
+        transform: scale(0.96);
+        transition: none;
       }
     }
   }
@@ -189,10 +256,6 @@
 /* --- АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ТА ПЛАНШЕТІВ --- */
 @media (max-width: 1024px) {
   .hero-header {
-    /* Суцільний фон без blur. Колір береться з --header-solid, який
-       header.tsx записує з секції під шапкою. Темна тема трохи світліша
-       за секцію, щоб була видна межа. color-mix працює з iOS 16.2+,
-       перший рядок є запасним варіантом для старіших браузерів */
     &::before {
       background-color: var(--header-solid);
       background-color: color-mix(in srgb, var(--header-solid), #fff 8%);
@@ -201,7 +264,6 @@
       backdrop-filter: none;
     }
 
-    /* Світла тема трохи темніша за секцію */
     &--light::before {
       background-color: var(--header-solid);
       background-color: color-mix(in srgb, var(--header-solid), #000 8%);
@@ -213,7 +275,6 @@
       display: flex;
       width: 100%;
 
-      /* Маска по краях меню: кнопки плавно зникають до стрілок */
       &:has(.hero-header__scroll-indicator--left):has(
           .hero-header__scroll-indicator--right
         ) {
@@ -278,7 +339,6 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-
       width: 100%;
       padding: 0 20px;
       justify-content: safe center;
@@ -305,8 +365,6 @@
       pointer-events: auto;
       z-index: 10;
       transition: opacity 0.2s ease;
-
-      /* Стрілочка без фону, просто висить над меню */
       background: transparent;
 
       svg {
