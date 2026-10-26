@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.scss";
 
@@ -11,6 +11,11 @@ const inter = Inter({
   variable: "--font-inter", // CSS-змінна для прокидання в SCSS
   display: "swap",
 });
+
+// === ОСЬ ЦЕЙ БЛОК РОБИТЬ ВЕРХНЮ ЗОНУ НА МОБАЙЛІ БІЛОЮ ===
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
   // Заміни на реальний домен після деплою. Це обов'язково для коректної роботи OpenGraph
