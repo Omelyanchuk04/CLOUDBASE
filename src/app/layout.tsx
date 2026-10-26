@@ -80,7 +80,7 @@ export default function RootLayout({
     <html lang="uk" className={inter.variable}>
       <body>
         {/* Додаємо компонент шапки перед основним контентом */}
-        <Header />
+        {/* <Header /> */}
 
         <main className="app-wrapper">{children}</main>
       </body>
