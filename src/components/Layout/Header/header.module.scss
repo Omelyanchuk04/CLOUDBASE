@@ -42,7 +42,8 @@
     sans-serif;
   transition: color 0.4s ease;
 
-  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (десктоп і мобайл) --- */
+  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (десктоп) ---
+     На телефонах фон перевизначено нижче в медіазапиті */
   &::before {
     content: "";
     position: absolute;
@@ -188,27 +189,14 @@
 /* --- АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ТА ПЛАНШЕТІВ --- */
 @media (max-width: 1024px) {
   .hero-header {
-    /* Непрозора смуга над шапкою. Її колір = фон шапки, накладений
-       на колір секції під нею (його записує header.tsx у --header-under).
-       Safari бере колір статус-бару з цих пікселів, тож blur тут не потрібен */
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 62px;
-      z-index: -1;
-      background:
-        linear-gradient(var(--header-bg), var(--header-bg)),
-        var(--header-under, var(--header-solid));
-    }
-
-    /* Коли верхній рядок сховано, смуга покриває лише статус-бар,
-       а рядок меню лишається прозорим */
-    &--hidden-top::after {
-      height: 54px;
-      transition: height 0.3s ease;
+    /* Суцільний фон без blur. Safari фарбує зону статус-бару кольором
+       контенту під шапкою, тому прозорість дає сіру смугу. Колір бере
+       з --header-solid, який міняється разом з темою */
+    &::before {
+      background-color: var(--header-solid);
+      will-change: auto;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
     }
 
     &__local {

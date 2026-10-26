@@ -46,7 +46,7 @@ const Header: React.FC = () => {
           }
           lastScrollY = currentScrollY;
 
-          // 2. Залізобетонна логіка зміни кольору шапки
+          // 2. Зміна кольору шапки за секцією під нею (світла або темна тема)
           const sections = document.querySelectorAll("[data-theme]");
           let foundLight = false;
 
