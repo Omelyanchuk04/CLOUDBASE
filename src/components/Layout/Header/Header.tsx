@@ -79,7 +79,7 @@ const Header: React.FC = () => {
           }
           lastScrollY = currentScrollY;
 
-          // 2. Тема за секцією під лінією 65px (для десктопа і як запасний варіант)
+          // 2. Тема за секцією під лінією 65px (для ПК і як запасний варіант)
           const sections = document.querySelectorAll("[data-theme]");
           let foundLight = false;
 
@@ -92,10 +92,12 @@ const Header: React.FC = () => {
             }
           });
 
-          // 3. На телефонах колір і тема беруться з однієї точки під шапкою,
-          // тож фон і текст завжди узгоджені між собою
-          const isMobile = window.matchMedia("(max-width: 1024px)").matches;
-          const under = isMobile ? getUnderBackground() : null;
+          // 3. На смартфонах колір і тема беруться з однієї точки під шапкою.
+          // На ПК цей блок не працює, тема береться з секцій (пункт 2)
+          const isTouch = window.matchMedia(
+            "(hover: none) and (pointer: coarse)",
+          ).matches;
+          const under = isTouch ? getUnderBackground() : null;
 
           if (headerRef.current) {
             if (under) {
