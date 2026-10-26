@@ -10,13 +10,17 @@
   --primary-color: #2563eb;
 }
 
+/* Темна тема (опціонально) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: #ffffff;
+    --background-color: #ffffff; /* Жорстко ставимо білий для фону */
     --text-color: #0f172a;
   }
 }
 
+/* =========================================
+   Сучасний CSS Reset
+   ========================================= */
 *,
 *::before,
 *::after {
@@ -26,8 +30,7 @@
 }
 
 /* 1. ОЧИЩЕНІ HTML ТА BODY */
-/* Ми ПРИБРАЛИ звідси overflow-x: clip та max-width. 
-   Саме через них Safari ламав колір верхньої зони. */
+/* Прибрали overflow-x, щоб Safari міг нормально рендерити білий overscroll */
 html,
 body {
   scroll-behavior: smooth;
@@ -51,9 +54,24 @@ body {
   line-height: 1.5;
 }
 
-/* 2. НОВИЙ КЛАС ДЛЯ ОБГОРТКИ */
-/* Переносимо захист від горизонтального скролу сюди. 
-   Він вже є у твоєму layout.tsx (<main className="app-wrapper">) */
+/* ==========================================
+   ФІКС ДЛЯ SAFARI: БІЛИЙ OVERSCROLL
+   ========================================== */
+/* Створюємо невидиму білу лінію на самому верху екрана. 
+   Safari побачить її першою і пофарбує зону відтягування у білий колір */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #ffffff;
+  z-index: -1;
+}
+
+/* 2. КЛАС ДЛЯ ОБГОРТКИ (ЗАХИСТ ВІД ГОРИЗОНТАЛЬНОГО СКРОЛУ) */
+/* Цей клас вже є у твоєму layout.tsx (<main className="app-wrapper">) */
 .app-wrapper {
   position: relative;
   width: 100%;
@@ -61,6 +79,9 @@ body {
   overflow-x: clip;
 }
 
+/* =========================================
+   Базові стилі типових елементів
+   ========================================= */
 a {
   color: inherit;
   text-decoration: none;
