@@ -18,16 +18,36 @@ const navItems: NavItem[] = [
   { id: "contacts", label: "Контакти" },
 ];
 
-// Колір елемента під шапкою на рівні верхнього краю екрана.
-// Саму шапку пропускаємо, бо вона лежить зверху
+// Колір суцільного фону під шапкою на рівні верхнього краю екрана.
+// Якщо колір визначити не можна (градієнт, картинка, напівпрозорий фон,
+// або під шапкою лише body), повертаємо "", і шапка бере колір своєї теми
 const getUnderColor = (): string => {
   const x = document.documentElement.clientWidth / 2;
   const elements = document.elementsFromPoint(x, 2);
+
   for (const el of elements) {
+    // Саму шапку пропускаємо, вона лежить зверху
     if (el.closest("header")) continue;
-    const bg = getComputedStyle(el).backgroundColor;
-    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+
+    // Дійшли до кореня сторінки: суцільного фону під шапкою немає
+    if (el === document.documentElement || el === document.body) break;
+
+    const style = getComputedStyle(el);
+
+    // Градієнт або картинка на фоні: колір не визначити
+    if (style.backgroundImage !== "none") return "";
+
+    const bg = style.backgroundColor;
+
+    // Прозорий елемент: шукаємо далі
+    if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") continue;
+
+    // Напівпрозорий фон дає змішаний колір, його не беремо
+    if (/,\s*0?\.\d+\)$/.test(bg)) return "";
+
+    return bg;
   }
+
   return "";
 };
 
@@ -78,7 +98,7 @@ const Header: React.FC = () => {
           setIsLightTheme((prev) => (prev !== foundLight ? foundLight : prev));
 
           // 3. На телефонах шапка суцільна і бере колір секції під собою.
-          // Якщо колір не визначено, прибираємо змінну і лишається колір теми
+          // Якщо колір не визначено, прибираємо змінну, і лишається колір теми
           const underColor = getUnderColor();
           if (headerRef.current) {
             if (underColor) {
