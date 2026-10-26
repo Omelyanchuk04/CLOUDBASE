@@ -4,7 +4,11 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const White = () => {
-  const ref = useRef<HTMLElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+
+  const layer2Ref = useRef<HTMLDivElement>(null);
+  const layer3Ref = useRef<HTMLDivElement>(null);
+  const layer4Ref = useRef<HTMLDivElement>(null);
 
   const [isMobile, setIsMobile] = useState(false);
   const [windowWidth, setWindowWidth] = useState(1200);
@@ -21,70 +25,73 @@ const White = () => {
   }, []);
 
   const { scrollYProgress: enterProgress } = useScroll({
-    target: ref,
+    target: mainRef,
     offset: ["start 170%", "start start"],
   });
 
-  // ОПТИМІЗАЦІЯ 2: Використовуємо звичайний vh замість svh, щоб уникнути лагів при скролі на iOS
-  const yEnter = useTransform(enterProgress, [0, 1], ["-100vh", "0vh"]);
+  const yEnter = useTransform(
+    enterProgress,
+    [0, 1],
+    isMobile ? ["0vh", "0vh"] : ["-100vh", "0vh"],
+  );
 
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: mainRef,
     offset: ["start start", "end end"],
   });
 
-  const xProgress = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
-  const xEnter = useTransform(xProgress, (v) => {
-    if (isMobile) return `0px`;
-    return `calc(${v * 50}vw - ${v * 50}% - ${v * 32}px)`;
+  const xEnter = useTransform(
+    scrollYProgress,
+    [0, 0.25],
+    isMobile
+      ? ["calc(0vw - 0% - 0px)", "calc(0vw - 0% - 0px)"]
+      : ["calc(0vw - 0% - 0px)", "calc(50vw - 50% - 32px)"],
+  );
+
+  const minW = 900,
+    maxW = 1600;
+  const minT = 0.55,
+    maxT = 0.85;
+  const boundedW = Math.min(Math.max(windowWidth, minW), maxW);
+  const targetScale =
+    minT + ((boundedW - minW) / (maxW - minW)) * (maxT - minT);
+
+  const scaleEnter = useTransform(
+    scrollYProgress,
+    [0, 0.25],
+    isMobile ? [1, 1] : [1, targetScale],
+  );
+
+  const { scrollYProgress: clip2Prog } = useScroll({
+    target: layer2Ref,
+    offset: ["start end", "start start"],
   });
+  const clip2 = useTransform(
+    clip2Prog,
+    [0, 1],
+    ["inset(100% 0px 0px 0px)", "inset(0% 0px 0px 0px)"],
+  );
 
-  const scaleEnter = useTransform(scrollYProgress, (v) => {
-    if (isMobile) return 1;
-
-    const minW = 900,
-      maxW = 1600;
-    const minT = 0.55,
-      maxT = 0.85;
-    const boundedW = Math.min(Math.max(windowWidth, minW), maxW);
-    const target = minT + ((boundedW - minW) / (maxW - minW)) * (maxT - minT);
-
-    const p = Math.min(Math.max(v / 0.25, 0), 1);
-    return 1 - p * (1 - target);
+  const { scrollYProgress: clip3Prog } = useScroll({
+    target: layer3Ref,
+    offset: ["start end", "start start"],
   });
+  const clip3 = useTransform(
+    clip3Prog,
+    [0, 1],
+    ["inset(100% 0px 0px 0px)", "inset(0% 0px 0px 0px)"],
+  );
 
-  const opacity1 = useTransform(scrollYProgress, (v) => {
-    if (isMobile) return 1;
-    if (v < 0.05) return 0;
-    if (v > 0.25) return 1;
-    return (v - 0.05) / (0.25 - 0.05);
+  const { scrollYProgress: clip4Prog } = useScroll({
+    target: layer4Ref,
+    offset: ["start end", "start start"],
   });
+  const clip4 = useTransform(
+    clip4Prog,
+    [0, 1],
+    ["inset(100% 0px 0px 0px)", "inset(0% 0px 0px 0px)"],
+  );
 
-  const clip2Val = useTransform(scrollYProgress, (v) => {
-    const start = isMobile ? 0 : 0.25;
-    const end = isMobile ? 0.3333 : 0.5;
-    const p = Math.min(Math.max((v - start) / (end - start), 0), 1);
-    return 100 - p * 100;
-  });
-  const clip3Val = useTransform(scrollYProgress, (v) => {
-    const start = isMobile ? 0.3333 : 0.5;
-    const end = isMobile ? 0.6666 : 0.75;
-    const p = Math.min(Math.max((v - start) / (end - start), 0), 1);
-    return 100 - p * 100;
-  });
-  const clip4Val = useTransform(scrollYProgress, (v) => {
-    const start = isMobile ? 0.6666 : 0.75;
-    const end = isMobile ? 1.0 : 1.0;
-    const p = Math.min(Math.max((v - start) / (end - start), 0), 1);
-    return 100 - p * 100;
-  });
-
-  const clip2 = useTransform(clip2Val, (v) => `inset(${v}% 0 0 0)`);
-  const clip3 = useTransform(clip3Val, (v) => `inset(${v}% 0 0 0)`);
-  const clip4 = useTransform(clip4Val, (v) => `inset(${v}% 0 0 0)`);
-
-  // === ВЕРТИКАЛЬНЕ ВИРІВНЮВАННЯ ТЕКСТІВ ===
-  // svh змінено на vh
   const textLayerClasses =
     "sticky top-0 h-[100vh] w-full flex flex-col max-[899px]:justify-end max-[899px]:pb-[10vh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
 
@@ -122,11 +129,9 @@ const White = () => {
     </svg>
   );
 
-  // svh змінено на vh
   const imgLayerClasses =
     "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
 
-  // ОПТИМІЗАЦІЯ 3: Відключено тінь на мобільному (max-[899px]:shadow-none)
   const wrapperClasses =
     "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white max-[899px]:shadow-none min-[900px]:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
     "max-[899px]:origin-top min-[900px]:origin-right " +
@@ -135,15 +140,12 @@ const White = () => {
   const imgClasses = "w-full h-full object-fill block absolute inset-0";
 
   return (
-    <section ref={ref} data-theme="light" className="relative w-full">
+    <section ref={mainRef} data-theme="light" className="relative w-full">
       <div className="relative w-full z-0">
-        {/* ШАР 1 (Білий) */}
+        {/* ШАР 1 (Білий) - Тепер текст не з'являється анімовано, а завжди видимий */}
         <div className="max-[899px]:h-[100vh] min-[900px]:h-[200vh] w-full bg-[#f5f5f7]">
           <div className={textLayerClasses}>
-            <motion.div
-              style={{ opacity: opacity1 }}
-              className={textWrapperClasses}
-            >
+            <div className={textWrapperClasses}>
               <img
                 src="/main/BAS-logo.png"
                 alt="BAS Logo"
@@ -162,12 +164,12 @@ const White = () => {
               <a href="#" className={linkClasses}>
                 Дізнатись більше {chevronIcon}
               </a>
-            </motion.div>
+            </div>
           </div>
         </div>
 
         {/* ШАР 2 (Зелений) */}
-        <div className="h-[100vh] w-full bg-[#6ee7b7]">
+        <div ref={layer2Ref} className="h-[100vh] w-full bg-[#6ee7b7]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -193,7 +195,7 @@ const White = () => {
         </div>
 
         {/* ШАР 3 (Жовтий) */}
-        <div className="h-[100vh] w-full bg-[#fde047]">
+        <div ref={layer3Ref} className="h-[100vh] w-full bg-[#fde047]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -218,7 +220,7 @@ const White = () => {
         </div>
 
         {/* ШАР 4 (Червоний) */}
-        <div className="h-[100vh] w-full bg-[#fca5a5]">
+        <div ref={layer4Ref} className="h-[100vh] w-full bg-[#fca5a5]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -254,7 +256,6 @@ const White = () => {
               }}
               className={wrapperClasses}
             >
-              {/* ОПТИМІЗАЦІЯ 1: Прибрали loading="lazy". Усі картинки вантажаться одразу, тому затримок при анімації не буде. */}
               <img
                 src="/main/BAS-img.jpg"
                 alt="Підтримка BAS"
