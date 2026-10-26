@@ -42,15 +42,20 @@
     sans-serif;
   transition: color 0.4s ease;
 
-  /* --- НАПІВПРОЗОРИЙ ФОН ---
-     Без backdrop-filter. Blur на верхньому краї міг давати сіру смугу в Safari */
+  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (десктоп і мобайл) --- */
   &::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
     background-color: var(--header-bg);
-    transition: background-color 0.4s ease;
+    transform: translateZ(0);
+    will-change: backdrop-filter, background-color;
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    transition:
+      background-color 0.4s ease,
+      border-color 0.4s ease;
   }
 
   &__top {
@@ -184,7 +189,7 @@
 @media (max-width: 1024px) {
   .hero-header {
     /* Суцільна верхня смуга: Safari бере її колір для зони статус-бару.
-       Тільки на мобільних, бо на десктопі вона виглядала б як чужорідний блок */
+       Тільки на мобільних, бо на десктопі вона не потрібна */
     &::after {
       content: "";
       position: absolute;
@@ -195,6 +200,15 @@
       z-index: -1;
       background-color: var(--header-solid);
       transition: background-color 0.4s ease;
+    }
+
+    /* Коли верхній рядок сховано, суцільна смуга лишається тільки над статус-баром,
+       інакше вся навігація стає суцільною */
+    &--hidden-top::after {
+      height: 24px;
+      transition:
+        height 0.3s ease,
+        background-color 0.4s ease;
     }
 
     &__local {
