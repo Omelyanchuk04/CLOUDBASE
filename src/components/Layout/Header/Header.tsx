@@ -18,6 +18,19 @@ const navItems: NavItem[] = [
   { id: "contacts", label: "Контакти" },
 ];
 
+// Колір елемента під шапкою на рівні верхнього краю екрана.
+// Саму шапку пропускаємо, бо вона лежить зверху
+const getUnderColor = (): string => {
+  const x = document.documentElement.clientWidth / 2;
+  const elements = document.elementsFromPoint(x, 2);
+  for (const el of elements) {
+    if (el.closest("header")) continue;
+    const bg = getComputedStyle(el).backgroundColor;
+    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+  }
+  return "";
+};
+
 const Header: React.FC = () => {
   const [activeItem, setActiveItem] = useState<string>("home");
   const [showTop, setShowTop] = useState<boolean>(true);
@@ -26,6 +39,7 @@ const Header: React.FC = () => {
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
 
+  const headerRef = useRef<HTMLElement>(null);
   const navListRef = useRef<HTMLUListElement>(null);
 
   // ЄДИНА, НАДІЙНА І ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ (Ховання лого + зміна теми)
@@ -46,7 +60,7 @@ const Header: React.FC = () => {
           }
           lastScrollY = currentScrollY;
 
-          // 2. Зміна кольору шапки за секцією під нею (світла або темна тема)
+          // 2. Зміна теми шапки (світла або темна) за секцією під нею
           const sections = document.querySelectorAll("[data-theme]");
           let foundLight = false;
 
@@ -62,6 +76,17 @@ const Header: React.FC = () => {
 
           // Оновлюємо стан тільки якщо колір реально змінився
           setIsLightTheme((prev) => (prev !== foundLight ? foundLight : prev));
+
+          // 3. На телефонах шапка суцільна і бере колір секції під собою.
+          // Якщо колір не визначено, прибираємо змінну і лишається колір теми
+          const underColor = getUnderColor();
+          if (headerRef.current) {
+            if (underColor) {
+              headerRef.current.style.setProperty("--header-solid", underColor);
+            } else {
+              headerRef.current.style.removeProperty("--header-solid");
+            }
+          }
 
           ticking = false;
         });
@@ -113,6 +138,7 @@ const Header: React.FC = () => {
 
   return (
     <header
+      ref={headerRef}
       className={`${styles["hero-header"]} ${
         !showTop ? styles["hero-header--hidden-top"] : ""
       } ${isLightTheme ? styles["hero-header--light"] : ""}`}
