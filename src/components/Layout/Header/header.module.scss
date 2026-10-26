@@ -189,14 +189,22 @@
 /* --- АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ТА ПЛАНШЕТІВ --- */
 @media (max-width: 1024px) {
   .hero-header {
-    /* Суцільний фон без blur. Safari фарбує зону статус-бару кольором
-       контенту під шапкою, тому прозорість дає сіру смугу. Колір бере
-       з --header-solid, який міняється разом з темою */
+    /* Суцільний фон без blur. Колір береться з --header-solid, який
+       header.tsx записує з секції під шапкою. Темна тема трохи світліша
+       за секцію, щоб була видна межа. color-mix працює з iOS 16.2+,
+       перший рядок є запасним варіантом для старіших браузерів */
     &::before {
       background-color: var(--header-solid);
+      background-color: color-mix(in srgb, var(--header-solid), #fff 8%);
       will-change: auto;
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
+    }
+
+    /* Світла тема трохи темніша за секцію */
+    &--light::before {
+      background-color: var(--header-solid);
+      background-color: color-mix(in srgb, var(--header-solid), #000 8%);
     }
 
     &__local {
