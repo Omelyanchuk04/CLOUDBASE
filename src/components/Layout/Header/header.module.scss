@@ -9,7 +9,6 @@
      ТЕМНА ТЕМА
      ======================================================= */
   --header-bg: rgba(0, 0, 0, 0.45);
-  --header-solid: #000000;
   --text-color: #ffffff;
   --btn-bg: transparent;
   --btn-border: rgba(255, 255, 255, 0.25);
@@ -25,7 +24,6 @@
      ======================================================= */
   &--light {
     --header-bg: rgba(255, 255, 255, 0.65);
-    --header-solid: #ffffff;
     --text-color: #1d1d1f;
     --btn-border: rgba(0, 0, 0, 0.15);
     --btn-bg-hover: rgba(0, 0, 0, 0.05);
@@ -188,29 +186,6 @@
 /* --- АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ ТА ПЛАНШЕТІВ --- */
 @media (max-width: 1024px) {
   .hero-header {
-    /* Суцільна верхня смуга: Safari бере її колір для зони статус-бару.
-       Тільки на мобільних, бо на десктопі вона не потрібна */
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 62px;
-      z-index: -1;
-      background-color: var(--header-solid);
-      transition: background-color 0.4s ease;
-    }
-
-    /* Коли верхній рядок сховано, суцільна смуга лишається тільки над статус-баром,
-       інакше вся навігація стає суцільною */
-    &--hidden-top::after {
-      height: 24px;
-      transition:
-        height 0.3s ease,
-        background-color 0.4s ease;
-    }
-
     &__local {
       padding-left: 0;
       padding-right: 0;
