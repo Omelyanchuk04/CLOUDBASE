@@ -12,9 +12,12 @@ const inter = Inter({
   display: "swap",
 });
 
-// === ОСЬ ЦЕЙ БЛОК РОБИТЬ ВЕРХНЮ ЗОНУ НА МОБАЙЛІ БІЛОЮ ===
+// ПРИМУСОВИЙ БІЛИЙ КОЛІР ДЛЯ СТАТУС-БАРУ (Світла і темна теми)
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#ffffff" },
+  ],
 };
 
 export const metadata: Metadata = {
