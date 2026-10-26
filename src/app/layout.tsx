@@ -12,12 +12,10 @@ const inter = Inter({
   display: "swap",
 });
 
-// ПРИМУСОВИЙ БІЛИЙ КОЛІР ДЛЯ СТАТУС-БАРУ (Світла і темна теми)
+// ЖОРСТКО фіксуємо світлу тему для браузера, щоб статус-бар завжди був білим на iOS
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#ffffff" },
-  ],
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 export const metadata: Metadata = {
@@ -41,6 +39,12 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "CloudBASe" }],
   creator: "CloudBASe",
+  // Спеціальні налаштування для iOS Safari
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CloudBASe",
+  },
   openGraph: {
     title: "CloudBASe | Енергонезалежні хмарні сервери",
     description:
