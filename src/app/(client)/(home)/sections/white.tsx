@@ -6,7 +6,6 @@ import { motion, useScroll, useTransform } from "framer-motion";
 const White = () => {
   const ref = useRef<HTMLElement>(null);
 
-  // ОПТИМІЗАЦІЯ 1: Зберігаємо ширину екрана в стейт, щоб не смикати DOM під час скролу
   const [isMobile, setIsMobile] = useState(false);
   const [windowWidth, setWindowWidth] = useState(1200);
 
@@ -25,14 +24,15 @@ const White = () => {
     target: ref,
     offset: ["start 170%", "start start"],
   });
-  const yEnter = useTransform(enterProgress, [0, 1], ["-100svh", "0svh"]);
+
+  // ОПТИМІЗАЦІЯ 2: Використовуємо звичайний vh замість svh, щоб уникнути лагів при скролі на iOS
+  const yEnter = useTransform(enterProgress, [0, 1], ["-100vh", "0vh"]);
 
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
-  // ОПТИМІЗАЦІЯ 2: Використовуємо кешоване значення isMobile, а не window.innerWidth
   const xProgress = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
   const xEnter = useTransform(xProgress, (v) => {
     if (isMobile) return `0px`;
@@ -42,7 +42,6 @@ const White = () => {
   const scaleEnter = useTransform(scrollYProgress, (v) => {
     if (isMobile) return 1;
 
-    // Математика працює з кешованим windowWidth (0 лагів)
     const minW = 900,
       maxW = 1600;
     const minT = 0.55,
@@ -85,8 +84,9 @@ const White = () => {
   const clip4 = useTransform(clip4Val, (v) => `inset(${v}% 0 0 0)`);
 
   // === ВЕРТИКАЛЬНЕ ВИРІВНЮВАННЯ ТЕКСТІВ ===
+  // svh змінено на vh
   const textLayerClasses =
-    "sticky top-0 h-[100svh] w-full flex flex-col max-[899px]:justify-end max-[899px]:pb-[10svh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
+    "sticky top-0 h-[100vh] w-full flex flex-col max-[899px]:justify-end max-[899px]:pb-[10vh] min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-start px-6 min-[900px]:px-10 lg:px-[5%] xl:px-[8%]";
 
   const exactWidths =
     "w-[361px] min-[390px]:w-[376px] min-[428px]:w-[407px] min-[458px]:w-[438px] sm:w-[538px] md:w-[691px]";
@@ -122,11 +122,13 @@ const White = () => {
     </svg>
   );
 
+  // svh змінено на vh
   const imgLayerClasses =
-    "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18svh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
+    "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
 
+  // ОПТИМІЗАЦІЯ 3: Відключено тінь на мобільному (max-[899px]:shadow-none)
   const wrapperClasses =
-    "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
+    "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white max-[899px]:shadow-none min-[900px]:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
     "max-[899px]:origin-top min-[900px]:origin-right " +
     `${exactWidths} min-[900px]:w-[691px] lg:w-[845px] xl:w-[998px] 2xl:w-[1152px]`;
 
@@ -136,7 +138,7 @@ const White = () => {
     <section ref={ref} data-theme="light" className="relative w-full">
       <div className="relative w-full z-0">
         {/* ШАР 1 (Білий) */}
-        <div className="max-[899px]:h-[100svh] min-[900px]:h-[200svh] w-full bg-[#f5f5f7]">
+        <div className="max-[899px]:h-[100vh] min-[900px]:h-[200vh] w-full bg-[#f5f5f7]">
           <div className={textLayerClasses}>
             <motion.div
               style={{ opacity: opacity1 }}
@@ -165,7 +167,7 @@ const White = () => {
         </div>
 
         {/* ШАР 2 (Зелений) */}
-        <div className="h-[100svh] w-full bg-[#6ee7b7]">
+        <div className="h-[100vh] w-full bg-[#6ee7b7]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -191,7 +193,7 @@ const White = () => {
         </div>
 
         {/* ШАР 3 (Жовтий) */}
-        <div className="h-[100svh] w-full bg-[#fde047]">
+        <div className="h-[100vh] w-full bg-[#fde047]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -216,7 +218,7 @@ const White = () => {
         </div>
 
         {/* ШАР 4 (Червоний) */}
-        <div className="h-[100svh] w-full bg-[#fca5a5]">
+        <div className="h-[100vh] w-full bg-[#fca5a5]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -241,7 +243,7 @@ const White = () => {
       </div>
 
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
-        <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
+        <div className="sticky top-0 h-[100vh] w-full overflow-hidden">
           <div className={imgLayerClasses}>
             <motion.div
               style={{
@@ -252,6 +254,7 @@ const White = () => {
               }}
               className={wrapperClasses}
             >
+              {/* ОПТИМІЗАЦІЯ 1: Прибрали loading="lazy". Усі картинки вантажаться одразу, тому затримок при анімації не буде. */}
               <img
                 src="/main/BAS-img.jpg"
                 alt="Підтримка BAS"
@@ -284,8 +287,8 @@ const White = () => {
                 src="/main/BAS-img2.jpg"
                 alt="Системи KBS"
                 className={imgClasses}
-                loading="lazy"
                 decoding="async"
+                fetchPriority="high"
               />
             </motion.div>
           </motion.div>
@@ -312,8 +315,8 @@ const White = () => {
                 src="/main/BAS-img3.jpg"
                 alt="Індивідуальні допрацювання"
                 className={imgClasses}
-                loading="lazy"
                 decoding="async"
+                fetchPriority="high"
               />
             </motion.div>
           </motion.div>
@@ -340,8 +343,8 @@ const White = () => {
                 src="/main/BAS-img4.jpg"
                 alt="Хмара для бухгалтерії"
                 className={imgClasses}
-                loading="lazy"
                 decoding="async"
+                fetchPriority="high"
               />
             </motion.div>
           </motion.div>
