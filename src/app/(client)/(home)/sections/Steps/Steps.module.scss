@@ -1,0 +1,132 @@
+.section {
+  position: relative;
+  width: 100%;
+  /* Трохи темніший за білий (класичний фон Apple) */
+  background-color: #f5f5f7;
+  color: #1d1d1f;
+  padding: 6rem 0;
+  overflow: hidden;
+  font-family:
+    var(--font-inter),
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+/* Легке світіння на фоні для преміальності (дуже м'яке на світлому) */
+.glowContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  width: 80vw;
+  height: 80vw;
+  max-width: 800px;
+  max-height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(37, 99, 235, 0.03) 0%,
+    rgba(122, 0, 255, 0.02) 40%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  border-radius: 50%;
+  filter: blur(60px);
+  transform: translateZ(0);
+}
+
+/* =========================================================
+   СТИЛІ ДЛЯ КАРТОК (APPLE BENTO BOX)
+   ========================================================= */
+
+/* Клас для кольорових карток (якщо використовуєш новий TSX) */
+.coloredCard,
+/* Клас для скляних карток (залишив для сумісності з попереднім кодом) */
+.glassCard {
+  border-radius: 28px;
+  padding: 2rem 2.5rem;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  /* М'яка, розсіяна тінь як в iOS */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Напівпрозорий бейдж із цифрою в правому верхньому кутку */
+.stepBadge {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* =========================================================
+   СТАРІ КЛАСИ (Залишені, щоб нічого не зламалося)
+   ========================================================= */
+
+/* Велика напівпрозора цифра на фоні картки */
+.stepNumberBg {
+  position: absolute;
+  top: -20px;
+  right: -10px;
+  font-size: 10rem;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.03); /* Змінено на темний для світлого фону */
+  pointer-events: none;
+  z-index: 0;
+  transition: color 0.3s ease;
+  user-select: none;
+}
+
+.glassCard:hover .stepNumberBg {
+  color: rgba(0, 0, 0, 0.06);
+}
+
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 2;
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 2;
+}

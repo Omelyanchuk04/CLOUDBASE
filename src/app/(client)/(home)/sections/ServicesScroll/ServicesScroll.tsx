@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-const White = () => {
+const ServicesScroll = () => {
   const mainRef = useRef<HTMLElement>(null);
 
   const layer2Ref = useRef<HTMLDivElement>(null);
@@ -355,4 +355,4 @@ const White = () => {
   );
 };
 
-export default White;
+export default ServicesScroll;

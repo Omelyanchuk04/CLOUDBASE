@@ -1,13 +1,16 @@
 import styles from "./page.module.css";
 // Ніяких фігурних дужок. Тільки прямий імпорт.
 import MacbookSection from "./sections/MacbookSection/MacbookSection";
-import White from "./sections/white";
+import ServicesScroll from "./sections/ServicesScroll/ServicesScroll";
+import AboutUs from "./sections/AboutUs/AboutUs";
+import Steps from "./sections/Steps/Steps";
 
 export default function Home() {
   return (
     <>
       <MacbookSection />
-      <White />
+      <ServicesScroll />
+      <Steps />
     </>
   );
 }
