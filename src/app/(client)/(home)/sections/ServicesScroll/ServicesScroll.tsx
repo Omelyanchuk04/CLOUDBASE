@@ -103,19 +103,19 @@ const ServicesScroll = () => {
     `max-[899px]:mx-auto ${exactWidths} ` +
     "min-[900px]:w-full min-[900px]:max-w-[340px] lg:max-w-[380px] xl:max-w-[440px]";
 
-  const baseLogoClasses = "w-auto mb-3 md:mb-5 object-contain object-left";
+  const baseLogoClasses = "w-auto mb-4 md:mb-5 object-contain object-left";
 
   const paragraphClasses =
-    "text-[19px] min-[900px]:text-xl lg:text-3xl font-semibold tracking-tight leading-snug";
+    "text-[22px] min-[900px]:text-[24px] lg:text-3xl font-semibold tracking-tight leading-snug";
   const inlineTitleClasses = "text-black";
   const inlineDescClasses = "text-black/60";
 
   const linkClasses =
-    "mt-3 md:mt-5 inline-flex items-center text-[#0066cc] font-semibold text-[17px] min-[900px]:text-lg lg:text-xl hover:opacity-80 transition-opacity group cursor-pointer tracking-tight";
+    "mt-4 md:mt-5 inline-flex items-center text-[#0066cc] font-semibold text-[19px] min-[900px]:text-xl hover:opacity-80 transition-opacity group cursor-pointer tracking-tight";
 
   const chevronIcon = (
     <svg
-      className="ml-1 w-4 h-4 min-[900px]:w-4 min-[900px]:h-4 lg:w-5 lg:h-5 transition-transform group-hover:translate-x-1"
+      className="ml-1.5 w-4 h-4 min-[900px]:w-5 min-[900px]:h-5 transition-transform group-hover:translate-x-1"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.5"
@@ -132,8 +132,9 @@ const ServicesScroll = () => {
   const imgLayerClasses =
     "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
 
+  // ДОДАНО: border-2 border-[#1d1d1f] замість border-gray-200/60
   const wrapperClasses =
-    "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border border-gray-200/60 bg-white max-[899px]:shadow-none min-[900px]:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
+    "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border-2 border-[#1d1d1f] bg-white max-[899px]:shadow-none min-[900px]:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
     "max-[899px]:origin-top min-[900px]:origin-right " +
     `${exactWidths} min-[900px]:w-[691px] lg:w-[845px] xl:w-[998px] 2xl:w-[1152px]`;
 
@@ -142,14 +143,14 @@ const ServicesScroll = () => {
   return (
     <section ref={mainRef} data-theme="light" className="relative w-full">
       <div className="relative w-full z-0">
-        {/* ШАР 1 (Білий) - Тепер текст не з'являється анімовано, а завжди видимий */}
+        {/* ШАР 1 (Білий) */}
         <div className="max-[899px]:h-[100vh] min-[900px]:h-[200vh] w-full bg-[#f5f5f7]">
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
                 src="/main/BAS-logo.png"
                 alt="BAS Logo"
-                className={`h-9 lg:h-12 ${baseLogoClasses}`}
+                className={`h-11 lg:h-14 ${baseLogoClasses}`}
               />
               <div className={paragraphClasses}>
                 <span className={inlineTitleClasses}>
@@ -175,7 +176,7 @@ const ServicesScroll = () => {
               <img
                 src="/main/KBS-logo.png"
                 alt="KBS Logo"
-                className={`h-9 lg:h-12 ${baseLogoClasses}`}
+                className={`h-11 lg:h-14 ${baseLogoClasses}`}
               />
               <div className={paragraphClasses}>
                 <span className={inlineTitleClasses}>
@@ -201,7 +202,7 @@ const ServicesScroll = () => {
               <img
                 src="/main/extention-logo.png"
                 alt="Extensions Logo"
-                className={`h-11 lg:h-20 ${baseLogoClasses}`}
+                className={`h-14 lg:h-20 ${baseLogoClasses}`}
               />
               <div className={paragraphClasses}>
                 <span className={inlineTitleClasses}>
@@ -226,7 +227,7 @@ const ServicesScroll = () => {
               <img
                 src="/main/rdp-logo.png"
                 alt="RDP Cloud Logo"
-                className={`h-10 lg:h-16 ${baseLogoClasses}`}
+                className={`h-12 lg:h-16 ${baseLogoClasses}`}
               />
               <div className={paragraphClasses}>
                 <span className={inlineTitleClasses}>Надійна хмара. </span>
