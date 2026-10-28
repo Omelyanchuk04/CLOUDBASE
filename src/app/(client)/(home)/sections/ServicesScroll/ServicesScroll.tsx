@@ -62,6 +62,20 @@ const ServicesScroll = () => {
     isMobile ? [1, 1] : [1, targetScale],
   );
 
+  // Рамка (на мобайлі одразу 4px, на десктопі плавно з'являється)
+  const borderW = useTransform(
+    scrollYProgress,
+    [0, 0.25],
+    isMobile ? ["4px", "4px"] : ["0px", "4px"],
+  );
+
+  // Радіус кутів (на мобайлі одразу 0px, на десктопі плавно зменшується до 0px)
+  const borderR = useTransform(
+    scrollYProgress,
+    [0, 0.25],
+    isMobile ? ["0px", "0px"] : ["24px", "0px"],
+  );
+
   const { scrollYProgress: clip2Prog } = useScroll({
     target: layer2Ref,
     offset: ["start end", "start start"],
@@ -103,12 +117,14 @@ const ServicesScroll = () => {
     `max-[899px]:mx-auto ${exactWidths} ` +
     "min-[900px]:w-full min-[900px]:max-w-[340px] lg:max-w-[380px] xl:max-w-[440px]";
 
-  const baseLogoClasses = "w-auto mb-4 md:mb-5 object-contain object-left";
+  const baseLogoClasses =
+    "w-auto mb-4 md:mb-5 object-contain object-left drop-shadow-sm";
 
   const paragraphClasses =
     "text-[22px] min-[900px]:text-[24px] lg:text-3xl font-semibold tracking-tight leading-snug";
-  const inlineTitleClasses = "text-black";
-  const inlineDescClasses = "text-black/60";
+
+  const inlineTitleClasses = "text-neutral-900";
+  const inlineDescClasses = "text-neutral-700";
 
   const linkClasses =
     "mt-4 md:mt-5 inline-flex items-center text-[#0066cc] font-semibold text-[19px] min-[900px]:text-xl hover:opacity-80 transition-opacity group cursor-pointer tracking-tight";
@@ -132,9 +148,8 @@ const ServicesScroll = () => {
   const imgLayerClasses =
     "absolute inset-0 flex max-[899px]:items-start max-[899px]:pt-[18vh] min-[900px]:pt-0 min-[900px]:items-center justify-center pointer-events-none";
 
-  // ДОДАНО: border-2 border-[#1d1d1f] замість border-gray-200/60
   const wrapperClasses =
-    "relative aspect-video max-[899px]:rounded-none min-[900px]:rounded-xl md:rounded-2xl overflow-hidden border-2 border-[#1d1d1f] bg-white max-[899px]:shadow-none min-[900px]:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 pointer-events-auto " +
+    "relative aspect-video overflow-hidden border-[#1d1d1f] border-solid bg-white max-[899px]:shadow-none min-[900px]:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.4)] shrink-0 pointer-events-auto " +
     "max-[899px]:origin-top min-[900px]:origin-right " +
     `${exactWidths} min-[900px]:w-[691px] lg:w-[845px] xl:w-[998px] 2xl:w-[1152px]`;
 
@@ -143,8 +158,13 @@ const ServicesScroll = () => {
   return (
     <section ref={mainRef} data-theme="light" className="relative w-full">
       <div className="relative w-full z-0">
-        {/* ШАР 1 (Білий) */}
-        <div className="max-[899px]:h-[100vh] min-[900px]:h-[200vh] w-full bg-[#f5f5f7]">
+        {/* ШАР 1: Дуже світлий та чистий (від білого до легкого сірого) */}
+        <div
+          className="max-[899px]:h-[100vh] min-[900px]:h-[200vh] w-full relative"
+          style={{
+            background: "linear-gradient(135deg, #ffffff 0%, #f0f0f5 100%)",
+          }}
+        >
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -169,8 +189,14 @@ const ServicesScroll = () => {
           </div>
         </div>
 
-        {/* ШАР 2 (Зелений) */}
-        <div ref={layer2Ref} className="h-[100vh] w-full bg-[#6ee7b7]">
+        {/* ШАР 2: М'ятно-блакитний (Fresh Mint to Sky Blue) */}
+        <div
+          ref={layer2Ref}
+          className="h-[100vh] w-full relative"
+          style={{
+            background: "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+          }}
+        >
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -195,8 +221,14 @@ const ServicesScroll = () => {
           </div>
         </div>
 
-        {/* ШАР 3 (Жовтий) */}
-        <div ref={layer3Ref} className="h-[100vh] w-full bg-[#fde047]">
+        {/* ШАР 3: Глибокий блакитний/Індиго (Cyan to Indigo) */}
+        <div
+          ref={layer3Ref}
+          className="h-[100vh] w-full relative"
+          style={{
+            background: "linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%)",
+          }}
+        >
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -220,8 +252,14 @@ const ServicesScroll = () => {
           </div>
         </div>
 
-        {/* ШАР 4 (Червоний) */}
-        <div ref={layer4Ref} className="h-[100vh] w-full bg-[#fca5a5]">
+        {/* ШАР 4: Рожево-фіолетовий градієнт */}
+        <div
+          ref={layer4Ref}
+          className="h-[100vh] w-full relative"
+          style={{
+            background: "linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)",
+          }}
+        >
           <div className={textLayerClasses}>
             <div className={textWrapperClasses}>
               <img
@@ -245,6 +283,7 @@ const ServicesScroll = () => {
         </div>
       </div>
 
+      {/* ШАР З КАРТИНКАМИ */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
         <div className="sticky top-0 h-[100vh] w-full overflow-hidden">
           <div className={imgLayerClasses}>
@@ -253,7 +292,9 @@ const ServicesScroll = () => {
                 y: yEnter,
                 x: xEnter,
                 scale: scaleEnter,
-                willChange: "transform",
+                borderWidth: borderW,
+                borderRadius: borderR,
+                willChange: "transform, border-width, border-radius",
               }}
               className={wrapperClasses}
             >
@@ -281,7 +322,9 @@ const ServicesScroll = () => {
                 y: yEnter,
                 x: xEnter,
                 scale: scaleEnter,
-                willChange: "transform",
+                borderWidth: borderW,
+                borderRadius: borderR,
+                willChange: "transform, border-width, border-radius",
               }}
               className={wrapperClasses}
             >
@@ -309,7 +352,9 @@ const ServicesScroll = () => {
                 y: yEnter,
                 x: xEnter,
                 scale: scaleEnter,
-                willChange: "transform",
+                borderWidth: borderW,
+                borderRadius: borderR,
+                willChange: "transform, border-width, border-radius",
               }}
               className={wrapperClasses}
             >
@@ -337,7 +382,9 @@ const ServicesScroll = () => {
                 y: yEnter,
                 x: xEnter,
                 scale: scaleEnter,
-                willChange: "transform",
+                borderWidth: borderW,
+                borderRadius: borderR,
+                willChange: "transform, border-width, border-radius",
               }}
               className={wrapperClasses}
             >
