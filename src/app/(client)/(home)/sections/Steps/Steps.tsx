@@ -4,16 +4,18 @@ import React from "react";
 import { motion, Variants } from "framer-motion";
 import styles from "./Steps.module.scss";
 
-// Збільшені кольорові іконки (36x36)
+type IconProps = { color: string };
+
+// Іконки (36x36). Колір приходить ззовні, щоб іконка і номер
+// кроку мали один і той самий колір
 const Icons = {
-  // Планшет (Clipboard) - Синій
-  Form: () => (
+  Form: ({ color }: IconProps) => (
     <svg
       width="36"
       height="36"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#007AFF"
+      stroke={color}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -26,14 +28,13 @@ const Icons = {
       <line x1="8" y1="16" x2="8.01" y2="16" />
     </svg>
   ),
-  // Гарнітура - Фіолетовий
-  Chat: () => (
+  Chat: ({ color }: IconProps) => (
     <svg
       width="36"
       height="36"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#AF52DE"
+      stroke={color}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -42,14 +43,13 @@ const Icons = {
       <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
     </svg>
   ),
-  // Комп'ютер/ПК - Рожевий
-  PC: () => (
+  PC: ({ color }: IconProps) => (
     <svg
       width="36"
       height="36"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#FF2D55"
+      stroke={color}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -60,14 +60,13 @@ const Icons = {
       <path d="M9 10h.01M15 10h.01M12 10h.01" />
     </svg>
   ),
-  // Договір/Ручка - Помаранчевий
-  Contract: () => (
+  Contract: ({ color }: IconProps) => (
     <svg
       width="36"
       height="36"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#FF9500"
+      stroke={color}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -76,14 +75,13 @@ const Icons = {
       <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   ),
-  // Оплата/Картка - Зелений
-  Card: () => (
+  Card: ({ color }: IconProps) => (
     <svg
       width="36"
       height="36"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#34C759"
+      stroke={color}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -94,35 +92,40 @@ const Icons = {
   ),
 };
 
+// color використовується і для іконки, і для кружечка з номером
 const stepsData = [
   {
     title: "Заявка на сайті",
     desc: "Залиште заявку або зв'яжіться з нами.",
-    icon: <Icons.Form />,
+    icon: Icons.Form,
+    color: "#007AFF",
   },
   {
     title: "Консультація",
     desc: "Уточнюємо деталі та потреби бізнесу.",
-    icon: <Icons.Chat />,
+    icon: Icons.Chat,
+    color: "#AF52DE",
   },
   {
     title: "Обстеження ПК",
     desc: "Аудит конфігурацій BAS та робочих місць.",
-    icon: <Icons.PC />,
+    icon: Icons.PC,
+    color: "#FF2D55",
   },
   {
     title: "Договір",
     desc: "Узгоджуємо умови співпраці та SLA.",
-    icon: <Icons.Contract />,
+    icon: Icons.Contract,
+    color: "#FF9500",
   },
   {
     title: "Оплата",
     desc: "Розпочинаємо налаштування після оплати.",
-    icon: <Icons.Card />,
+    icon: Icons.Card,
+    color: "#34C759",
   },
 ];
 
-// Галочка для першого (виконаного) кроку
 const CheckIcon = () => (
   <svg
     width="18"
@@ -138,24 +141,60 @@ const CheckIcon = () => (
   </svg>
 );
 
+// ===== Анімації =====
+
+// Заголовок: елементи з'являються по черзі знизу
+const headingContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+// Кожен крок анімується, коли сам потрапляє у вікно.
+// Порядок: кружечок, лінія (лише телефон), картка
+const stepContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+  },
+};
+
+const circlePop: Variants = {
+  hidden: { opacity: 0, scale: 0.5 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 260, damping: 18 },
+  },
+};
+
+// Лінія "росте" вниз від кружечка до наступного кроку
+const lineGrow: Variants = {
+  hidden: { scaleY: 0 },
+  visible: {
+    scaleY: 1,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const cardRise: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 const Steps = () => {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
-  };
-
   return (
     <section className={styles.section} data-theme="light" id="steps">
       <div className={styles.glowContainer}>
@@ -163,88 +202,96 @@ const Steps = () => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-10 w-full">
-        {/* Заголовок */}
+        {/* Заголовок: на телефоні і на ПК вирівняний по лівому краю */}
         <motion.div
-          variants={containerVariants}
+          variants={headingContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="mb-14 md:mb-20 text-center lg:text-left"
+          viewport={{ once: true, amount: 0.5 }}
+          className="mb-12 md:mb-20 text-left"
         >
           <motion.h2
-            variants={itemVariants}
+            variants={fadeUp}
             className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-neutral-900"
           >
             Як ми працюємо
           </motion.h2>
           <motion.p
-            variants={itemVariants}
-            className="text-lg text-neutral-500 max-w-2xl mx-auto lg:mx-0"
+            variants={fadeUp}
+            className="text-lg text-neutral-500 max-w-2xl"
           >
             Прозорий та швидкий процес підключення вашого бізнесу.
           </motion.p>
         </motion.div>
 
-        {/* Таймлайн в один ряд */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="flex flex-col lg:flex-row items-start justify-between w-full lg:gap-4"
-        >
+        <div className="flex flex-col lg:flex-row items-stretch justify-between w-full lg:gap-4">
           {stepsData.map((step, index) => {
-            const isActive = index === 0;
+            const isFirst = index === 0;
             const isLast = index === stepsData.length - 1;
+            const Icon = step.icon;
 
             return (
               <motion.div
-                key={index}
-                variants={itemVariants}
-                className="relative flex-1 group w-full lg:w-auto pb-10 lg:pb-0"
+                key={step.title}
+                variants={stepContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                className="relative flex-1 group w-full lg:w-auto flex flex-col items-center"
               >
-                {/* Горизонтальна лінія між кроками (ДЕСКТОП) */}
+                {/* Кружечок з номером по центру над карткою.
+                    На телефоні зверху 16px (mt-4), крім першого кроку.
+                    Знизу відступ 16px дає margin-top картки з .contentBox,
+                    тож відстані до сусідніх карток однакові.
+                    На ПК відступу немає, кружечки стоять на одній лінії */}
+                <motion.div
+                  variants={circlePop}
+                  className={`relative z-10 flex items-center justify-center w-9 h-9 shrink-0 rounded-full text-sm font-semibold text-white ${
+                    isFirst ? "" : "mt-4 lg:mt-0"
+                  }`}
+                  style={{
+                    backgroundColor: step.color,
+                    boxShadow: `0 8px 20px -6px ${step.color}99`,
+                  }}
+                >
+                  {isFirst ? <CheckIcon /> : index + 1}
+                </motion.div>
+
+                {/* Лінія між кроками (ТІЛЬКИ ТЕЛЕФОН). Тягнеться на всю
+                    висоту кроку, а картка перекриває її зверху.
+                    Центрування через mx-auto, а не translate, бо framer-motion
+                    перезаписує transform */}
                 {!isLast && (
-                  <div className="hidden lg:block absolute top-[18px] left-[52px] right-2 h-[1px] bg-neutral-200 transition-colors group-hover:bg-neutral-300" />
+                  <motion.div
+                    variants={lineGrow}
+                    className="lg:hidden absolute top-0 bottom-0 left-0 right-0 mx-auto w-px origin-top bg-neutral-200"
+                  />
                 )}
 
-                {/* Вертикальна лінія (МОБАЙЛ) */}
-                {!isLast && (
-                  <div className="lg:hidden absolute top-[44px] left-[18px] bottom-2 w-[1px] bg-neutral-200" />
-                )}
+                {/* Картка */}
+                <motion.div
+                  variants={cardRise}
+                  className={`${styles.contentBox} flex-1 w-full`}
+                >
+                  <div className="mb-4">
+                    <Icon color={step.color} />
+                  </div>
 
-                <div className="flex lg:flex-col items-start gap-5 lg:gap-0">
-                  {/* Кружечок з цифрою */}
-                  <div
-                    className={`relative z-10 flex items-center justify-center w-9 h-9 shrink-0 rounded-full text-sm font-medium transition-colors ${
-                      isActive
-                        ? "bg-black text-white"
-                        : "bg-white border border-neutral-300 text-neutral-400 group-hover:border-neutral-500 group-hover:text-neutral-900"
+                  <h3
+                    className={`text-lg font-semibold mb-2 tracking-tight ${
+                      isFirst ? "text-neutral-900" : "text-neutral-700"
                     }`}
                   >
-                    {isActive ? <CheckIcon /> : index + 1}
-                  </div>
-
-                  {/* Контент: Іконка + Текст */}
-                  <div className="lg:mt-8">
-                    <div className="mb-4 transition-transform origin-left group-hover:scale-110 duration-300">
-                      {step.icon}
-                    </div>
-
-                    <h3
-                      className={`text-lg font-semibold mb-2 tracking-tight transition-colors ${isActive ? "text-neutral-900" : "text-neutral-700 group-hover:text-neutral-900"}`}
-                    >
-                      {step.title}
-                    </h3>
-                    <p className="text-[14px] leading-relaxed text-neutral-500 lg:pr-4">
-                      {step.desc}
-                    </p>
-                  </div>
-                </div>
+                    {step.title}
+                  </h3>
+                  <p className="text-[14px] leading-relaxed text-neutral-500 lg:pr-4">
+                    {step.desc}
+                  </p>
+                </motion.div>
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

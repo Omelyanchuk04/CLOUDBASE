@@ -1,8 +1,19 @@
 .section {
+  /* Кольори останнього шару ServicesScroll (linear-gradient 135deg).
+     Якщо там зміниться фон останньої секції, оновіть ці два значення */
+  --seam-from: #fccb90;
+  --seam-to: #d57eeb;
+  /* Висота переходу. Менше значення дає коротший перехід */
+  --seam-h: 220px;
+  /* Фон секції, у який розчиняється перехід. Трохи темніший за білий,
+     щоб білі картки було видно */
+  --section-bg: #ebebf0;
+  /* Колір карток */
+  --card-bg: #ffffff;
+
   position: relative;
   width: 100%;
-  /* Трохи темніший за білий (класичний фон Apple) */
-  background-color: #f5f5f7;
+  background-color: var(--section-bg);
   color: #1d1d1f;
   padding: 6rem 0;
   overflow: hidden;
@@ -11,9 +22,48 @@
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
+
+  /* Продовження градієнта останньої секції ServicesScroll.
+     Розмір тайла і його положення не змінюємо, від них залежить колір на межі.
+     Висота елемента окремо від тайла, тому перехід коротший, а стик лишається
+     без шва */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--seam-h);
+    z-index: 0;
+    pointer-events: none;
+
+    background-image: linear-gradient(
+      135deg,
+      var(--seam-from) 0px,
+      var(--seam-to) calc((100vw + 100vh) * 0.7071)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% calc(100vh + 600px);
+    background-position: 0 -100vh;
+
+    /* Розчинення у фон секції на коротшій відстані */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      rgba(0, 0, 0, 0.7) 35%,
+      rgba(0, 0, 0, 0.25) 70%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      rgba(0, 0, 0, 0.7) 35%,
+      rgba(0, 0, 0, 0.25) 70%,
+      transparent 100%
+    );
+  }
 }
 
-/* Легке світіння на фоні для преміальності (дуже м'яке на світлому) */
 .glowContainer {
   position: absolute;
   inset: 0;
@@ -42,34 +92,21 @@
   transform: translateZ(0);
 }
 
-/* =========================================================
-   СТИЛІ ДЛЯ КАРТОК (APPLE BENTO BOX)
-   ========================================================= */
-
-/* Клас для кольорових карток (якщо використовуєш новий TSX) */
-.coloredCard,
-/* Клас для скляних карток (залишив для сумісності з попереднім кодом) */
-.glassCard {
-  border-radius: 28px;
-  padding: 2rem 2.5rem;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  position: relative;
-  z-index: 10;
-  height: 100%;
+/* Обгортка для контенту (Apple Bento Box) */
+.contentBox {
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  margin-top: 1rem;
+  /* Для однакової висоти карток */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  /* М'яка, розсіяна тінь як в iOS */
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-
-  &:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-  }
+  height: 100%;
+  position: relative;
+  z-index: 10;
 }
 
-/* Напівпрозорий бейдж із цифрою в правому верхньому кутку */
 .stepBadge {
   position: absolute;
   top: 1.5rem;
