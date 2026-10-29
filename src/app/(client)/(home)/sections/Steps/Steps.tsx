@@ -6,8 +6,6 @@ import styles from "./Steps.module.scss";
 
 type IconProps = { color: string };
 
-// Іконки (36x36). Колір приходить ззовні, щоб іконка і номер
-// кроку мали один і той самий колір
 const Icons = {
   Form: ({ color }: IconProps) => (
     <svg
@@ -92,7 +90,6 @@ const Icons = {
   ),
 };
 
-// color використовується і для іконки, і для кружечка з номером
 const stepsData = [
   {
     title: "Заявка на сайті",
@@ -141,9 +138,6 @@ const CheckIcon = () => (
   </svg>
 );
 
-// ===== Анімації =====
-
-// Заголовок: елементи з'являються по черзі знизу
 const headingContainer: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12 } },
@@ -158,13 +152,9 @@ const fadeUp: Variants = {
   },
 };
 
-// Кожен крок анімується, коли сам потрапляє у вікно.
-// Порядок: кружечок, лінія (лише телефон), картка
 const stepContainer: Variants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
-  },
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
 };
 
 const circlePop: Variants = {
@@ -173,15 +163,6 @@ const circlePop: Variants = {
     opacity: 1,
     scale: 1,
     transition: { type: "spring", stiffness: 260, damping: 18 },
-  },
-};
-
-// Лінія "росте" вниз від кружечка до наступного кроку
-const lineGrow: Variants = {
-  hidden: { scaleY: 0 },
-  visible: {
-    scaleY: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
   },
 };
 
@@ -202,7 +183,6 @@ const Steps = () => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-10 w-full">
-        {/* Заголовок: на телефоні і на ПК вирівняний по лівому краю */}
         <motion.div
           variants={headingContainer}
           initial="hidden"
@@ -224,10 +204,12 @@ const Steps = () => {
           </motion.p>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row items-stretch justify-between w-full lg:gap-4">
+        <div
+          className={styles.track}
+          style={{ "--count": stepsData.length } as React.CSSProperties}
+        >
           {stepsData.map((step, index) => {
             const isFirst = index === 0;
-            const isLast = index === stepsData.length - 1;
             const Icon = step.icon;
 
             return (
@@ -237,18 +219,18 @@ const Steps = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
-                className="relative flex-1 group w-full lg:w-auto flex flex-col items-center"
+                className={styles.step}
+                style={
+                  {
+                    "--i": index,
+                    "--z": index + 1,
+                  } as React.CSSProperties
+                }
               >
-                {/* Кружечок з номером по центру над карткою.
-                    На телефоні зверху 16px (mt-4), крім першого кроку.
-                    Знизу відступ 16px дає margin-top картки з .contentBox,
-                    тож відстані до сусідніх карток однакові.
-                    На ПК відступу немає, кружечки стоять на одній лінії */}
+                {/* ЗНАЧОК НОМЕРА ВІДІРВАНИЙ ВІД КАРТКИ */}
                 <motion.div
                   variants={circlePop}
-                  className={`relative z-10 flex items-center justify-center w-9 h-9 shrink-0 rounded-full text-sm font-semibold text-white ${
-                    isFirst ? "" : "mt-4 lg:mt-0"
-                  }`}
+                  className={styles.badge}
                   style={{
                     backgroundColor: step.color,
                     boxShadow: `0 8px 20px -6px ${step.color}99`,
@@ -257,34 +239,20 @@ const Steps = () => {
                   {isFirst ? <CheckIcon /> : index + 1}
                 </motion.div>
 
-                {/* Лінія між кроками (ТІЛЬКИ ТЕЛЕФОН). Тягнеться на всю
-                    висоту кроку, а картка перекриває її зверху.
-                    Центрування через mx-auto, а не translate, бо framer-motion
-                    перезаписує transform */}
-                {!isLast && (
-                  <motion.div
-                    variants={lineGrow}
-                    className="lg:hidden absolute top-0 bottom-0 left-0 right-0 mx-auto w-px origin-top bg-neutral-200"
-                  />
-                )}
-
-                {/* Картка */}
+                {/* БІЛА КАРТКА */}
                 <motion.div
                   variants={cardRise}
-                  className={`${styles.contentBox} flex-1 w-full`}
+                  className={`${styles.contentBox} w-full`}
                 >
-                  <div className="mb-4">
+                  <div className="mb-4 mt-2">
                     <Icon color={step.color} />
                   </div>
-
                   <h3
-                    className={`text-lg font-semibold mb-2 tracking-tight ${
-                      isFirst ? "text-neutral-900" : "text-neutral-700"
-                    }`}
+                    className={`text-lg font-semibold mb-2 tracking-tight ${isFirst ? "text-neutral-900" : "text-neutral-700"}`}
                   >
                     {step.title}
                   </h3>
-                  <p className="text-[14px] leading-relaxed text-neutral-500 lg:pr-4">
+                  <p className="text-[14px] leading-relaxed text-neutral-500 lg:pr-6">
                     {step.desc}
                   </p>
                 </motion.div>

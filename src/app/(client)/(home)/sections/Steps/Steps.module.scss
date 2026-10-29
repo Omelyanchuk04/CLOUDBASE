@@ -1,14 +1,8 @@
 .section {
-  /* Кольори останнього шару ServicesScroll (linear-gradient 135deg).
-     Якщо там зміниться фон останньої секції, оновіть ці два значення */
   --seam-from: #fccb90;
   --seam-to: #d57eeb;
-  /* Висота переходу. Менше значення дає коротший перехід */
   --seam-h: 220px;
-  /* Фон секції, у який розчиняється перехід. Трохи темніший за білий,
-     щоб білі картки було видно */
   --section-bg: #ebebf0;
-  /* Колір карток */
   --card-bg: #ffffff;
 
   position: relative;
@@ -23,10 +17,6 @@
     BlinkMacSystemFont,
     sans-serif;
 
-  /* Продовження градієнта останньої секції ServicesScroll.
-     Розмір тайла і його положення не змінюємо, від них залежить колір на межі.
-     Висота елемента окремо від тайла, тому перехід коротший, а стик лишається
-     без шва */
   &::before {
     content: "";
     position: absolute;
@@ -46,7 +36,6 @@
     background-size: 100% calc(100vh + 600px);
     background-position: 0 -100vh;
 
-    /* Розчинення у фон секції на коротшій відстані */
     -webkit-mask-image: linear-gradient(
       to bottom,
       #000 0%,
@@ -92,78 +81,138 @@
   transform: translateZ(0);
 }
 
+/* ==========================================
+   РОЗКЛАДКА КРОКІВ
+   ========================================== */
+.track {
+  display: flex;
+  flex-direction: column;
+  /* Збільшено відстань від заголовку до початку карток на мобайлі */
+  margin-top: 4.5rem;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  --mobile-card-w: clamp(170px, 50vw, 220px);
+  --mobile-step-x: calc((100% - var(--mobile-card-w)) / (var(--count, 5) - 1));
+
+  width: var(--mobile-card-w);
+  margin-left: calc(var(--i, 0) * var(--mobile-step-x));
+  z-index: var(--z, 1);
+}
+
+.step + .step {
+  margin-top: -85px;
+}
+
 /* Обгортка для контенту (Apple Bento Box) */
 .contentBox {
   background-color: var(--card-bg);
   border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-top: 1rem;
-  /* Для однакової висоти карток */
+  padding: 1.25rem;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    0 2px 10px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  aspect-ratio: 1 / 1;
   position: relative;
   z-index: 10;
 }
 
-.stepBadge {
+.step:not(:last-child) .contentBox {
+  padding-bottom: 85px;
+  padding-right: 1.5rem;
+}
+
+/* ВИПРАВЛЕННЯ ДЛЯ ЕКРАНІВ < 820px */
+@media (max-width: 819px) {
+  .step + .step {
+    margin-top: -40px;
+  }
+  .step:not(:last-child) .contentBox {
+    padding-bottom: 45px;
+  }
+}
+
+/* ВИПРАВЛЕННЯ ДЛЯ ЕКРАНІВ < 400px (Для iPhone SE та вужчих) */
+@media (max-width: 400px) {
+  .step + .step {
+    /* Зводимо накладання майже до нуля, щоб текст 100% помістився в квадрат */
+    margin-top: -5px;
+  }
+  .step:not(:last-child) .contentBox {
+    padding-bottom: 10px;
+  }
+}
+
+/* Кружечок з номером (ПОВНІСТЮ ВІДІРВАНИЙ ТА ЛІТАЄ ЗВЕРХУ) */
+.badge {
   position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  width: 32px;
-  height: 32px;
+  top: -38px;
+  right: 0px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.6);
-  color: rgba(0, 0, 0, 0.4);
-  font-size: 14px;
+  color: #fff;
+  font-size: 13px;
   font-weight: 600;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  z-index: 20;
 }
 
-/* =========================================================
-   СТАРІ КЛАСИ (Залишені, щоб нічого не зламалося)
-   ========================================================= */
+/* ПК */
+@media (min-width: 1024px) {
+  .track {
+    --step-y: 80px;
+    --step-x: 18.75%;
+    --card-w: 25%;
+    --card-h: 224px;
 
-/* Велика напівпрозора цифра на фоні картки */
-.stepNumberBg {
-  position: absolute;
-  top: -20px;
-  right: -10px;
-  font-size: 10rem;
-  font-weight: 800;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.03); /* Змінено на темний для світлого фону */
-  pointer-events: none;
-  z-index: 0;
-  transition: color 0.3s ease;
-  user-select: none;
-}
+    position: relative;
+    display: block;
+    height: calc((var(--count, 5) - 1) * var(--step-y) + var(--card-h));
 
-.glassCard:hover .stepNumberBg {
-  color: rgba(0, 0, 0, 0.06);
-}
+    /* Збільшено відстань від заголовка на десктопі */
+    margin-top: 6rem;
+  }
 
-.iconWrapper {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.05);
-  color: #1d1d1f;
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  position: relative;
-  z-index: 2;
-}
+  .step {
+    position: absolute;
+    top: calc(var(--i, 0) * var(--step-y));
+    left: calc(var(--i, 0) * var(--step-x));
+    width: var(--card-w);
+    margin-left: 0;
+  }
 
-.contentWrapper {
-  position: relative;
-  z-index: 2;
+  .step + .step {
+    margin-top: 0;
+  }
+
+  .step .contentBox {
+    flex: none;
+    height: var(--card-h);
+    aspect-ratio: auto;
+    padding: 1.5rem;
+  }
+
+  .step:not(:last-child) .contentBox {
+    padding-bottom: 1.5rem;
+    padding-right: 3.5rem;
+  }
+
+  .badge {
+    top: -46px;
+    right: 0px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
 }
