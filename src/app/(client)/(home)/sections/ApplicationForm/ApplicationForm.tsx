@@ -239,19 +239,17 @@ const ApplicationForm = () => {
       <div className="relative z-10 mx-auto w-full max-w-[860px] px-6">
         {/* Заголовок: на телефоні зліва, на ПК по центру */}
         <div className="text-left md:text-center">
-          <h2 className="text-4xl font-semibold leading-[1.05] tracking-[-0.03em] md:text-6xl">
-            Опишіть задачу.{" "}
-            <span className="text-white/40">Ми подбаємо про решту.</span>
+          <h2 className="text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
+            Залиште заявку
           </h2>
 
-          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/55 md:mx-auto md:text-lg">
-            Залиште контакти та опис. Наш менеджер зв'яжеться з вами, щоб
-            уточнити деталі й запропонувати рішення.
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/55 md:mx-auto md:text-lg">
+            Оберіть напрямок і коротко опишіть задачу. Відповімо протягом
+            робочого дня.
           </p>
         </div>
 
-        {/* Вибір напрямку. Від нього залежать приклади в полі нижче
-            і опис під тегами, тож вибір щось пояснює */}
+        {/* Вибір напрямку. Від нього залежать опис і приклад у полі форми */}
         <div className="mt-12 md:mt-16">
           <p className="mb-4 text-left text-xs font-medium uppercase tracking-[0.2em] text-white/40 md:text-center">
             Оберіть напрямок
@@ -282,21 +280,6 @@ const ApplicationForm = () => {
               );
             })}
           </div>
-
-          {/* Опис обраного напрямку. key змушує анімацію відіграти при зміні */}
-          <motion.p
-            key={service.id}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="mt-4 text-left text-sm leading-relaxed text-white/55 md:text-center"
-          >
-            <span
-              className="mr-2 inline-block h-2 w-2 rounded-full align-middle"
-              style={{ backgroundColor: service.color }}
-            />
-            {service.hint}
-          </motion.p>
         </div>
 
         {/* Картка з обертовою рамкою. На фокусі рамка яскравіша */}
@@ -337,6 +320,23 @@ const ApplicationForm = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Опис обраного напрямку. key змушує анімацію відіграти при зміні */}
+                <div className="flex items-start gap-3 border-b border-white/10 pb-5">
+                  <span
+                    className="mt-[7px] h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: service.color }}
+                  />
+                  <motion.p
+                    key={service.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className="text-sm leading-relaxed text-white/55"
+                  >
+                    {service.hint}
+                  </motion.p>
+                </div>
+
                 <div className="grid gap-3 sm:grid-cols-2">
                   <input
                     value={name}
@@ -405,11 +405,6 @@ const ApplicationForm = () => {
             )}
           </div>
         </motion.div>
-
-        <p className="mt-8 text-left text-xs text-white/40 md:text-center">
-          Відповідаємо протягом 1 робочого дня · Консультація безкоштовна · Без
-          зобов'язань
-        </p>
       </div>
     </section>
   );
