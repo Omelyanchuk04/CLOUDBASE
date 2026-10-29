@@ -239,11 +239,12 @@ const ApplicationForm = () => {
       <div className="relative z-10 mx-auto w-full max-w-[860px] px-6">
         {/* Заголовок: на телефоні зліва, на ПК по центру */}
         <div className="text-left md:text-center">
-          <h2 className="text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
+          {/* Градієнтна заливка тексту від білого до сірого */}
+          <h2 className="bg-gradient-to-b from-white to-white/40 bg-clip-text text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-transparent md:text-6xl">
             Залиште заявку
           </h2>
 
-          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/55 md:mx-auto md:text-lg">
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/55 md:mx-auto md:text-lg">
             Оберіть напрямок і коротко опишіть задачу. Відповімо протягом
             робочого дня.
           </p>
