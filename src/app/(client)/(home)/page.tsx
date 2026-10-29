@@ -3,6 +3,7 @@ import styles from "./page.module.css";
 import MacbookSection from "./sections/MacbookSection/MacbookSection";
 import ServicesScroll from "./sections/ServicesScroll/ServicesScroll";
 import Steps from "./sections/Steps/Steps";
+import ApplicationForm from "./sections/ApplicationForm/ApplicationForm";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <MacbookSection />
       <ServicesScroll />
       <Steps />
+      <ApplicationForm />
     </>
   );
 }
