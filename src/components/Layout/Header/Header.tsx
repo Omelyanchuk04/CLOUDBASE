@@ -11,12 +11,47 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: "home", label: "Головна", color: "#fccb90", tilt: "-2deg" },
+  { id: "home", label: "Головна", color: "#6f86d6", tilt: "-2deg" },
   { id: "bas", label: "BAS", color: "#48c6ef", tilt: "1deg" },
   { id: "kbs", label: "KBS", color: "#84fab0", tilt: "-1deg" },
   { id: "cloud", label: "Хмара", color: "#d57eeb", tilt: "2deg" },
   { id: "about", label: "Про нас", color: "#fde047", tilt: "-1.5deg" },
   { id: "contacts", label: "Контакти", color: "#fca5a5", tilt: "1.5deg" },
+];
+
+interface ContactItem {
+  id: string;
+  label: string;
+  value: string;
+  href: string | null; // null — пункт без посилання, наприклад графік
+}
+
+// Контакти у випадаючому меню кнопки "Заявка". Замініть на реальні дані
+const contacts: ContactItem[] = [
+  {
+    id: "phone",
+    label: "Телефон",
+    value: "+380 00 000 00 00",
+    href: "tel:+380000000000",
+  },
+  {
+    id: "telegram",
+    label: "Telegram",
+    value: "@cloudbase",
+    href: "https://t.me/cloudbase",
+  },
+  {
+    id: "email",
+    label: "Email",
+    value: "info@cloudbase.ua",
+    href: "mailto:info@cloudbase.ua",
+  },
+  {
+    id: "hours",
+    label: "Графік роботи",
+    value: "Пн–Пт, 9:00–18:00",
+    href: null,
+  },
 ];
 
 // Суцільний фон елемента під шапкою на рівні верхнього краю екрана.
@@ -55,12 +90,14 @@ const Header: React.FC = () => {
   const [activeItem, setActiveItem] = useState<string>("home");
   const [showTop, setShowTop] = useState<boolean>(true);
   const [isLightTheme, setIsLightTheme] = useState<boolean>(false);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
 
   const headerRef = useRef<HTMLElement>(null);
   const navListRef = useRef<HTMLUListElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // ЄДИНА, НАДІЙНА І ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ
   useEffect(() => {
@@ -130,6 +167,31 @@ const Header: React.FC = () => {
     };
   }, []);
 
+  // Закриття випадаючого меню: клік поза ним, Esc або прокрутка
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const closeOnOutside = (e: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const closeOnEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    const closeOnScroll = () => setMenuOpen(false);
+
+    document.addEventListener("pointerdown", closeOnOutside);
+    document.addEventListener("keydown", closeOnEsc);
+    window.addEventListener("scroll", closeOnScroll, { passive: true });
+
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutside);
+      document.removeEventListener("keydown", closeOnEsc);
+      window.removeEventListener("scroll", closeOnScroll);
+    };
+  }, [menuOpen]);
+
   // ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
   const checkNavScroll = useCallback(() => {
     if (navListRef.current) {
@@ -164,6 +226,14 @@ const Header: React.FC = () => {
     }
   };
 
+  // Ліва частина кнопки: прокрутка до форми заявки
+  const scrollToApplication = () => {
+    setMenuOpen(false);
+    document
+      .getElementById("application")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <header
       ref={headerRef}
@@ -184,36 +254,106 @@ const Header: React.FC = () => {
           </div>
 
           <div className={styles["hero-header__actions-wrapper"]}>
-            <button className={styles["hero-header__contact-button"]}>
-              {/* Іконка гарнітури */}
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div ref={menuRef} className={styles["hero-header__cta-wrap"]}>
+              <div className={styles["hero-header__cta-group"]}>
+                <button
+                  type="button"
+                  className={styles["hero-header__cta-main"]}
+                  onClick={scrollToApplication}
+                >
+                  {/* Іконка гарнітури */}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" />
+                    <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
+                  </svg>
+                  Заявка
+                </button>
+
+                <span
+                  className={styles["hero-header__cta-divider"]}
+                  aria-hidden="true"
+                />
+
+                <button
+                  type="button"
+                  className={styles["hero-header__cta-toggle"]}
+                  aria-label="Контакти"
+                  aria-expanded={menuOpen}
+                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  {/* Стрілочка вниз, перевертається при відкритому меню */}
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`${styles["hero-header__cta-arrow"]} ${
+                      menuOpen ? styles["hero-header__cta-arrow--open"] : ""
+                    }`}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+              </div>
+
+              <div
+                className={`${styles["hero-header__menu"]} ${
+                  menuOpen ? styles["hero-header__menu--open"] : ""
+                }`}
               >
-                <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" />
-                <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
-              </svg>
-              Заявка
-              {/* Стрілочка вниз */}
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
+                <p className={styles["hero-header__menu-title"]}>
+                  Зв'язатися з нами
+                </p>
+                <ul className={styles["hero-header__menu-list"]}>
+                  {contacts.map((c) => {
+                    const inner = (
+                      <>
+                        <span className={styles["hero-header__menu-label"]}>
+                          {c.label}
+                        </span>
+                        <span className={styles["hero-header__menu-value"]}>
+                          {c.value}
+                        </span>
+                      </>
+                    );
+
+                    const external = c.href?.startsWith("http") ?? false;
+
+                    return (
+                      <li key={c.id}>
+                        {c.href ? (
+                          <a
+                            href={c.href}
+                            target={external ? "_blank" : undefined}
+                            rel={external ? "noopener noreferrer" : undefined}
+                            className={`${styles["hero-header__menu-item"]} ${styles["hero-header__menu-link"]}`}
+                          >
+                            {inner}
+                          </a>
+                        ) : (
+                          <div className={styles["hero-header__menu-item"]}>
+                            {inner}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
