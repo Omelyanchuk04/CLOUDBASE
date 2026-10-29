@@ -7,7 +7,9 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
 
   /* ОПТИМІЗАЦІЯ: clip працює набагато швидше за hidden і не блокує sticky/scroll нащадків */
   overflow: clip;
-  font-family: "Nexa", "Montserrat", "Poppins", sans-serif;
+
+  /* Шрифт як у решті сайту (Inter з layout) */
+  font-family: inherit;
 
   /* ==========================================
      ІДЕАЛЬНИЙ ПЕРЕХІД БЕЗ СТИКІВ
@@ -105,7 +107,9 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
 }
 
 /* ==========================================
-   СТИЛІ ТЕКСТУ ТА АДАПТИВ (Desktop-First)
+   ТЕКСТ У СТИЛІ САЙТУ
+   Заголовок з градієнтом, як у формі заявки.
+   Підзаголовок світлий, як в інших секціях
    ========================================== */
 .titleWrapper {
   text-align: center;
@@ -115,91 +119,143 @@ $color-bg: #0d0e15; /* Глибокий преміальний темний фо
 }
 
 .title {
-  color: #ffffff;
-  font-size: clamp(32px, 4vw, 40px);
-  line-height: 1.2;
-  font-weight: 700;
   display: inline-block;
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.02em;
-
-  @media (max-width: 1299px) {
-    font-size: 36px;
-  }
-  @media (max-width: 1024px) {
-    font-size: 32px;
-  }
-  @media (max-width: 768px) {
-    font-size: 32px; /* Збільшено з 28px */
-  }
-  @media (max-width: 480px) {
-    font-size: 28px; /* Збільшено з 24px */
-  }
+  margin-bottom: 0.9rem;
+  font-size: clamp(32px, 4.5vw, 56px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #ffffff 0%, #e9d5ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  line-height: 1.6;
-  font-weight: 500;
   display: inline-block;
-  max-width: 800px;
+  max-width: 560px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.55);
 
-  @media (max-width: 1299px) {
-    max-width: 700px;
-    font-size: 15px;
-  }
-  @media (max-width: 1024px) {
-    max-width: 600px;
-  }
-  @media (max-width: 768px) {
-    max-width: 100%;
-    font-size: 16px; /* Збільшено з 14px */
-  }
-  @media (max-width: 480px) {
-    font-size: 15px; /* Збільшено з 13px */
-    line-height: 1.5;
+  @media (min-width: 768px) {
+    font-size: 18px;
   }
 }
 
 /* ==========================================
-   КНОПКА "ДІЗНАТИСЯ БІЛЬШЕ"
+   СКЛЯНА КНОПКА "ДІЗНАТИСЯ БІЛЬШЕ"
+   Той самий стиль, що й кнопка "Заявка" в шапці:
+   прозоре скло без кольору, світла кромка, відблиск за курсором.
+   Наведення лише змінює кромку й тінь, без підняття
    ========================================== */
-.learnMoreBtn {
+.glassBtn {
+  --glass-inset:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -8px 14px -10px rgba(0, 0, 0, 0.4);
+
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  padding: 0.6rem 1.25rem;
-  font-size: 14px;
-  font-weight: 600;
+  gap: 0.6rem;
+  margin-top: 1.75rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
   color: #ffffff;
-  background: rgb(255, 96, 96);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   text-decoration: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  cursor: pointer;
+  isolation: isolate;
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    var(--glass-inset),
+    0 10px 24px -12px rgba(0, 0, 0, 0.5);
+  transform: scale(var(--press, 1));
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+  will-change: transform;
 
-  .arrow {
-    transition: transform 0.3s ease;
+  /* Відблиск на поверхні. Його центр іде за курсором (--gx, --gy) */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        circle 90px at var(--gx, 50%) var(--gy, 50%),
+        rgba(255, 255, 255, 0.35),
+        transparent 100%
+      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 50%);
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
   }
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+  @media (hover: hover) {
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow:
+        var(--glass-inset),
+        0 14px 28px -12px rgba(0, 0, 0, 0.55);
 
-    .arrow {
-      transform: translateX(4px);
+      &::before {
+        opacity: 0.9;
+      }
+
+      .arrow {
+        transform: translateX(3px);
+      }
     }
   }
 
-  @media (max-width: 768px) {
-    margin-top: 1rem;
-    padding: 0.6rem 1.2rem;
-    font-size: 15px; /* Збільшено з 13px */
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  &:active {
+    --press: 0.96;
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.3s ease;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+}
+
+.glassLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.arrow {
+  position: relative;
+  z-index: 1;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Для тих, хто вимкнув рухи в системі: без нахилу, лишається скло */
+@media (prefers-reduced-motion: reduce) {
+  .glassBtn {
+    transform: none;
+    transition:
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
   }
 }

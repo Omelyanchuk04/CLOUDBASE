@@ -234,6 +234,26 @@ const Header: React.FC = () => {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Скляна кнопка: відблиск і нахил слідують за курсором.
+  // Тільки для миші, на сенсорному екрані цей ефект не потрібен
+  // Скляна кнопка: відблиск слідує за курсором.
+  // Тільки для миші, на сенсорному екрані цей ефект не потрібен
+  const handleGlassMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    el.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
+    el.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
+  };
+
+  const handleGlassLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    el.style.removeProperty("--gx");
+    el.style.removeProperty("--gy");
+  };
+
   return (
     <header
       ref={headerRef}
@@ -255,7 +275,11 @@ const Header: React.FC = () => {
 
           <div className={styles["hero-header__actions-wrapper"]}>
             <div ref={menuRef} className={styles["hero-header__cta-wrap"]}>
-              <div className={styles["hero-header__cta-group"]}>
+              <div
+                className={styles["hero-header__cta-group"]}
+                onPointerMove={handleGlassMove}
+                onPointerLeave={handleGlassLeave}
+              >
                 <button
                   type="button"
                   className={styles["hero-header__cta-main"]}
