@@ -6,16 +6,17 @@ import styles from "./header.module.scss";
 interface NavItem {
   id: string;
   label: string;
-  hasIcon?: boolean;
+  color: string; // колір пігулки, як у секціях сервісів
+  tilt: string; // постійний нахил пігулки
 }
 
 const navItems: NavItem[] = [
-  { id: "home", label: "Головна" },
-  { id: "bas", label: "BAS" },
-  { id: "kbs", label: "KBS" },
-  { id: "cloud", label: "Хмара" },
-  { id: "about", label: "Про нас" },
-  { id: "contacts", label: "Контакти" },
+  { id: "home", label: "Головна", color: "#fccb90", tilt: "-2deg" },
+  { id: "bas", label: "BAS", color: "#48c6ef", tilt: "1deg" },
+  { id: "kbs", label: "KBS", color: "#84fab0", tilt: "-1deg" },
+  { id: "cloud", label: "Хмара", color: "#d57eeb", tilt: "2deg" },
+  { id: "about", label: "Про нас", color: "#fde047", tilt: "-1.5deg" },
+  { id: "contacts", label: "Контакти", color: "#fca5a5", tilt: "1.5deg" },
 ];
 
 // Суцільний фон елемента під шапкою на рівні верхнього краю екрана.
@@ -240,20 +241,30 @@ const Header: React.FC = () => {
             ref={navListRef}
             onScroll={checkNavScroll}
           >
-            {navItems.map((item) => (
-              <li key={item.id} className={styles["hero-header__nav-item"]}>
-                <button
-                  className={`${styles["hero-header__nav-button"]} ${
-                    activeItem === item.id
-                      ? styles["hero-header__nav-button--active"]
-                      : ""
-                  }`}
-                  onClick={() => setActiveItem(item.id)}
-                >
-                  {item.label}
-                </button>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const active = activeItem === item.id;
+
+              return (
+                <li key={item.id} className={styles["hero-header__nav-item"]}>
+                  <button
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setActiveItem(item.id)}
+                    style={
+                      {
+                        "--pill": item.color,
+                        "--tilt": item.tilt,
+                      } as React.CSSProperties
+                    }
+                    className={`${styles["hero-header__nav-button"]} ${
+                      active ? styles["hero-header__nav-button--active"] : ""
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
 
           {canScrollRight && (

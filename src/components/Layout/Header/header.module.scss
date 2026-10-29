@@ -8,30 +8,16 @@
   /* =======================================================
      ТЕМНА ТЕМА
      ======================================================= */
-  --header-bg: rgba(0, 0, 0, 0.45);
+  /* Прозорість фону на ПК. На телефонах фон задає --header-solid */
+  --header-bg: rgba(0, 0, 0, 0.35);
   --header-solid: #000000;
   --text-color: #ffffff;
 
-  /* Звичайні кнопки */
-  --btn-bg: transparent;
-  --btn-border: rgba(255, 255, 255, 0.25);
-  --btn-bg-hover: rgba(255, 255, 255, 0.08);
-  --btn-border-hover: rgba(255, 255, 255, 0.4);
-  --btn-bg-pressed: rgba(255, 255, 255, 0.15);
-  --btn-border-pressed: rgba(255, 255, 255, 0.5);
-  --btn-text-pressed: #ffffff;
-
-  /* Активна сторінка */
-  --btn-active-page-bg: #ffffff;
-  --btn-active-page-border: #ffffff;
-  --btn-active-page-text: #000000;
-
-  /* Акцентна CTA кнопка "Заявка" (темна тема -> біла кнопка) */
-  --cta-bg: #ffffff;
-  --cta-text: #000000;
-  --cta-border: #ffffff;
-  --cta-hover-bg: #f0f0f0;
-  --cta-pressed-bg: #e0e0e0;
+  /* Акцентна CTA кнопка "Заявка": приглушений лавандовий градієнт.
+     Однаковий в обох темах, текст завжди темний */
+  --cta-gradient: linear-gradient(135deg, #eadcff 0%, #b99bd9 100%);
+  --cta-text: #0b0b0f;
+  --cta-glow: rgba(185, 155, 217, 0.45);
 
   --logo-filter: invert(0) brightness(1);
 
@@ -39,29 +25,9 @@
      СВІТЛА ТЕМА
      ======================================================= */
   &--light {
-    --header-bg: rgba(255, 255, 255, 0.65);
+    --header-bg: rgba(255, 255, 255, 0.5);
     --header-solid: #ffffff;
     --text-color: #1d1d1f;
-
-    /* Звичайні кнопки */
-    --btn-border: rgba(0, 0, 0, 0.15);
-    --btn-bg-hover: rgba(0, 0, 0, 0.05);
-    --btn-border-hover: rgba(0, 0, 0, 0.3);
-    --btn-bg-pressed: rgba(0, 0, 0, 0.1);
-    --btn-border-pressed: rgba(0, 0, 0, 0.4);
-    --btn-text-pressed: #1d1d1f;
-
-    /* Активна сторінка */
-    --btn-active-page-bg: #000000;
-    --btn-active-page-border: #000000;
-    --btn-active-page-text: #ffffff;
-
-    /* Акцентна CTA кнопка "Заявка" (світла тема -> чорна кнопка) */
-    --cta-bg: #000000;
-    --cta-text: #ffffff;
-    --cta-border: #000000;
-    --cta-hover-bg: #222222;
-    --cta-pressed-bg: #333333;
 
     --logo-filter: invert(1) brightness(0);
   }
@@ -134,36 +100,41 @@
 
   /* =======================================================
      CTA КНОПКА "ЗАЯВКА"
+     Фон задає градієнт. Наведення і натискання змінюють яскравість
+     через filter, бо градієнт не можна плавно перефарбувати
      ======================================================= */
   &__contact-button {
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: var(--cta-bg);
+    background-image: var(--cta-gradient);
+    background-color: transparent;
     color: var(--cta-text);
-    border: 1px solid var(--cta-border);
+    border: 1px solid transparent;
     box-sizing: border-box;
     border-radius: 30px;
     padding: 7px 18px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-    will-change: transform, background-color, border-color, box-shadow;
+    box-shadow: 0 6px 16px -8px var(--cta-glow);
+    transition:
+      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+      filter 0.2s ease,
+      box-shadow 0.2s ease;
+    will-change: transform, filter;
 
     @media (hover: hover) {
       &:hover {
-        background-color: var(--cta-hover-bg);
-        border-color: var(--cta-hover-bg);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        filter: brightness(1.05) saturate(1.05);
+        box-shadow: 0 10px 22px -8px var(--cta-glow);
       }
     }
 
     &:active {
-      background-color: var(--cta-pressed-bg);
-      border-color: var(--cta-pressed-bg);
       transform: scale(0.96);
-      box-shadow: none;
+      filter: brightness(0.95);
+      box-shadow: 0 4px 10px -6px var(--cta-glow);
       transition: none;
     }
   }
@@ -183,7 +154,7 @@
   &__nav-list {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     list-style: none;
     margin: 0;
     flex-wrap: wrap;
@@ -191,55 +162,52 @@
     justify-content: center;
   }
 
+  /* Пігулка напрямку. --pill (колір) і --tilt (нахил) задає header.tsx
+     через inline-стиль. Неактивна має фон з тією самою прозорістю, що
+     й шапка, і кольорову рамку. Активна заповнена своїм кольором */
   &__nav-button {
     display: flex;
     align-items: center;
     gap: 6px;
-    background-color: var(--btn-bg);
-    color: var(--text-color);
-    border: 1px solid var(--btn-border);
     box-sizing: border-box;
-    border-radius: 30px;
     padding: 6px 16px;
+    border-radius: 30px;
+    border: 1px solid color-mix(in srgb, var(--pill) 60%, transparent);
+    background-color: var(--header-bg);
+    color: var(--text-color);
     font-size: 14px;
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
     white-space: nowrap;
-    will-change: transform, background-color, border-color, opacity;
+    cursor: pointer;
+    transform: rotate(var(--tilt, 0deg));
+    transition: all 0.2s ease;
+    will-change: transform, background-color, border-color;
 
-    &--active {
-      background-color: var(--btn-active-page-bg);
-      color: var(--btn-active-page-text);
-      border-color: var(--btn-active-page-border);
-
-      @media (hover: hover) {
-        &:hover {
-          opacity: 0.85;
-        }
-      }
-
-      &:active {
-        transform: scale(0.96);
-        transition: none;
+    @media (hover: hover) {
+      &:hover {
+        background-color: color-mix(in srgb, var(--pill) 14%, transparent);
+        border-color: var(--pill);
       }
     }
 
-    &:not(&--active) {
+    &--active {
+      background-color: var(--pill);
+      border-color: var(--pill);
+      color: #0b0b0f;
+      box-shadow: 0 8px 18px -10px var(--pill);
+
+      /* Має йти після :hover вище, інакше наведення перефарбує активну */
       @media (hover: hover) {
         &:hover {
-          background-color: var(--btn-bg-hover);
-          border-color: var(--btn-border-hover);
+          background-color: var(--pill);
+          border-color: var(--pill);
         }
       }
+    }
 
-      &:active {
-        background-color: var(--btn-bg-pressed);
-        color: var(--btn-text-pressed);
-        border-color: var(--btn-border-pressed);
-        transform: scale(0.96);
-        transition: none;
-      }
+    &:active {
+      transform: rotate(var(--tilt, 0deg)) scale(0.96);
+      transition: none;
     }
   }
 }
@@ -262,6 +230,10 @@
     &__local {
       padding-left: 0;
       padding-right: 0;
+      /* Верхній і нижній відступ зменшено на 4px, бо список
+         сам отримує 4px зверху й знизу для нахилених пігулок */
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-bottom: 11px;
       display: flex;
       width: 100%;
 
@@ -331,7 +303,9 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       width: 100%;
-      padding: 0 20px;
+      /* Вертикальний відступ потрібен, бо overflow-x обрізає все,
+         що виходить за межі списку, у тому числі кути нахилених пігулок */
+      padding: 4px 20px;
       justify-content: safe center;
 
       &::-webkit-scrollbar {
@@ -378,7 +352,7 @@
 
 /* --- ТІЛЬКИ СМАРТФОНИ (touch без наведення) ---
    Суцільний фон без blur, колір з секції під шапкою, затримка перемикання
-   тексту й кнопок. На ПК цей блок не діє, шапка лишається прозорою */
+   тексту й пігулок. На ПК цей блок не діє, шапка лишається прозорою */
 @media (hover: none) and (pointer: coarse) {
   .hero-header {
     /* Текст перемикається рівно посередині переходу фону (0.4s / 2) */
@@ -408,15 +382,6 @@
 
     &__logo-text {
       transition: color 0s linear 0.2s;
-    }
-
-    &__contact-button {
-      transition:
-        color 0s linear 0.2s,
-        background-color 0s linear 0.2s,
-        border-color 0s linear 0.2s,
-        transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-        box-shadow 0.2s ease;
     }
 
     &__nav-button {
