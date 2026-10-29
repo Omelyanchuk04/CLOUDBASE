@@ -7,17 +7,20 @@ type Service = {
   id: string;
   label: string;
   color: string;
+  tilt: string;
   hint: string;
   examples: string[];
 };
 
 // Напрямки з секцій сервісів. Для кожного свої приклади запитів
-// у полі та короткий опис, щоб вибір щось пояснював
+// у полі та короткий опис, щоб вибір щось пояснював.
+// tilt — постійний нахил пігулки, різний для кожного напрямку
 const services: Service[] = [
   {
     id: "bas",
     label: "Супровід BAS",
     color: "#48c6ef",
+    tilt: "-rotate-3",
     hint: "Оновлення, налаштування конфігурацій і технічна підтримка BAS.",
     examples: [
       "Після оновлення BAS не проводяться документи…",
@@ -28,6 +31,7 @@ const services: Service[] = [
     id: "kbs",
     label: "Системи KBS",
     color: "#84fab0",
+    tilt: "rotate-2",
     hint: "Супровід KBS: актуальні звітні форми та стабільна робота баз.",
     examples: [
       "Не формується звітна форма за новий квартал…",
@@ -38,6 +42,7 @@ const services: Service[] = [
     id: "custom",
     label: "Допрацювання",
     color: "#fde047",
+    tilt: "-rotate-2",
     hint: "Нестандартні звіти, обробки, друковані форми та нові функції під ваші процеси.",
     examples: [
       "Потрібен звіт, якого немає в стандартній конфігурації…",
@@ -48,6 +53,7 @@ const services: Service[] = [
     id: "cloud",
     label: "Хмара 24/7",
     color: "#d57eeb",
+    tilt: "rotate-3",
     hint: "Віддалений доступ до баз, розгортання та щоденне резервне копіювання.",
     examples: [
       "Хочу перенести базу у хмару з доступом з будь-якого місця…",
@@ -58,6 +64,7 @@ const services: Service[] = [
     id: "other",
     label: "Інше",
     color: "#fca5a5",
+    tilt: "-rotate-1",
     hint: "Питання, які не підходять під інші напрямки. Опишіть задачу своїми словами.",
     examples: [
       "Є питання, які не стосуються цих напрямків…",
@@ -130,21 +137,6 @@ const ArrowUp = () => (
   </svg>
 );
 
-const ClipIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-  </svg>
-);
-
 const CheckIcon = () => (
   <svg
     width="24"
@@ -167,7 +159,6 @@ const ApplicationForm = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
-  const [fileName, setFileName] = useState("");
   const [focused, setFocused] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
@@ -184,7 +175,7 @@ const ApplicationForm = () => {
 
     setStatus("sending");
     // TODO: замініть на реальний запит (API, пошта або Telegram-бот).
-    // Передайте service.label, name, phone, message і fileName
+    // Передайте service.label, name, phone і message
     setTimeout(() => setStatus("sent"), 1200);
   };
 
@@ -201,7 +192,6 @@ const ApplicationForm = () => {
     setName("");
     setPhone("");
     setMessage("");
-    setFileName("");
   };
 
   return (
@@ -252,11 +242,11 @@ const ApplicationForm = () => {
 
         {/* Вибір напрямку. Від нього залежать опис і приклад у полі форми */}
         <div className="mt-12 md:mt-16">
-          <p className="mb-4 text-left text-xs font-medium uppercase tracking-[0.2em] text-white/40 md:text-center">
+          <p className="mb-5 text-left text-xs font-medium uppercase tracking-[0.2em] text-white/40 md:text-center">
             Оберіть напрямок
           </p>
 
-          <div className="flex flex-wrap justify-start gap-2.5 md:justify-center">
+          <div className="flex flex-wrap justify-start gap-x-4 gap-y-5 md:justify-center">
             {services.map((s) => {
               const active = s.id === serviceId;
 
@@ -266,16 +256,21 @@ const ApplicationForm = () => {
                   type="button"
                   onClick={() => setServiceId(s.id)}
                   aria-pressed={active}
-                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                  style={
                     active
-                      ? "border-white bg-white text-black"
-                      : "border-white/15 text-white/70 hover:border-white/35 hover:text-white"
-                  }`}
+                      ? {
+                          backgroundColor: s.color,
+                          borderColor: s.color,
+                          color: "#0b0b0f",
+                          boxShadow: `0 12px 24px -12px ${s.color}`,
+                        }
+                      : {
+                          borderColor: `${s.color}80`,
+                          color: s.color,
+                        }
+                  }
+                  className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${s.tilt}`}
                 >
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: s.color }}
-                  />
                   {s.label}
                 </button>
               );
@@ -321,23 +316,6 @@ const ApplicationForm = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Опис обраного напрямку. key змушує анімацію відіграти при зміні */}
-                <div className="flex items-start gap-3 border-b border-white/10 pb-5">
-                  <span
-                    className="mt-[7px] h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: service.color }}
-                  />
-                  <motion.p
-                    key={service.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, ease: "easeOut" }}
-                    className="text-sm leading-relaxed text-white/55"
-                  >
-                    {service.hint}
-                  </motion.p>
-                </div>
-
                 <div className="grid gap-3 sm:grid-cols-2">
                   <input
                     value={name}
@@ -370,21 +348,22 @@ const ApplicationForm = () => {
                 />
 
                 <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-4">
-                  <label className="flex min-w-0 cursor-pointer items-center gap-2 text-white/50 transition-colors hover:text-white">
-                    <input
-                      type="file"
-                      className="sr-only"
-                      onChange={(e) =>
-                        setFileName(e.target.files?.[0]?.name ?? "")
-                      }
+                  {/* Опис обраного напрямку. key змушує анімацію відіграти при зміні */}
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: service.color }}
                     />
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10">
-                      <ClipIcon />
-                    </span>
-                    {fileName && (
-                      <span className="truncate text-xs">{fileName}</span>
-                    )}
-                  </label>
+                    <motion.p
+                      key={service.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                      className="text-sm leading-relaxed text-white/55"
+                    >
+                      {service.hint}
+                    </motion.p>
+                  </div>
 
                   <div className="flex shrink-0 items-center gap-3">
                     <span className="hidden text-xs text-white/35 sm:inline">
