@@ -54,74 +54,6 @@ const contacts: ContactItem[] = [
   },
 ];
 
-// Перетворює #rrggbb на [r, g, b]
-const hexToRgb = (hex: string): [number, number, number] => {
-  const n = parseInt(hex.trim().replace("#", ""), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-};
-
-type UnderBg = { color: string; isLight: boolean };
-
-// Колір під шапкою на рівні верхнього краю екрана (лінія 2px). Викликається
-// лише на телефонах.
-// 1) Плавний перехід: елемент із data-header-fade="#від #до". Колір рахуємо
-//    так само, як його малює градієнт
-// 2) Суцільний фон елемента під шапкою
-// Повертає null, якщо колір визначити не можна
-const getUnderBackground = (): UnderBg | null => {
-  const fades = Array.from(
-    document.querySelectorAll<HTMLElement>("[data-header-fade]"),
-  );
-
-  for (const fade of fades) {
-    const rect = fade.getBoundingClientRect();
-    if (rect.height === 0 || rect.top > 2 || rect.bottom < 2) continue;
-
-    const [fromHex, toHex] = (fade.dataset.headerFade ?? "").split(" ");
-    if (!fromHex || !toHex) return null;
-
-    const t = Math.min(Math.max((2 - rect.top) / rect.height, 0), 1);
-    const from = hexToRgb(fromHex);
-    const to = hexToRgb(toHex);
-    const mixed = from.map((v, i) => Math.round(v + (to[i] - v) * t)) as [
-      number,
-      number,
-      number,
-    ];
-    const brightness =
-      (0.299 * mixed[0] + 0.587 * mixed[1] + 0.114 * mixed[2]) / 255;
-
-    return { color: `rgb(${mixed.join(", ")})`, isLight: brightness > 0.5 };
-  }
-
-  const x = document.documentElement.clientWidth / 2;
-  const elements = document.elementsFromPoint(x, 2);
-
-  for (const el of elements) {
-    // Саму шапку пропускаємо, вона лежить зверху
-    if (el.closest("header")) continue;
-    // Дійшли до кореня сторінки: суцільного фону під шапкою немає
-    if (el === document.documentElement || el === document.body) break;
-
-    const style = getComputedStyle(el);
-    if (style.backgroundImage !== "none") return null;
-
-    const bg = style.backgroundColor;
-    if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") continue;
-    // Напівпрозорий фон дає змішаний колір, його не беремо
-    if (/,\s*0?\.\d+\)$/.test(bg)) return null;
-
-    const parts: string[] = bg.match(/\d+(?:\.\d+)?/g) ?? [];
-    const [r, g, b] = parts.map(Number);
-    // Відносна яскравість: 0 — чорний, 1 — білий
-    const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    return { color: bg, isLight: brightness > 0.5 };
-  }
-
-  return null;
-};
-
 const Header: React.FC = () => {
   const [activeItem, setActiveItem] = useState<string>("home");
   const [showTop, setShowTop] = useState<boolean>(true);
@@ -131,78 +63,100 @@ const Header: React.FC = () => {
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
 
-  const headerRef = useRef<HTMLElement>(null);
   const navListRef = useRef<HTMLUListElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // ЄДИНА ЛОГІКА СКРОЛУ: ховання верхнього рядка, колір і тема шапки
+  // ХОВАННЯ ВЕРХНЬОГО РЯДКА. Обробник прокрутки лише читає позицію
+  // і міняє стан, коли він справді змінився. Поріг 6px не дає шапці
+  // смикатися туди-сюди при повільній прокрутці
   useEffect(() => {
-    let lastScrollY = window.scrollY;
     let ticking = false;
-    // Останній колір, записаний у шапку. У DOM пишемо лише при зміні,
-    // щоб не перемальовувати шапку на кожному кадрі прокрутки
-    let appliedColor: string | null = null;
-    const touchQuery = window.matchMedia("(hover: none) and (pointer: coarse)");
+    let anchor = window.scrollY;
+    let hidden = false;
 
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
+    const update = () => {
+      ticking = false;
+      const y = window.scrollY;
 
-      window.requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-
-        // 1. Ховання верхньої панелі
-        if (currentScrollY > lastScrollY && currentScrollY > 60) {
-          setShowTop((prev) => (prev ? false : prev));
-        } else {
-          setShowTop((prev) => (!prev ? true : prev));
+      if (y <= 80) {
+        if (hidden) {
+          hidden = false;
+          setShowTop(true);
         }
-        lastScrollY = currentScrollY;
+        anchor = y;
+        return;
+      }
 
-        // 2. Колір під шапкою (лише телефони)
-        const under = touchQuery.matches ? getUnderBackground() : null;
-
-        if (headerRef.current) {
-          if (under && under.color !== appliedColor) {
-            headerRef.current.style.setProperty("--header-solid", under.color);
-            appliedColor = under.color;
-          } else if (!under && appliedColor !== null) {
-            headerRef.current.style.removeProperty("--header-solid");
-            appliedColor = null;
-          }
+      if (!hidden) {
+        if (y > anchor + 6) {
+          hidden = true;
+          setShowTop(false);
+          anchor = y;
+        } else if (y < anchor) {
+          anchor = y;
         }
-
-        // 3. Тема шапки. На телефоні за фоном під шапкою,
-        //    на ПК за секціями з data-theme під лінією 65px
-        let light = under ? under.isLight : false;
-
-        if (!under) {
-          const sections = document.querySelectorAll("[data-theme]");
-          sections.forEach((sec) => {
-            const rect = sec.getBoundingClientRect();
-            if (
-              rect.top <= 65 &&
-              rect.bottom >= 65 &&
-              sec.getAttribute("data-theme") === "light"
-            ) {
-              light = true;
-            }
-          });
-        }
-
-        setIsLightTheme((prev) => (prev !== light ? light : prev));
-
-        ticking = false;
-      });
+      } else if (y < anchor - 6) {
+        hidden = false;
+        setShowTop(true);
+        anchor = y;
+      } else if (y > anchor) {
+        anchor = y;
+      }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-    handleScroll();
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // ТЕМА ШАПКИ. Слідкуємо за секціями з data-theme="light", які перетинають
+  // лінію на 65px від верху. IntersectionObserver не змушує браузер
+  // перераховувати верстку під час прокрутки, на відміну від читання
+  // розмірів у обробнику скролу
+  useEffect(() => {
+    const lightSections = new Set<Element>();
+    let observer: IntersectionObserver | null = null;
+
+    const applyTheme = () => {
+      const light = lightSections.size > 0;
+      setIsLightTheme((prev) => (prev !== light ? light : prev));
+    };
+
+    const build = () => {
+      observer?.disconnect();
+      lightSections.clear();
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) lightSections.add(entry.target);
+            else lightSections.delete(entry.target);
+          });
+          applyTheme();
+        },
+        // Смуга 1px на рівні 65–66px від верху. Елемент потрапляє в неї,
+        // якщо перетинає лінію під шапкою
+        { rootMargin: `-65px 0px ${-(window.innerHeight - 66)}px 0px` },
+      );
+
+      document
+        .querySelectorAll('[data-theme="light"]')
+        .forEach((el) => observer?.observe(el));
+    };
+
+    build();
+    // Висота вікна на телефоні змінюється, коли ховається адресний рядок,
+    // тому смугу перебудовуємо при зміні розміру
+    window.addEventListener("resize", build);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("resize", build);
+      observer?.disconnect();
     };
   }, []);
 
@@ -250,9 +204,12 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setTimeout(checkNavScroll, 100);
+    const timer = setTimeout(checkNavScroll, 100);
     window.addEventListener("resize", checkNavScroll);
-    return () => window.removeEventListener("resize", checkNavScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", checkNavScroll);
+    };
   }, [checkNavScroll]);
 
   const scrollNav = (direction: "left" | "right") => {
@@ -293,7 +250,6 @@ const Header: React.FC = () => {
 
   return (
     <header
-      ref={headerRef}
       className={`${styles["hero-header"]} ${
         !showTop ? styles["hero-header--hidden-top"] : ""
       } ${isLightTheme ? styles["hero-header--light"] : ""}`}

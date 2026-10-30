@@ -8,9 +8,8 @@
   /* =======================================================
      ТЕМНА ТЕМА
      ======================================================= */
-  /* Прозорість фону на ПК. На телефонах фон задає --header-solid */
+  /* Прозорість фону шапки. Однакова на ПК і телефоні */
   --header-bg: rgba(0, 0, 0, 0.35);
-  --header-solid: #000000;
   --text-color: #ffffff;
 
   /* Випадаюче меню контактів */
@@ -42,7 +41,6 @@
      ======================================================= */
   &--light {
     --header-bg: rgba(255, 255, 255, 0.5);
-    --header-solid: #ffffff;
     --text-color: #1d1d1f;
 
     --menu-bg: #ffffff;
@@ -69,8 +67,7 @@
     sans-serif;
   transition: color 0.4s ease;
 
-  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (ПК, будь-яка ширина) ---
-     На смартфонах перевизначено в медіазапиті (hover: none) and (pointer: coarse) */
+  /* --- НАПІВПРОЗОРИЙ ФОН З BLUR (однаково на ПК і телефоні) --- */
   &::before {
     content: "";
     position: absolute;
@@ -93,7 +90,7 @@
   }
 
   /* overflow: visible, щоб не обрізати кнопку і випадаюче меню.
-     Приховування верхнього рядка на телефоні тримає height: 0 і opacity */
+     Приховування верхнього рядка тримає height: 0 і opacity */
   &__global {
     display: flex;
     justify-content: space-between;
@@ -550,74 +547,36 @@
 }
 
 /* --- ТІЛЬКИ СМАРТФОНИ (touch без наведення) ---
-   Прозора шапка без blur. Верхня смуга під статус-баром суцільна, щоб
-   Safari не фарбував її кольором контенту. На ПК цей блок не діє */
+   Шапка і скло такі самі, як на ПК. Тут прибрано те, що гальмувало
+   прокрутку на телефоні: вкладений blur кнопки, постійні will-change
+   і переходи, які йшли разом із прокруткою */
 @media (hover: none) and (pointer: coarse) {
   .hero-header {
-    /* Текст і логотип змінюються без затримки. Фон іде за прокруткою,
-       тож затримка кольору відставала б від пальця */
-    transition: color 0.15s ease;
+    transition: color 0.3s ease;
 
-    /* Фон шапки на телефоні без blur і без анімації кольору. Blur на всю
-       шапку і плавна зміна кольору під час прокрутки давали відставання */
-    &::before {
-      background-color: transparent;
-      /* Запасний варіант для старих браузерів: суцільний колір */
-      background-image: linear-gradient(
-        to bottom,
-        var(--header-solid) 0,
-        var(--header-solid) 112px
-      );
-      /* Перші 52px суцільні (зона статус-бару), далі шапка поступово
-         стає прозорою. Колір береться з --header-solid, який header.tsx
-         записує з секції під шапкою. Світла тема трохи темніша за секцію,
-         темна трохи світліша, щоб була видна межа */
-      background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--header-solid), #fff 8%) 0,
-        color-mix(in srgb, var(--header-solid), #fff 8%) 52px,
-        color-mix(in srgb, var(--header-solid) 60%, transparent) 112px
-      );
+    &__global {
+      transition:
+        height 0.3s ease,
+        opacity 0.3s ease;
+    }
+
+    &__cta-group {
       will-change: auto;
+      /* Blur не дублюємо: фон шапки вже розмитий під кнопкою */
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
-      transition: none;
-    }
-
-    &--light::before {
-      background-image: linear-gradient(
-        to bottom,
-        var(--header-solid) 0,
-        var(--header-solid) 112px
-      );
-      background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--header-solid), #000 8%) 0,
-        color-mix(in srgb, var(--header-solid), #000 8%) 52px,
-        color-mix(in srgb, var(--header-solid) 60%, transparent) 112px
-      );
-    }
-
-    &__logo {
-      transition: filter 0.15s ease;
-    }
-
-    &__logo-text {
-      transition: color 0.15s ease;
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.3s ease;
     }
 
     &__nav-button {
+      will-change: auto;
       transition:
-        color 0s linear 0.2s,
-        background-color 0s linear 0.2s,
-        border-color 0s linear 0.2s,
-        transform 0.2s ease;
-    }
-
-    &__scroll-indicator {
-      transition:
-        opacity 0.2s ease,
-        color 0s linear 0.2s;
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
     }
   }
 }
