@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 type Service = {
@@ -162,9 +162,26 @@ const ApplicationForm = () => {
   const [focused, setFocused] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
+  // Видимість секції. Друк у полі йде лише тоді, коли секція на екрані,
+  // інакше таймер щоразу перемальовує форму під час прокрутки
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: "200px 0px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Приклади беруться з обраного напрямку, тож друк змінюється разом із вибором
   const emptyPrompt = !focused && message === "";
-  const typed = useTypewriter(service.examples, emptyPrompt);
+  const typed = useTypewriter(service.examples, emptyPrompt && inView);
 
   const canSend =
     name.trim() !== "" && phone.trim() !== "" && message.trim() !== "";
@@ -196,23 +213,23 @@ const ApplicationForm = () => {
 
   return (
     <section
+      ref={sectionRef}
       id="application"
       data-theme="dark"
       className="relative w-full overflow-hidden bg-[#08080c] pb-24 pt-44 text-white md:pb-32 md:pt-56"
     >
-      {/* Перехід із попередньої світлої секції. Починається з того самого
-          кольору, що фон кроків (#ebebf0), і поступово темніє до фону цієї
-          секції. pointer-events-none, щоб шапка не брала колір градієнта */}
+      {/* Перехід із попередньої світлої секції. Шапка на телефоні бере колір
+          цього елемента за положенням (data-header-fade, див. header.tsx),
+          тому градієнт має бути двоколірним і збігатися з data-header-fade.
+          pointer-events-none, щоб елемент не перехоплював кліки */}
       <div
+        data-header-fade="#ebebf0 #08080c"
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-[240px]"
-        style={{
-          background:
-            "linear-gradient(to bottom, #ebebf0 0%, #d3cfdc 20%, #b0abbf 38%, #7d7890 55%, #3b3749 72%, #17151e 88%, #08080c 100%)",
-        }}
+        style={{ background: "linear-gradient(to bottom, #ebebf0, #08080c)" }}
       />
 
-      {/* Невидимий маркер для шапки. Поки він під шапкою, шапка світла,
+      {/* Невидимий маркер для шапки на ПК. Поки він під шапкою, шапка світла,
           бо фон там ще світлий. Висота відповідає світлій частині градієнта */}
       <div
         data-theme="light"
@@ -220,10 +237,11 @@ const ApplicationForm = () => {
         className="pointer-events-none absolute inset-x-0 top-0 h-[100px]"
       />
 
-      {/* Декоративне світло */}
+      {/* Декоративне світло. Радіальний градієнт замість blur: розмиття
+          дороге для телефона і дає мерехтіння під час прокрутки */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[38%] h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-[#d57eeb]/20 blur-[120px]" />
-        <div className="absolute -bottom-32 right-0 h-[380px] w-[520px] rounded-full bg-[#48c6ef]/15 blur-[120px]" />
+        <div className="absolute left-1/2 top-[38%] h-[640px] w-[960px] -translate-x-1/2 bg-[radial-gradient(closest-side,rgba(213,126,235,0.38),rgba(213,126,235,0.14)_55%,transparent)]" />
+        <div className="absolute -bottom-32 right-0 h-[420px] w-[600px] bg-[radial-gradient(closest-side,rgba(72,198,239,0.22),transparent)]" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[860px] px-6">
@@ -278,16 +296,17 @@ const ApplicationForm = () => {
           </div>
         </div>
 
-        {/* Картка з обертовою рамкою. На фокусі рамка яскравіша */}
+        {/* Картка з рамкою. На ПК рамка обертається і має тінь,
+            на телефоні рамка статична, щоб не навантажувати прокрутку */}
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="group relative mt-6 rounded-[1.5rem] p-px shadow-[0_40px_80px_-30px_rgba(213,126,235,0.35)] md:mt-8"
+          className="group relative mt-6 rounded-[1.5rem] p-px lg:shadow-[0_40px_80px_-30px_rgba(213,126,235,0.35)] md:mt-8"
         >
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.5rem]">
-            <div className="absolute left-1/2 top-1/2 -ml-[600px] -mt-[600px] h-[1200px] w-[1200px] animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_0deg,#48c6ef,#d57eeb,#fccb90,#84fab0,#48c6ef)] opacity-40 transition-opacity duration-500 group-focus-within:opacity-100 motion-reduce:animate-none" />
+            <div className="absolute left-1/2 top-1/2 -ml-[400px] -mt-[400px] h-[800px] w-[800px] bg-[conic-gradient(from_0deg,#48c6ef,#d57eeb,#fccb90,#84fab0,#48c6ef)] opacity-40 transition-opacity duration-500 group-focus-within:opacity-100 lg:-ml-[600px] lg:-mt-[600px] lg:h-[1200px] lg:w-[1200px] lg:will-change-transform lg:motion-safe:animate-[spin_8s_linear_infinite]" />
           </div>
 
           <div className="relative rounded-[calc(1.5rem_-_1px)] bg-[#0e0e14] p-5 md:p-7">

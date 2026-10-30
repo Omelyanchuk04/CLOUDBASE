@@ -54,10 +54,46 @@ const contacts: ContactItem[] = [
   },
 ];
 
-// Суцільний фон елемента під шапкою на рівні верхнього краю екрана.
-// Повертає колір і те, світлий він чи темний. Якщо колір визначити не можна
-// (градієнт, картинка, напівпрозорий фон або лише body), повертає null
-const getUnderBackground = (): { color: string; isLight: boolean } | null => {
+// Перетворює #rrggbb на [r, g, b]
+const hexToRgb = (hex: string): [number, number, number] => {
+  const n = parseInt(hex.trim().replace("#", ""), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+type UnderBg = { color: string; isLight: boolean };
+
+// Колір під шапкою на рівні верхнього краю екрана (лінія 2px). Викликається
+// лише на телефонах.
+// 1) Плавний перехід: елемент із data-header-fade="#від #до". Колір рахуємо
+//    так само, як його малює градієнт
+// 2) Суцільний фон елемента під шапкою
+// Повертає null, якщо колір визначити не можна
+const getUnderBackground = (): UnderBg | null => {
+  const fades = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-header-fade]"),
+  );
+
+  for (const fade of fades) {
+    const rect = fade.getBoundingClientRect();
+    if (rect.height === 0 || rect.top > 2 || rect.bottom < 2) continue;
+
+    const [fromHex, toHex] = (fade.dataset.headerFade ?? "").split(" ");
+    if (!fromHex || !toHex) return null;
+
+    const t = Math.min(Math.max((2 - rect.top) / rect.height, 0), 1);
+    const from = hexToRgb(fromHex);
+    const to = hexToRgb(toHex);
+    const mixed = from.map((v, i) => Math.round(v + (to[i] - v) * t)) as [
+      number,
+      number,
+      number,
+    ];
+    const brightness =
+      (0.299 * mixed[0] + 0.587 * mixed[1] + 0.114 * mixed[2]) / 255;
+
+    return { color: `rgb(${mixed.join(", ")})`, isLight: brightness > 0.5 };
+  }
+
   const x = document.documentElement.clientWidth / 2;
   const elements = document.elementsFromPoint(x, 2);
 
@@ -99,62 +135,65 @@ const Header: React.FC = () => {
   const navListRef = useRef<HTMLUListElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // ЄДИНА, НАДІЙНА І ОПТИМІЗОВАНА ЛОГІКА СКРОЛУ
+  // ЄДИНА ЛОГІКА СКРОЛУ: ховання верхнього рядка, колір і тема шапки
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ticking = false;
+    // Останній колір, записаний у шапку. У DOM пишемо лише при зміні,
+    // щоб не перемальовувати шапку на кожному кадрі прокрутки
+    let appliedColor: string | null = null;
+    const touchQuery = window.matchMedia("(hover: none) and (pointer: coarse)");
 
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
+      if (ticking) return;
+      ticking = true;
 
-          // 1. Логіка ховання верхньої панелі
-          if (currentScrollY > lastScrollY && currentScrollY > 60) {
-            setShowTop((prev) => (prev ? false : prev));
-          } else {
-            setShowTop((prev) => (!prev ? true : prev));
+      window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+
+        // 1. Ховання верхньої панелі
+        if (currentScrollY > lastScrollY && currentScrollY > 60) {
+          setShowTop((prev) => (prev ? false : prev));
+        } else {
+          setShowTop((prev) => (!prev ? true : prev));
+        }
+        lastScrollY = currentScrollY;
+
+        // 2. Колір під шапкою (лише телефони)
+        const under = touchQuery.matches ? getUnderBackground() : null;
+
+        if (headerRef.current) {
+          if (under && under.color !== appliedColor) {
+            headerRef.current.style.setProperty("--header-solid", under.color);
+            appliedColor = under.color;
+          } else if (!under && appliedColor !== null) {
+            headerRef.current.style.removeProperty("--header-solid");
+            appliedColor = null;
           }
-          lastScrollY = currentScrollY;
+        }
 
-          // 2. Тема за секцією під лінією 65px (для ПК і як запасний варіант)
+        // 3. Тема шапки. На телефоні за фоном під шапкою,
+        //    на ПК за секціями з data-theme під лінією 65px
+        let light = under ? under.isLight : false;
+
+        if (!under) {
           const sections = document.querySelectorAll("[data-theme]");
-          let foundLight = false;
-
           sections.forEach((sec) => {
             const rect = sec.getBoundingClientRect();
-            if (rect.top <= 65 && rect.bottom >= 65) {
-              if (sec.getAttribute("data-theme") === "light") {
-                foundLight = true;
-              }
+            if (
+              rect.top <= 65 &&
+              rect.bottom >= 65 &&
+              sec.getAttribute("data-theme") === "light"
+            ) {
+              light = true;
             }
           });
+        }
 
-          // 3. На смартфонах колір і тема беруться з однієї точки під шапкою.
-          // На ПК цей блок не працює, тема береться з секцій (пункт 2)
-          const isTouch = window.matchMedia(
-            "(hover: none) and (pointer: coarse)",
-          ).matches;
-          const under = isTouch ? getUnderBackground() : null;
+        setIsLightTheme((prev) => (prev !== light ? light : prev));
 
-          if (headerRef.current) {
-            if (under) {
-              headerRef.current.style.setProperty(
-                "--header-solid",
-                under.color,
-              );
-            } else {
-              headerRef.current.style.removeProperty("--header-solid");
-            }
-          }
-
-          const light = under ? under.isLight : foundLight;
-          setIsLightTheme((prev) => (prev !== light ? light : prev));
-
-          ticking = false;
-        });
-        ticking = true;
-      }
+        ticking = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -234,8 +273,6 @@ const Header: React.FC = () => {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // Скляна кнопка: відблиск і нахил слідують за курсором.
-  // Тільки для миші, на сенсорному екрані цей ефект не потрібен
   // Скляна кнопка: відблиск слідує за курсором.
   // Тільки для миші, на сенсорному екрані цей ефект не потрібен
   const handleGlassMove = (e: React.PointerEvent<HTMLDivElement>) => {
