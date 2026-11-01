@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { easedGradient } from "@/lib/utils/gradients";
 
 type Service = {
   id: string;
@@ -152,8 +153,20 @@ const CheckIcon = () => (
   </svg>
 );
 
-const ApplicationForm = () => {
-  const [serviceId, setServiceId] = useState(services[0].id);
+// fromColor: колір секції над формою, щоб перехід був без шва.
+// На головній це #ebebf0, тому без пропса нічого не змінюється
+// defaultService: напрямок, обраний одразу (наприклад "kbs" на сторінці KBS).
+// lightTop: false, якщо секція над формою темна, щоб шапка не світлішала
+const ApplicationForm = ({
+  fromColor = "#ebebf0",
+  defaultService = services[0].id,
+  lightTop = true,
+}: {
+  fromColor?: string;
+  defaultService?: string;
+  lightTop?: boolean;
+}) => {
+  const [serviceId, setServiceId] = useState(defaultService);
   const service = services.find((s) => s.id === serviceId) ?? services[0];
 
   const [name, setName] = useState("");
@@ -216,32 +229,44 @@ const ApplicationForm = () => {
       ref={sectionRef}
       id="application"
       data-theme="dark"
-      className="relative w-full overflow-hidden bg-[#08080c] pb-24 pt-44 text-white md:pb-32 md:pt-56"
+      className="relative w-full overflow-hidden bg-[#08080c] pb-24 pt-[200px] text-white md:pb-32 md:pt-[240px]"
     >
       {/* Перехід із попередньої світлої секції. Шапка на телефоні бере колір
           цього елемента за положенням (data-header-fade, див. header.tsx),
           тому градієнт має бути двоколірним і збігатися з data-header-fade.
           pointer-events-none, щоб елемент не перехоплював кліки */}
       <div
-        data-header-fade="#ebebf0 #08080c"
+        data-header-fade={`${fromColor} #08080c`}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[240px]"
-        style={{ background: "linear-gradient(to bottom, #ebebf0, #08080c)" }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-[280px]"
+        style={{ background: easedGradient(fromColor, "#08080c") }}
       />
 
       {/* Невидимий маркер для шапки на ПК. Поки він під шапкою, шапка світла,
           бо фон там ще світлий. Висота відповідає світлій частині градієнта */}
-      <div
-        data-theme="light"
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[100px]"
-      />
+      {lightTop && (
+        <div
+          data-theme="light"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[120px]"
+        />
+      )}
 
-      {/* Декоративне світло. Радіальний градієнт замість blur: розмиття
-          дороге для телефона і дає мерехтіння під час прокрутки */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      {/* Декоративне світло. Маска гасить його до нуля біля нижнього краю,
+          тож світло не обривається на межі з футером. Фон секції і футера
+          однаковий (#08080c), тому шва немає */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          WebkitMaskImage:
+            "linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%)",
+        }}
+      >
         <div className="absolute left-1/2 top-[38%] h-[640px] w-[960px] -translate-x-1/2 bg-[radial-gradient(closest-side,rgba(213,126,235,0.38),rgba(213,126,235,0.14)_55%,transparent)]" />
-        <div className="absolute -bottom-32 right-0 h-[420px] w-[600px] bg-[radial-gradient(closest-side,rgba(72,198,239,0.22),transparent)]" />
+        <div className="absolute bottom-24 right-0 h-[420px] w-[600px] bg-[radial-gradient(closest-side,rgba(72,198,239,0.22),transparent)]" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[860px] px-6">
@@ -392,7 +417,7 @@ const ApplicationForm = () => {
                       type="submit"
                       disabled={!canSend || status === "sending"}
                       aria-label="Надіслати заявку"
-                      className={`flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-200 hover:scale-105 active:scale-95 disabled:bg-white/15 disabled:text-white/40 disabled:hover:scale-100 ${
+                      className={`flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-200 hover:bg-white/85 active:scale-95 disabled:bg-white/15 disabled:text-white/40 ${
                         status === "sending" ? "animate-pulse" : ""
                       }`}
                     >

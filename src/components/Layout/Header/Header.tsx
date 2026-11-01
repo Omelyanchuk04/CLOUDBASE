@@ -1,22 +1,25 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from "./header.module.scss";
 
 interface NavItem {
   id: string;
   label: string;
+  href: string; // адреса сторінки або якоря на головній
   color: string; // колір пігулки, як у секціях сервісів
   tilt: string; // постійний нахил пігулки
 }
 
 const navItems: NavItem[] = [
-  { id: "home", label: "Головна", color: "#6f86d6", tilt: "-2deg" },
-  { id: "bas", label: "BAS", color: "#48c6ef", tilt: "1deg" },
-  { id: "kbs", label: "KBS", color: "#84fab0", tilt: "-1deg" },
-  { id: "cloud", label: "Хмара", color: "#d57eeb", tilt: "2deg" },
-  { id: "about", label: "Про нас", color: "#fde047", tilt: "-1.5deg" },
-  { id: "contacts", label: "Контакти", color: "#fca5a5", tilt: "1.5deg" },
+  { id: "home", label: "Головна", href: "/", color: "#6f86d6", tilt: "-2deg" },
+  { id: "bas", label: "BAS", href: "/BAS", color: "#48c6ef", tilt: "1deg" },
+  { id: "kbs", label: "KBS", href: "/KBS", color: "#84fab0", tilt: "-1deg" },
+  { id: "cloud", label: "Хмара", href: "/cloud", color: "#d57eeb", tilt: "2deg" },
+  { id: "about", label: "Про нас", href: "/about", color: "#fde047", tilt: "-1.5deg" },
+  { id: "contacts", label: "Контакти", href: "/#application", color: "#fca5a5", tilt: "1.5deg" },
 ];
 
 interface ContactItem {
@@ -55,7 +58,11 @@ const contacts: ContactItem[] = [
 ];
 
 const Header: React.FC = () => {
-  const [activeItem, setActiveItem] = useState<string>("home");
+  // Активний пункт визначаємо за адресою, тож після переходу пігулка сама перемикається
+  const pathname = usePathname();
+  const activeItem =
+    navItems.find((item) => item.href !== "/" && pathname.startsWith(item.href))?.id ??
+    (pathname === "/" ? "home" : "");
   const [showTop, setShowTop] = useState<boolean>(true);
   const [isLightTheme, setIsLightTheme] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -149,16 +156,19 @@ const Header: React.FC = () => {
         .forEach((el) => observer?.observe(el));
     };
 
-    build();
+    // Будуємо після відмальовування нової сторінки: шапка живе в layout
+    // і не перезавантажується між сторінками, тому секції шукаємо щоразу
+    const raf = requestAnimationFrame(build);
     // Висота вікна на телефоні змінюється, коли ховається адресний рядок,
     // тому смугу перебудовуємо при зміні розміру
     window.addEventListener("resize", build);
 
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", build);
       observer?.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   // Закриття випадаючого меню: клік поза ним, Esc або прокрутка
   useEffect(() => {
@@ -222,12 +232,14 @@ const Header: React.FC = () => {
     }
   };
 
-  // Ліва частина кнопки: прокрутка до форми заявки
-  const scrollToApplication = () => {
+  // Ліва частина кнопки: якщо форма на цій сторінці, плавно до неї.
+  // Інакше звичайний перехід на головну до форми (href="/#application")
+  const handleApplicationClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     setMenuOpen(false);
-    document
-      .getElementById("application")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = document.getElementById("application");
+    if (!el) return;
+    e.preventDefault();
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   // Скляна кнопка: відблиск слідує за курсором.
@@ -256,7 +268,11 @@ const Header: React.FC = () => {
     >
       <div className={styles["hero-header__top"]}>
         <div className={styles["hero-header__global"]}>
-          <div className={styles["hero-header__logo-wrapper"]}>
+          <Link
+            href="/"
+            className={styles["hero-header__logo-wrapper"]}
+            aria-label="CloudBASE, на головну"
+          >
             <img
               src="/logo.png"
               alt="Cloudbase Logo"
@@ -264,7 +280,7 @@ const Header: React.FC = () => {
               style={{ filter: "var(--logo-filter)" }}
             />
             <span className={styles["hero-header__logo-text"]}>CloudBASE</span>
-          </div>
+          </Link>
 
           <div className={styles["hero-header__actions-wrapper"]}>
             <div ref={menuRef} className={styles["hero-header__cta-wrap"]}>
@@ -273,10 +289,10 @@ const Header: React.FC = () => {
                 onPointerMove={handleGlassMove}
                 onPointerLeave={handleGlassLeave}
               >
-                <button
-                  type="button"
+                <Link
+                  href="/#application"
                   className={styles["hero-header__cta-main"]}
-                  onClick={scrollToApplication}
+                  onClick={handleApplicationClick}
                 >
                   {/* Іконка гарнітури */}
                   <svg
@@ -293,7 +309,7 @@ const Header: React.FC = () => {
                     <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
                   </svg>
                   Заявка
-                </button>
+                </Link>
 
                 <span
                   className={styles["hero-header__cta-divider"]}
@@ -403,10 +419,10 @@ const Header: React.FC = () => {
 
               return (
                 <li key={item.id} className={styles["hero-header__nav-item"]}>
-                  <button
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => setActiveItem(item.id)}
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => setMenuOpen(false)}
                     style={
                       {
                         "--pill": item.color,
@@ -418,7 +434,7 @@ const Header: React.FC = () => {
                     }`}
                   >
                     {item.label}
-                  </button>
+                  </Link>
                 </li>
               );
             })}

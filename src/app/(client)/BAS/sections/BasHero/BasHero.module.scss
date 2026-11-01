@@ -1,0 +1,285 @@
+/* Hero сторінки BAS. Фон, плями й скляна кнопка
+   ті самі, що в MacbookSection на головній */
+$color-bg: #0d0e15;
+
+.section {
+  position: relative;
+  width: 100%;
+  background-color: $color-bg;
+  overflow: clip;
+  color: #fff;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 300px;
+    background: linear-gradient(to bottom, #000000 0%, transparent 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+/* Плавний перехід у білу секцію конфігурацій */
+/* Плавний перехід у білу секцію. Градієнт задається в компоненті
+   (easedFade), щоб не було видимої лінії на початку й у кінці */
+.fadeBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 280px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.blobContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+%blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  transform: translateZ(0);
+
+  @media (max-width: 768px) {
+    mix-blend-mode: normal;
+  }
+}
+
+.blobPink {
+  @extend %blob;
+  top: 2%;
+  left: -8%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(closest-side, rgba(250, 36, 60, 0.22), rgba(250, 36, 60, 0));
+
+  @media (max-width: 768px) {
+    width: 90vw;
+    height: 90vw;
+  }
+}
+
+.blobPurple {
+  @extend %blob;
+  top: 20%;
+  right: -12%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(closest-side, rgba(122, 0, 255, 0.25), rgba(122, 0, 255, 0));
+
+  @media (max-width: 768px) {
+    width: 100vw;
+    height: 100vw;
+  }
+}
+
+.blobBlue {
+  @extend %blob;
+  top: 45%;
+  left: 15%;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(closest-side, rgba(0, 122, 255, 0.25), rgba(0, 122, 255, 0));
+
+  @media (max-width: 768px) {
+    width: 90vw;
+    height: 90vw;
+  }
+}
+
+/* Заголовок з градієнтом, як на головній */
+.title {
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  background: linear-gradient(180deg, #ffffff 0%, #e9d5ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Друге слово заголовка з фірмовим градієнтом напрямків */
+.titleAccent {
+  background: linear-gradient(90deg, #8fd3f4 0%, #d57eeb 55%, #fccb90 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Скляна кнопка, як "Отримати консультацію" на головній */
+.glassBtn {
+  --glass-inset:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -8px 14px -10px rgba(0, 0, 0, 0.4);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  isolation: isolate;
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    var(--glass-inset),
+    0 10px 24px -12px rgba(0, 0, 0, 0.5);
+  transform: scale(var(--press, 1));
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      radial-gradient(circle 90px at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.35), transparent 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 50%);
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+
+      &::before {
+        opacity: 0.9;
+      }
+
+      .arrow {
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  &:active {
+    --press: 0.96;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+}
+
+.arrow {
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Вікна зі скриншотами */
+.stage {
+  position: relative;
+}
+
+.window {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #1b1b22;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 50px 100px -30px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.windowBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #2a2a33, #22222a);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 33px;
+  }
+}
+
+/* Скляні сповіщення навколо вікон */
+.chip {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(180deg, rgba(40, 40, 52, 0.75), rgba(24, 24, 32, 0.7));
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 20px 40px -18px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+.chipIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  color: #0b0b0f;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glassBtn {
+    transform: none;
+  }
+}

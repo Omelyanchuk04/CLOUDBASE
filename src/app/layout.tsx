@@ -4,6 +4,7 @@ import "./globals.scss";
 
 // Імпортуємо компонент шапки (перевірте, чи правильний шлях до вашого компонента)
 import Header from "../components/Layout/Header/Header";
+import Footer from "../components/Layout/Footer/Footer";
 
 // Підключення шрифту (оптимізовано Next.js)
 const inter = Inter({
@@ -83,6 +84,8 @@ export default function RootLayout({
         <Header />
 
         <main className="app-wrapper">{children}</main>
+
+        <Footer />
       </body>
     </html>
   );
