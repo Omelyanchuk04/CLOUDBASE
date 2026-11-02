@@ -8,7 +8,6 @@ import {
   SolutionCategory,
   SolutionCategoryDef,
   SOLUTION_CATEGORIES,
-  SOLUTION_STEPS,
   SOLUTIONS,
 } from "../../basData";
 import { ease, Fit } from "../shared/Illustration";
@@ -199,16 +198,6 @@ const SolutionsCatalog = () => {
                 </motion.div>
               </AnimatePresence>
 
-              <ol className="mt-7 space-y-2.5">
-                {SOLUTION_STEPS.map((step, i) => (
-                  <li key={step} className="flex gap-3 text-[15px] leading-snug text-neutral-700">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-[13px] font-semibold text-neutral-900 shadow-sm ring-1 ring-black/5">
-                      {i + 1}
-                    </span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
 
               <button
                 type="button"

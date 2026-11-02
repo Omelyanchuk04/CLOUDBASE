@@ -34,11 +34,8 @@ const scrollTo = (id: string) => (e: React.MouseEvent) => {
 const WORDS = [
   { w: "Хмара", accent: false },
   { w: "для", accent: false },
-  { w: "BAS,", accent: true },
-  { w: "KBS", accent: true },
-  { w: "та", accent: false },
-  { w: "інших", accent: false },
-  { w: "програм", accent: false },
+  { w: "ваших", accent: true },
+  { w: "програм", accent: true },
 ];
 const TEXT_END = 0.8;
 
@@ -95,7 +92,7 @@ const CloudHero = () => {
           </h1>
 
           <motion.p {...appear(TEXT_END)} className="mt-4 max-w-[640px] text-[15px] text-white/60 md:text-lg">
-            Віддалений доступ 24/7 з будь-якого пристрою і щоденне резервне копіювання. Орендовані сервери за кордоном, які працюють без вимкнень.
+            Доступ 24/7 з будь-якого пристрою і щоденні резервні копії.
           </motion.p>
 
           <motion.div {...appear(TEXT_END + 0.1)} className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4 md:justify-center">

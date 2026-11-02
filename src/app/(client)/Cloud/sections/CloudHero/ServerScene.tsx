@@ -13,13 +13,27 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const H = 500;
 const UNITS = 6;
 
-type Client = { id: string; title: string; sub: string; color: string; side: "left" | "right"; y: number };
+// Робочі місця: монітор з BAS, ноутбук з KBS, монітор з іншими програмами
+type Client = {
+  id: string;
+  title: string;
+  color: string; // колір лінії і імпульсу
+  side: "left" | "right";
+  y: number;
+  device: "monitor" | "laptop";
+  logo?: string;
+};
 
 const CLIENTS: Client[] = [
-  { id: "bas", title: "BAS", sub: "Бухгалтерія, торгівля", color: "#48c6ef", side: "left", y: 70 },
-  { id: "kbs", title: "KBS", sub: "ОБУ, БКП", color: "#84fab0", side: "left", y: 310 },
-  { id: "other", title: "Ваші програми", sub: "Інше ПЗ для роботи", color: "#d57eeb", side: "right", y: 190 },
+  { id: "bas", title: "BAS", color: "#3b8fe0", side: "left", y: 40, device: "monitor", logo: "/main/BAS-logo.png" },
+  { id: "kbs", title: "KBS", color: "#3fcf8e", side: "left", y: 290, device: "laptop", logo: "/main/KBS-logo.png" },
+  { id: "other", title: "Інші програми", color: "#d57eeb", side: "right", y: 160, device: "monitor" },
 ];
+
+// Плитки «інших програм» на екрані
+const TILES = ["#8ec5fc", "#fccb90", "#d57eeb", "#84fab0", "#fde68a", "#a18cd1"];
+
+const SCREEN_RATIO = 0.62;
 
 // Масштаб полотна під ширину контейнера
 const useScale = (w: number) => {
@@ -67,25 +81,56 @@ const Unit = ({ i, play, vents }: { i: number; play: boolean; vents: number }) =
   </div>
 );
 
-const ClientCard = ({ c, x, w, delay, reduce }: { c: Client; x: number; w: number; delay: number; reduce: boolean }) => (
+// Екран пристрою: логотип програми або плитки інших програм
+const Screen = ({ c, w }: { c: Client; w: number }) => (
+  <div
+    className="rounded-[12px] bg-gradient-to-b from-[#26262f] to-[#17171e] p-[6px] ring-1 ring-white/[0.14]"
+    style={{ width: w, height: w * SCREEN_RATIO, boxShadow: "0 30px 60px -28px rgba(0,0,0,0.85)" }}
+  >
+    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[7px] bg-gradient-to-b from-white to-[#eef0f4]">
+      {c.logo ? (
+        <img src={c.logo} alt={c.title} className="h-auto w-[58%]" draggable={false} />
+      ) : (
+        <div className="grid grid-cols-3 gap-2.5">
+          {TILES.map((t) => (
+            <span
+              key={t}
+              className="block h-[30px] w-[30px] rounded-[9px]"
+              style={{ background: `linear-gradient(135deg, ${t}, ${t}99)` }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+const Device = ({ c, x, w, delay, reduce }: { c: Client; x: number; w: number; delay: number; reduce: boolean }) => (
   <motion.div
-    className="absolute rounded-[18px] bg-white/[0.05] p-4 ring-1 ring-white/[0.12]"
-    style={{ left: x, top: c.y, width: w, boxShadow: "0 30px 60px -30px rgba(0,0,0,0.8)" }}
+    className="absolute flex flex-col items-center"
+    style={{ left: x, top: c.y, width: w }}
     initial={reduce ? false : { opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.9, delay, ease }}
   >
-    <div className="flex items-center gap-3">
-      <span className="h-9 w-9 shrink-0 rounded-[10px]" style={{ background: `linear-gradient(135deg, ${c.color}, ${c.color}88)` }} />
-      <div className="min-w-0">
-        <div className="text-[17px] font-semibold leading-tight text-white">{c.title}</div>
-        <div className="text-[13px] leading-snug text-white/45">{c.sub}</div>
-      </div>
-    </div>
-    <div className="mt-4 space-y-2">
-      <span className="block h-[6px] w-[85%] rounded-full bg-white/[0.09]" />
-      <span className="block h-[6px] w-[60%] rounded-full bg-white/[0.09]" />
-    </div>
+    {c.device === "monitor" ? (
+      <>
+        <Screen c={c} w={w} />
+        {/* Ніжка і підставка */}
+        <span className="block h-[16px] w-[14px] bg-gradient-to-b from-[#2a2a33] to-[#1c1c24]" />
+        <span className="block h-[6px] w-[78px] rounded-full bg-[#2a2a33] ring-1 ring-white/[0.08]" />
+      </>
+    ) : (
+      <>
+        <Screen c={c} w={w * 0.9} />
+        {/* Корпус ноутбука */}
+        <span
+          className="block h-[9px] rounded-b-[10px] rounded-t-[2px] bg-gradient-to-b from-[#34343e] to-[#1f1f27] ring-1 ring-white/[0.08]"
+          style={{ width: w * 1.04 }}
+        />
+      </>
+    )}
+    <span className="mt-3 text-[15px] font-semibold text-white/60">{c.title}</span>
   </motion.div>
 );
 
@@ -111,8 +156,11 @@ const ServerScene = ({ reduce, ready }: { reduce: boolean; ready: boolean }) => 
 
   // Лінії від карток до стійки
   const lines = CLIENTS.map((c) => {
-    const cy = c.y + 52;
-    const sx = c.side === "left" ? 16 + CARD_W : W - 16 - CARD_W;
+    // Лінія виходить із середини екрана
+    const sw = c.device === "laptop" ? CARD_W * 0.9 : CARD_W;
+    const cy = c.y + (sw * SCREEN_RATIO) / 2;
+    const inset = (CARD_W - sw) / 2;
+    const sx = c.side === "left" ? 16 + CARD_W - inset : W - 16 - CARD_W + inset;
     const ex = c.side === "left" ? rackX : rackX + RACK_W;
     const ey = Math.min(Math.max(cy, rackTop + 40), rackTop + rackH - 40);
     const mx = (sx + ex) / 2;
@@ -178,7 +226,7 @@ const ServerScene = ({ reduce, ready }: { reduce: boolean; ready: boolean }) => 
 
         {/* Робочі місця */}
         {CLIENTS.map((c, i) => (
-          <ClientCard
+          <Device
             key={c.id}
             c={c}
             w={CARD_W}
