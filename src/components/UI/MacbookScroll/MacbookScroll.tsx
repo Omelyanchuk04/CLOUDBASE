@@ -7,6 +7,7 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  useReducedMotion,
 } from "framer-motion";
 import { cn } from "../../../lib/utils/utils";
 
@@ -44,6 +45,7 @@ export const MacbookScroll = ({
   badge?: React.ReactNode;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const reduce = !!useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -88,6 +90,13 @@ export const MacbookScroll = ({
         ІДЕАЛЬНО ВІДКАЛІБРОВАНІ МАСШТАБИ ДЛЯ 100% ЗБІГУ:
         На екранах 393px працює min-[390px]:scale-[0.49], що дає рівно 376 пікселів ширини!
       */}
+      {/* Поява ноутбука при відкритті сторінки: піднімається знизу після тексту */}
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 80 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.4, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        style={{ willChange: "transform, opacity" }}
+      >
       <div
         className="transform origin-top mt-4 flex flex-col items-center 
           scale-[0.47] mb-[-14rem] 
@@ -130,6 +139,7 @@ export const MacbookScroll = ({
           {badge && <div className="absolute bottom-4 left-4">{badge}</div>}
         </div>
       </div>
+      </motion.div>
     </div>
   );
 };

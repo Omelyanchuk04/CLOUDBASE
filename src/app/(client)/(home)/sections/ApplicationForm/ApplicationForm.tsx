@@ -229,7 +229,8 @@ const ApplicationForm = ({
       ref={sectionRef}
       id="application"
       data-theme="dark"
-      className="relative w-full overflow-hidden bg-[#08080c] pb-24 pt-[200px] text-white md:pb-32 md:pt-[240px]"
+      // Над темною секцією перехід не потрібен, тож і великий відступ зверху теж
+      className={`relative w-full overflow-hidden bg-[#08080c] pb-24 text-white md:pb-32 ${lightTop ? "pt-[200px] md:pt-[240px]" : "pt-10 md:pt-14"}`}
     >
       {/* Перехід із попередньої світлої секції. Шапка на телефоні бере колір
           цього елемента за положенням (data-header-fade, див. header.tsx),

@@ -239,10 +239,14 @@ const Steps = () => {
                   {isFirst ? <CheckIcon /> : index + 1}
                 </motion.div>
 
-                {/* БІЛА КАРТКА */}
+                {/* КАРТКА: блідий відтінок кольору кроку. Фон непрозорий,
+                    бо картки накладаються одна на одну */}
                 <motion.div
                   variants={cardRise}
                   className={`${styles.contentBox} w-full`}
+                  style={{
+                    background: `linear-gradient(160deg, color-mix(in srgb, ${step.color} 13%, #ffffff) 0%, color-mix(in srgb, ${step.color} 5%, #ffffff) 100%)`,
+                  }}
                 >
                   <div className="mb-4 mt-2">
                     <Icon color={step.color} />

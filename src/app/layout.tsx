@@ -5,6 +5,7 @@ import "./globals.scss";
 // Імпортуємо компонент шапки (перевірте, чи правильний шлях до вашого компонента)
 import Header from "../components/Layout/Header/Header";
 import Footer from "../components/Layout/Footer/Footer";
+import ScrollToTop from "@/components/Layout/ScrollToTop";
 
 // Підключення шрифту (оптимізовано Next.js)
 const inter = Inter({
@@ -78,9 +79,11 @@ export default function RootLayout({
 }>) {
   return (
     // Змінна inter.variable додає клас, який ми використовуємо в globals.scss
-    <html lang="uk" className={inter.variable}>
+    <html lang="uk" className={inter.variable} data-scroll-behavior="smooth">
       <body>
         {/* Додаємо компонент шапки перед основним контентом */}
+        {/* Перехід на іншу сторінку завжди починається з верху */}
+        <ScrollToTop />
         <Header />
 
         <main className="app-wrapper">{children}</main>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { MacbookScroll } from "@/components/UI/MacbookScroll/MacbookScroll";
 import styles from "./MacbookSection.module.scss";
 
@@ -23,7 +24,18 @@ const handleGlassLeave = (e: React.PointerEvent<HTMLAnchorElement>) => {
   el.style.removeProperty("--gy");
 };
 
+// Поява при відкритті сторінки: заголовок, підзаголовок і кнопка по черзі
+// піднімаються знизу. Лише transform і opacity
+const ease = [0.16, 1, 0.3, 1] as const;
+
 const MacbookSection = () => {
+  const reduce = !!useReducedMotion();
+  const appear = (delay: number) => ({
+    initial: reduce ? false : ({ opacity: 0, y: 24 } as const),
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 1, delay, ease },
+  });
+
   return (
     <section className={styles.section} data-theme="dark">
       <div className={styles.blobContainer} aria-hidden="true">
@@ -35,15 +47,16 @@ const MacbookSection = () => {
       <MacbookScroll
         title={
           <div className={styles.titleWrapper}>
-            <span className={styles.title}>
+            <motion.span className={styles.title} {...appear(0.1)}>
               Обслуговування бухгалтерських програм
-            </span>
+            </motion.span>
             <br />
-            <span className={styles.subtitle}>
+            <motion.span className={styles.subtitle} {...appear(0.25)}>
               Встановлюємо, налаштовуємо й переносимо дані в хмару. Забезпечуємо
               стабільну роботу та технічну підтримку.
-            </span>
+            </motion.span>
             <br />
+            <motion.span className="inline-block" {...appear(0.4)}>
             <Link
               href="/BAS"
               className={styles.glassBtn}
@@ -66,6 +79,7 @@ const MacbookSection = () => {
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </Link>
+            </motion.span>
           </div>
         }
         src={`/main/BAS-img.jpg`}

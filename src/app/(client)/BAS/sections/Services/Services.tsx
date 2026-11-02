@@ -18,6 +18,14 @@ const glyphCut: Partial<Record<BasService["icon"], ReactNode>> = {
       <path d="M8 12.4l4 4 4-4" />
     </>
   ),
+  server: (
+    <>
+      <circle cx="7" cy="7.25" r="1.2" fill="#000" stroke="none" />
+      <circle cx="7" cy="16.75" r="1.2" fill="#000" stroke="none" />
+      <path d="M11 7.25h6" />
+      <path d="M11 16.75h6" />
+    </>
+  ),
   backup: (
     <>
       <path d="M4 6.2c0 1.9 3.6 3.5 8 3.5s8-1.6 8-3.5" />
@@ -53,6 +61,13 @@ const glyphShape: Record<BasService["icon"], ReactNode> = {
     </g>
   ),
   cloud: <path d="M6.6 19.5a4.6 4.6 0 0 1-.7-9.15 6.4 6.4 0 0 1 12.3-1.3 5.2 5.2 0 0 1-.6 10.45z" />,
+  // Сервер: два юніти стійки
+  server: (
+    <>
+      <rect x="2.5" y="3" width="19" height="8.5" rx="2.4" />
+      <rect x="2.5" y="12.5" width="19" height="8.5" rx="2.4" />
+    </>
+  ),
   // Блискавка
   power: <path d="M13.6 2 4.6 13.4h6.3L9.6 22l9.8-12.4h-6.4z" />,
   // База даних: циліндр з двома вирізаними обручами
@@ -76,14 +91,16 @@ const Glyph = ({ name, size, className }: { name: BasService["icon"]; size: numb
 
 // «Від 1 500 грн, разово» → сума, одиниця і примітка окремо
 const parsePrice = (p: string) => {
-  const m = p.match(/^Від\s+([\d\s\u00a0]+?)\s*грн[,.]?\s*(.*)$/i);
+  // «Від» необов'язкове: «700 грн на місяць» теж розбирається
+  const m = p.match(/^(Від\s+)?([\d\s\u00a0]+?)\s*грн[,.]?\s*(.*)$/i);
   if (!m) return null;
-  const rest = m[2].trim();
+  const rest = m[3].trim();
   const cut = rest.search(/[,.]/);
   const unit = cut < 0 ? rest : rest.slice(0, cut).trim();
   const note = cut < 0 ? "" : rest.slice(cut + 1).trim();
   return {
-    amount: m[1].trim().replace(/\s+/g, "\u00a0"),
+    from: !!m[1],
+    amount: m[2].trim().replace(/\s+/g, "\u00a0"),
     unit,
     note: note ? note[0].toUpperCase() + note.slice(1) : "",
   };
@@ -95,7 +112,7 @@ export const Price = ({ text }: { text: string }) => {
     <div className="mt-7 border-t border-black/10 pt-5 text-[#0b0b10]">
       {p ? (
         <>
-          <div className="text-[13px] font-semibold uppercase tracking-[0.06em] text-black/45">від</div>
+          {p.from && <div className="text-[13px] font-semibold uppercase tracking-[0.06em] text-black/45">від</div>}
           <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5">
             <span className={`${display.className} text-[40px] font-bold leading-none tracking-[-0.045em]`}>
               {p.amount}

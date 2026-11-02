@@ -79,7 +79,7 @@ export type BasService = {
   title: string;
   items: string[];
   price?: string;
-  icon: "install" | "support" | "dev" | "cloud" | "power" | "backup";
+  icon: "install" | "support" | "dev" | "cloud" | "power" | "backup" | "server";
   gradient: [string, string]; // фірмові градієнти з головної
 };
 
@@ -129,10 +129,10 @@ export const BAS_SERVICES: BasService[] = [
     items: [
       "Доступ 24/7 з будь-якого пристрою",
       "Щоденне резервне копіювання",
-      "Сервер з автономним живленням: 8–10 годин при повному навантаженні",
+      "Орендовані сервери за кордоном, працюють без вимкнень",
       "Одне робоче місце: 5 ГБ пам'яті, 1 база",
     ],
-    price: "Від 650 грн на місяць. Додаткова база — 250 грн на місяць",
+    price: "700 грн на місяць. За перше робоче місце, кожне наступне — 500 грн на місяць. Додаткова база — 200 грн на місяць",
     icon: "cloud",
     gradient: ["#fccb90", "#d57eeb"],
   },

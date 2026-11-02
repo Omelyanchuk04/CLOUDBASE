@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Link from "next/link";
 
 const ServicesScroll = () => {
   const mainRef = useRef<HTMLElement>(null);
@@ -182,9 +183,9 @@ const ServicesScroll = () => {
                   бізнесу.
                 </span>
               </div>
-              <a href="#" className={linkClasses}>
+              <Link href="/BAS" className={linkClasses}>
                 Дізнатись більше {chevronIcon}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -214,9 +215,9 @@ const ServicesScroll = () => {
                   даних.
                 </span>
               </div>
-              <a href="#" className={linkClasses}>
+              <Link href="/KBS" className={linkClasses}>
                 Дізнатись більше {chevronIcon}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -245,9 +246,9 @@ const ServicesScroll = () => {
                   друкованих форм та розширення функціоналу під ваші процеси.
                 </span>
               </div>
-              <a href="#" className={linkClasses}>
+              <Link href="/BAS#solutions" className={linkClasses}>
                 Дізнатись більше {chevronIcon}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -275,9 +276,9 @@ const ServicesScroll = () => {
                   серверах.
                 </span>
               </div>
-              <a href="#" className={linkClasses}>
+              <Link href="/Cloud" className={linkClasses}>
                 Дізнатись більше {chevronIcon}
-              </a>
+              </Link>
             </div>
           </div>
         </div>

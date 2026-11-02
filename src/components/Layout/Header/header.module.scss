@@ -368,7 +368,8 @@
     box-sizing: border-box;
     padding: 6px 16px;
     border-radius: 30px;
-    border: 1px solid color-mix(in srgb, var(--pill) 60%, transparent);
+    /* Окантовка як у пігулок футера: 1.5px повним кольором */
+    border: 1.5px solid var(--pill);
     background-color: var(--header-bg);
     color: var(--text-color);
     font-size: 14px;
