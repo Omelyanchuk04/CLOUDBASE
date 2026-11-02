@@ -7,7 +7,7 @@ const navLinks = [
   { label: "Головна", href: "/", color: "#6f86d6" },
   { label: "BAS", href: "/BAS", color: "#48c6ef" },
   { label: "KBS", href: "/KBS", color: "#84fab0" },
-  { label: "Хмара", href: "/cloud", color: "#d57eeb" },
+  { label: "Хмара", href: "/Cloud", color: "#d57eeb" },
   { label: "Про нас", href: "/about", color: "#fde047" },
   { label: "Контакти", href: "/#application", color: "#fca5a5" },
 ];

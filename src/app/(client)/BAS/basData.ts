@@ -11,6 +11,8 @@ export type ConfigVisual = "dashboard" | "trade" | "finance" | "planning" | "doc
 export type BasConfig = {
   id: string;
   name: string;
+  short?: string; // підпис на перемикачі, якщо потрібен коротший за назву
+  price?: string; // ціна у форматі «Від … грн …», показується під описом
   description: string;
   gradient: [string, string];
   image?: string; // скриншот, лише якщо він відповідає цій конфігурації
@@ -77,7 +79,7 @@ export type BasService = {
   title: string;
   items: string[];
   price?: string;
-  icon: "install" | "support" | "dev" | "cloud";
+  icon: "install" | "support" | "dev" | "cloud" | "power" | "backup";
   gradient: [string, string]; // фірмові градієнти з головної
 };
 

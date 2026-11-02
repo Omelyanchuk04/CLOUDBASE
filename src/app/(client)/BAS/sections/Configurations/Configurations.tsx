@@ -7,6 +7,7 @@ import { BAS_CONFIGS, BasConfig, ConfigVisual } from "../../basData";
 import { AppWindow, Bar, ease, Fit } from "../shared/Illustration";
 
 import { edgeMask } from "@/lib/utils/gradients";
+import { Price } from "../Services/Services";
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
@@ -223,13 +224,29 @@ const ConfigVisualView = ({ c }: { c: BasConfig }) => {
 
 /* ─────────────────────────── Секція ─────────────────────────── */
 
-const Configurations = () => {
-  const [activeId, setActiveId] = useState(BAS_CONFIGS[0].id);
-  const active = BAS_CONFIGS.find((c) => c.id === activeId) ?? BAS_CONFIGS[0];
+type Props = {
+  configs?: BasConfig[];
+  product?: string; // назва в заголовку: «Конфігурації BAS»
+  accentFrom?: string; // градієнт назви продукту в заголовку
+  accentTo?: string;
+  title?: React.ReactNode; // власний заголовок замість «Конфігурації …»
+  id?: string; // якір секції
+};
+
+const Configurations = ({
+  configs = BAS_CONFIGS,
+  product = "BAS",
+  accentFrom = "#3b9ae6",
+  accentTo = "#00508c",
+  title,
+  id = "configurations",
+}: Props) => {
+  const [activeId, setActiveId] = useState(configs[0].id);
+  const active = configs.find((c) => c.id === activeId) ?? configs[0];
 
   return (
     <section
-      id="configurations"
+      id={id}
       data-theme="light"
       className="relative w-full overflow-hidden bg-white pb-10 pt-4 text-neutral-900 md:pb-14 md:pt-6"
     >
@@ -255,7 +272,13 @@ const Configurations = () => {
           viewport={{ once: true, amount: 0.5 }}
           className="text-left text-4xl md:text-6xl bg-gradient-to-b from-[#0b0b10] to-[#0b0b10]/50 bg-clip-text pb-[0.08em] font-semibold leading-[1.05] tracking-[-0.03em] text-transparent"
         >
-          Конфігурації <span className="bg-gradient-to-b from-[#3b9ae6] to-[#00508c] bg-clip-text text-transparent">BAS</span>
+          {title ?? (<>Конфігурації{" "}
+          <span
+            className="bg-clip-text text-transparent"
+            style={{ backgroundImage: `linear-gradient(to bottom, ${accentFrom}, ${accentTo})` }}
+          >
+            {product}
+          </span></>)}
         </motion.h2>
 
         {/* ПК: перемикач стовпчиком зліва, картка праворуч.
@@ -263,7 +286,7 @@ const Configurations = () => {
         <div className="mt-8 grid gap-4 md:mt-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-8">
         {/* Перемикач: пігулки з нахилом і кольоровою рамкою, як у шапці */}
         <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-3 pt-2 [scrollbar-width:none] md:mx-0 md:px-0 lg:flex-col lg:items-start lg:gap-3.5 lg:overflow-visible lg:pb-0 lg:pt-3 [&::-webkit-scrollbar]:hidden">
-          {BAS_CONFIGS.map((c, i) => {
+          {configs.map((c, i) => {
             const on = c.id === activeId;
             const color = c.gradient[1];
             return (
@@ -282,7 +305,7 @@ const Configurations = () => {
                 }}
                 className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-neutral-900 backdrop-blur transition-colors duration-300"
               >
-                {c.name.replace("BAS ", "")}
+                {c.short ?? c.name.replace(`${product} `, "")}
               </motion.button>
             );
           })}
@@ -306,6 +329,7 @@ const Configurations = () => {
                 <p className="mt-4 text-[15px] leading-relaxed text-neutral-600 md:text-base">
                   {active.description}
                 </p>
+                {active.price && <Price text={active.price} />}
                 <a
                   href="#application"
                   onClick={scrollToApplication}

@@ -18,6 +18,12 @@ const glyphCut: Partial<Record<BasService["icon"], ReactNode>> = {
       <path d="M8 12.4l4 4 4-4" />
     </>
   ),
+  backup: (
+    <>
+      <path d="M4 6.2c0 1.9 3.6 3.5 8 3.5s8-1.6 8-3.5" />
+      <path d="M4 12.2c0 1.9 3.6 3.5 8 3.5s8-1.6 8-3.5" />
+    </>
+  ),
   dev: (
     <>
       <circle cx="3.4" cy="14.1" r="2.2" fill="#000" stroke="none" />
@@ -47,6 +53,10 @@ const glyphShape: Record<BasService["icon"], ReactNode> = {
     </g>
   ),
   cloud: <path d="M6.6 19.5a4.6 4.6 0 0 1-.7-9.15 6.4 6.4 0 0 1 12.3-1.3 5.2 5.2 0 0 1-.6 10.45z" />,
+  // Блискавка
+  power: <path d="M13.6 2 4.6 13.4h6.3L9.6 22l9.8-12.4h-6.4z" />,
+  // База даних: циліндр з двома вирізаними обручами
+  backup: <path d="M4 6c0-1.9 3.6-3.5 8-3.5s8 1.6 8 3.5v12c0 1.9-3.6 3.5-8 3.5s-8-1.6-8-3.5z" />,
 };
 
 const Glyph = ({ name, size, className }: { name: BasService["icon"]; size: number; className?: string }) => {
@@ -79,7 +89,7 @@ const parsePrice = (p: string) => {
   };
 };
 
-const Price = ({ text }: { text: string }) => {
+export const Price = ({ text }: { text: string }) => {
   const p = parsePrice(text);
   return (
     <div className="mt-7 border-t border-black/10 pt-5 text-[#0b0b10]">
@@ -124,6 +134,7 @@ type Props = {
   product?: string; // назва в заголовку: «Послуги для BAS»
   accent?: string; // колір назви продукту в заголовку
   fadeToWhite?: boolean; // плавний перехід у білу секцію нижче
+  title?: ReactNode; // власний заголовок замість «Послуги для …»
 };
 
 const Services = ({
@@ -131,6 +142,7 @@ const Services = ({
   product = "BAS",
   accent = "#5aa9ff",
   fadeToWhite = true,
+  title,
 }: Props) => {
   const [active, setActive] = useState(0);
   const cur = services[active];
@@ -180,7 +192,7 @@ const Services = ({
           <h2
             className="text-4xl md:text-6xl bg-gradient-to-b from-white to-white/40 bg-clip-text pb-[0.08em] font-semibold leading-[1.05] tracking-[-0.03em] text-transparent"
           >
-            Послуги для <span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to bottom, #ffffff -40%, ${accent})` }}>{product}</span>
+            {title ?? <>Послуги для <span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to bottom, #ffffff -40%, ${accent})` }}>{product}</span></>}
           </h2>
 
           <div className="hidden items-center gap-4 lg:flex">
