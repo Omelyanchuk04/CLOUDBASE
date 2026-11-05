@@ -18,8 +18,7 @@ const navItems: NavItem[] = [
   { id: "bas", label: "BAS", href: "/BAS", color: "#48c6ef", tilt: "1deg" },
   { id: "kbs", label: "KBS", href: "/KBS", color: "#84fab0", tilt: "-1deg" },
   { id: "cloud", label: "Хмара", href: "/Cloud", color: "#d57eeb", tilt: "2deg" },
-  { id: "about", label: "Про нас", href: "/about", color: "#fde047", tilt: "-1.5deg" },
-  { id: "contacts", label: "Контакти", href: "/#application", color: "#fca5a5", tilt: "1.5deg" },
+  { id: "about", label: "Про нас", href: "/About", color: "#fde047", tilt: "-1.5deg" },
 ];
 
 interface ContactItem {

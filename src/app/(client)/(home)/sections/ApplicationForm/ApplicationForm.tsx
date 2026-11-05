@@ -157,14 +157,25 @@ const CheckIcon = () => (
 // На головній це #ebebf0, тому без пропса нічого не змінюється
 // defaultService: напрямок, обраний одразу (наприклад "kbs" на сторінці KBS).
 // lightTop: false, якщо секція над формою темна, щоб шапка не світлішала
+// before: блок між заголовком і описом форми (наприклад контакти на сторінці
+// «Про нас»). title і subtitle замінюють заголовок і опис. Без них усе як раніше
 const ApplicationForm = ({
   fromColor = "#ebebf0",
   defaultService = services[0].id,
   lightTop = true,
+  before,
+  title = "Залиште заявку",
+  subtitle = "Оберіть напрямок і коротко опишіть задачу. Відповімо протягом робочого дня.",
+  compactTitle = false,
 }: {
   fromColor?: string;
   defaultService?: string;
   lightTop?: boolean;
+  before?: React.ReactNode;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  // compactTitle: менший заголовок, коли над формою вже є головний заголовок секції
+  compactTitle?: boolean;
 }) => {
   const [serviceId, setServiceId] = useState(defaultService);
   const service = services.find((s) => s.id === serviceId) ?? services[0];
@@ -274,13 +285,18 @@ const ApplicationForm = ({
         {/* Заголовок: на телефоні зліва, на ПК по центру */}
         <div className="text-left md:text-center">
           {/* Градієнтна заливка тексту від білого до сірого */}
-          <h2 className="bg-gradient-to-b from-white to-white/40 bg-clip-text text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-transparent md:text-6xl">
-            Залиште заявку
+          <h2
+            className={`bg-gradient-to-b from-white to-white/40 bg-clip-text font-semibold leading-[1.05] tracking-[-0.03em] text-transparent ${
+              compactTitle ? "pb-[0.06em] text-[28px] md:text-[40px]" : "text-4xl md:text-6xl"
+            }`}
+          >
+            {title}
           </h2>
 
-          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/55 md:mx-auto md:text-lg">
-            Оберіть напрямок і коротко опишіть задачу. Відповімо протягом
-            робочого дня.
+          {before && <div className="mt-8 md:mt-10">{before}</div>}
+
+          <p className={`${before ? "mt-14 md:mt-16" : "mt-4"} max-w-xl text-[15px] leading-relaxed text-white/55 md:mx-auto md:text-lg`}>
+            {subtitle}
           </p>
         </div>
 

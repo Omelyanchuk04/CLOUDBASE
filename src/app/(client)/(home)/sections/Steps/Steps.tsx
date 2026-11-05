@@ -175,9 +175,22 @@ const cardRise: Variants = {
   },
 };
 
-const Steps = () => {
+// seamFrom / seamTo: кольори смуги зверху. За замовчуванням як на головній
+// (після MacbookSection). На інших сторінках передайте колір секції вище
+// bg: колір фону секції ("transparent", щоб показати фон обгортки)
+// padding: власні відступи секції зверху і знизу (за замовчуванням 6rem)
+type Props = { seamFrom?: string; seamTo?: string; bg?: string; padding?: string };
+
+const Steps = ({ seamFrom, seamTo, bg, padding }: Props = {}) => {
+  const seam = {
+    ...(padding ? { padding } : {}),
+    ...(bg ? { "--section-bg": bg } : {}),
+    ...(seamFrom ? { "--seam-from": seamFrom } : {}),
+    ...(seamTo ?? seamFrom ? { "--seam-to": seamTo ?? seamFrom } : {}),
+  } as React.CSSProperties;
+
   return (
-    <section className={styles.section} data-theme="light" id="steps">
+    <section className={styles.section} data-theme="light" id="steps" style={seam}>
       <div className={styles.glowContainer}>
         <div className={styles.glow} />
       </div>
