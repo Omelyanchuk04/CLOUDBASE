@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
 import { easedFade } from "@/lib/utils/gradients";
 import styles from "../../../BAS/sections/BasHero/BasHero.module.scss";
 
@@ -104,6 +104,7 @@ const CardLink = ({
     <Link
       href={area.href}
       onClick={onClick}
+      draggable={false}
       className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-[28px] p-7 transition-colors duration-300"
       style={{
         // Матовий приглушений відтінок свого кольору, кольорова рамка, без світіння
@@ -114,7 +115,7 @@ const CardLink = ({
     >
 
       <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: area.logo ? "#ffffff" : "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-        {area.logo ? <img src={area.logo} alt="" className="h-7 w-7 object-contain" /> : <CloudIcon color="#ffffff" />}
+        {area.logo ? <img src={area.logo} alt="" draggable={false} className="h-7 w-7 object-contain" /> : <CloudIcon color="#ffffff" />}
       </span>
 
       <span className="relative mt-6 text-[30px] font-semibold leading-none tracking-[-0.02em]">{area.title}</span>
@@ -153,60 +154,111 @@ const AreaCard = ({ area, i, still }: { area: (typeof AREAS)[number]; i: number;
   );
 };
 
-// Телефон: картки віялом, але з однією в центрі. Бічні визирають з-за неї нахилені.
-// Тап по бічній картці або свайп переносить її в центр, тож прочитати можна кожну.
+// Телефон: картки віялом з однією в центрі. Бічні визирають з-за неї нахилені.
+// Свайп рухає картки разом із пальцем, а після відпускання вони плавно (пружиною)
+// доїжджають до найближчої. Тап по бічній картці або по крапці теж переносить її в центр.
 // Перехід на сторінку — тапом по картці, що вже в центрі
-const MobileFan = ({ still }: { still: boolean }) => {
-  const [active, setActive] = React.useState(1);
-  const go = (i: number) => setActive(Math.max(0, Math.min(AREAS.length - 1, i)));
+const STEP = 150; // скільки пікселів свайпу = одна картка
+const spring = { type: "spring" as const, stiffness: 260, damping: 30, mass: 0.9 };
+
+const FanCard = ({
+  area,
+  i,
+  pos,
+  active,
+  onPick,
+  dragged,
+}: {
+  area: (typeof AREAS)[number];
+  i: number;
+  pos: MotionValue<number>;
+  active: number;
+  onPick: (i: number) => void;
+  dragged: React.MutableRefObject<boolean>;
+}) => {
+  // Положення картки залежить від того, наскільки вона далеко від центру (дробове під час свайпу)
+  const d = useTransform(pos, (p) => i - p);
+  const x = useTransform(d, (v) => {
+    const far = Math.abs(v);
+    return Math.sign(v) * (far <= 1 ? far * 62 : 62 + (far - 1) * 34);
+  });
+  const y = useTransform(d, (v) => Math.abs(v) * 20);
+  const rotate = useTransform(d, (v) => v * 7);
+  const scale = useTransform(d, (v) => 1 - Math.abs(v) * 0.07);
+  const zIndex = useTransform(d, (v) => Math.round(100 - Math.abs(v) * 10));
+  const dim = useTransform(d, (v) => {
+    const far = Math.abs(v);
+    return Math.min(far, 1) * 0.35 + Math.max(far - 1, 0) * 0.15;
+  });
 
   return (
-    <div className="md:hidden">
+    <motion.div
+      className="absolute left-1/2 top-0 w-[270px]"
+      style={{ marginLeft: -135, x, y, rotate, scale, zIndex }}
+    >
+      <CardLink
+        area={area}
+        onClick={(e) => {
+          // Після свайпу або по бічній картці — не переходимо, а центруємо
+          if (dragged.current || i !== active) {
+            e.preventDefault();
+            if (!dragged.current) onPick(i);
+          }
+        }}
+      />
+      <motion.span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[28px] bg-black"
+        style={{ opacity: dim }}
+      />
+    </motion.div>
+  );
+};
+
+const MobileFan = ({ still }: { still: boolean }) => {
+  const pos = useMotionValue(1);
+  const [active, setActive] = React.useState(1);
+  const startPos = React.useRef(1);
+  const dragged = React.useRef(false);
+  const last = AREAS.length - 1;
+
+  React.useEffect(() => pos.on("change", (v) => setActive(Math.round(Math.max(0, Math.min(last, v))))), [pos, last]);
+
+  const goTo = (i: number) => {
+    animate(pos, Math.max(0, Math.min(last, i)), still ? { duration: 0 } : spring);
+  };
+
+  return (
+    <motion.div
+      className="md:hidden"
+      initial={still ? false : { opacity: 0, y: 60 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.2, delay: TEXT_END + 0.25, ease }}
+    >
       <motion.div
-        className="relative mx-auto h-[375px] w-full max-w-[340px] touch-pan-y"
+        className="relative mx-auto h-[375px] w-full max-w-[340px] touch-pan-y select-none"
+        onPanStart={() => {
+          pos.stop();
+          startPos.current = pos.get();
+          dragged.current = true;
+        }}
+        onPan={(_, info) => {
+          // За краями тягнеться туго, як гумка
+          let v = startPos.current - info.offset.x / STEP;
+          if (v < 0) v = v * 0.3;
+          if (v > last) v = last + (v - last) * 0.3;
+          pos.set(v);
+        }}
         onPanEnd={(_, info) => {
-          if (Math.abs(info.offset.x) < 40) return;
-          go(active + (info.offset.x < 0 ? 1 : -1));
+          // Враховуємо швидкість: швидкий короткий свайп теж перегортає
+          const projected = pos.get() - (info.velocity.x / STEP) * 0.18;
+          goTo(Math.round(projected));
+          setTimeout(() => (dragged.current = false), 50);
         }}
       >
-        {AREAS.map((a, i) => {
-          const d = i - active;
-          const far = Math.abs(d);
-          return (
-            <motion.div
-              key={a.href}
-              className="absolute left-1/2 top-0 w-[270px]"
-              style={{ zIndex: 10 - far, marginLeft: -135 }}
-              initial={still ? false : { opacity: 0, y: 60 }}
-              animate={{
-                opacity: 1,
-                // Ближня бічна картка визирає на 62px, дальня — ще трохи за нею
-                x: Math.sign(d) * (far === 0 ? 0 : far === 1 ? 62 : 96),
-                y: far * 20,
-                rotate: d * 7,
-                scale: 1 - far * 0.07,
-              }}
-              transition={{ duration: still ? 0 : 0.55, ease }}
-            >
-              <CardLink
-                area={a}
-                onClick={(e) => {
-                  if (i !== active) {
-                    e.preventDefault();
-                    setActive(i);
-                  }
-                }}
-              />
-              {/* Бічні картки трохи притемнені, щоб центральна читалась */}
-              <motion.span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-[28px] bg-black"
-                animate={{ opacity: i === active ? 0 : 0.35 + (Math.abs(i - active) - 1) * 0.15 }}
-                transition={{ duration: 0.4 }}
-              />
-            </motion.div>
-          );
-        })}
+        {AREAS.map((a, i) => (
+          <FanCard key={a.href} area={a} i={i} pos={pos} active={active} onPick={goTo} dragged={dragged} />
+        ))}
       </motion.div>
 
       {/* Перемикач під картками */}
@@ -215,7 +267,7 @@ const MobileFan = ({ still }: { still: boolean }) => {
           <button
             key={a.href}
             type="button"
-            onClick={() => setActive(i)}
+            onClick={() => goTo(i)}
             aria-label={a.title}
             aria-pressed={i === active}
             className="h-2 rounded-full transition-all duration-300"
@@ -223,7 +275,7 @@ const MobileFan = ({ still }: { still: boolean }) => {
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
