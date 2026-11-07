@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./header.module.scss";
+import ContactDrawer from "./ContactDrawer";
 
 interface NavItem {
   id: string;
@@ -28,7 +29,7 @@ interface ContactItem {
   href: string | null; // null — пункт без посилання, наприклад графік
 }
 
-// Контакти у випадаючому меню кнопки "Заявка". Замініть на реальні дані
+// Контакти в бічній панелі (стрілочка біля "Заявка"). Замініть на реальні дані
 const contacts: ContactItem[] = [
   {
     id: "phone",
@@ -71,6 +72,7 @@ const Header: React.FC = () => {
 
   const navListRef = useRef<HTMLUListElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   // ХОВАННЯ ВЕРХНЬОГО РЯДКА. Обробник прокрутки лише читає позицію
   // і міняє стан, коли він справді змінився. Поріг 6px не дає шапці
@@ -168,31 +170,6 @@ const Header: React.FC = () => {
       observer?.disconnect();
     };
   }, [pathname]);
-
-  // Закриття випадаючого меню: клік поза ним, Esc або прокрутка
-  useEffect(() => {
-    if (!menuOpen) return;
-
-    const closeOnOutside = (e: PointerEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    const closeOnEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
-    const closeOnScroll = () => setMenuOpen(false);
-
-    document.addEventListener("pointerdown", closeOnOutside);
-    document.addEventListener("keydown", closeOnEsc);
-    window.addEventListener("scroll", closeOnScroll, { passive: true });
-
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutside);
-      document.removeEventListener("keydown", closeOnEsc);
-      window.removeEventListener("scroll", closeOnScroll);
-    };
-  }, [menuOpen]);
 
   // ЛОГІКА СКРОЛУ МЕНЮ НА МОБАЙЛІ
   const checkNavScroll = useCallback(() => {
@@ -318,7 +295,7 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   className={styles["hero-header__cta-toggle"]}
-                  aria-label="Контакти"
+                  aria-label="Контакти і заявка"
                   aria-expanded={menuOpen}
                   onClick={() => setMenuOpen((v) => !v)}
                 >
@@ -341,50 +318,6 @@ const Header: React.FC = () => {
                 </button>
               </div>
 
-              <div
-                className={`${styles["hero-header__menu"]} ${
-                  menuOpen ? styles["hero-header__menu--open"] : ""
-                }`}
-              >
-                <p className={styles["hero-header__menu-title"]}>
-                  Зв'язатися з нами
-                </p>
-                <ul className={styles["hero-header__menu-list"]}>
-                  {contacts.map((c) => {
-                    const inner = (
-                      <>
-                        <span className={styles["hero-header__menu-label"]}>
-                          {c.label}
-                        </span>
-                        <span className={styles["hero-header__menu-value"]}>
-                          {c.value}
-                        </span>
-                      </>
-                    );
-
-                    const external = c.href?.startsWith("http") ?? false;
-
-                    return (
-                      <li key={c.id}>
-                        {c.href ? (
-                          <a
-                            href={c.href}
-                            target={external ? "_blank" : undefined}
-                            rel={external ? "noopener noreferrer" : undefined}
-                            className={`${styles["hero-header__menu-item"]} ${styles["hero-header__menu-link"]}`}
-                          >
-                            {inner}
-                          </a>
-                        ) : (
-                          <div className={styles["hero-header__menu-item"]}>
-                            {inner}
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -458,6 +391,9 @@ const Header: React.FC = () => {
           )}
         </nav>
       </div>
+
+      {/* Бічна панель з контактами і формою заявки */}
+      <ContactDrawer open={menuOpen} onClose={closeMenu} contacts={contacts} />
     </header>
   );
 };

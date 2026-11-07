@@ -16,7 +16,7 @@ type Service = {
 // Напрямки з секцій сервісів. Для кожного свої приклади запитів
 // у полі та короткий опис, щоб вибір щось пояснював.
 // tilt — постійний нахил пігулки, різний для кожного напрямку
-const services: Service[] = [
+export const services: Service[] = [
   {
     id: "bas",
     label: "Супровід BAS",
@@ -78,7 +78,7 @@ const inputCls =
   "w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-base text-white outline-none transition-colors placeholder:text-white/35 focus:border-white/30";
 
 // Ефект друкування: пише текст, пауза, стирає і переходить до наступного
-const useTypewriter = (texts: string[], enabled: boolean) => {
+export const useTypewriter = (texts: string[], enabled: boolean) => {
   const [text, setText] = useState("");
 
   useEffect(() => {

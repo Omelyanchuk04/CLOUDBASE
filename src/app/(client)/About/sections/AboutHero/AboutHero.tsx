@@ -68,7 +68,7 @@ const AREAS = [
     tone: ["#1d2c40", "#141922"],
     logo: "/main/BAS-logo.png",
     items: ["Встановлення", "Супровід", "Доробки під ваш облік"],
-    fan: "md:-mr-3 md:translate-y-10 md:-rotate-[7deg]",
+    fan: "-mr-3 translate-y-10 -rotate-[7deg]",
     z: "z-10",
   },
   {
@@ -78,7 +78,7 @@ const AREAS = [
     tone: ["#2b2140", "#16141f"],
     logo: null,
     items: ["Доступ 24/7 з будь-якого пристрою", "Щоденні резервні копії", "BAS, KBS, M.E.Doc, FREDO, Excel та інші"],
-    fan: "md:-translate-y-2",
+    fan: "-translate-y-2",
     z: "z-20",
   },
   {
@@ -88,55 +88,175 @@ const AREAS = [
     tone: ["#1b3029", "#131a17"],
     logo: "/main/KBS-logo.png",
     items: ["Встановлення", "Супровід", "ОБУ і БКП"],
-    fan: "md:-ml-3 md:translate-y-10 md:rotate-[7deg]",
+    fan: "-ml-3 translate-y-10 rotate-[7deg]",
     z: "z-10",
   },
 ];
 
+// Сама картка напрямку. onClick на телефоні не дає перейти, поки картка не в центрі
+const CardLink = ({
+  area,
+  onClick,
+}: {
+  area: (typeof AREAS)[number];
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}) => (
+    <Link
+      href={area.href}
+      onClick={onClick}
+      className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-[28px] p-7 transition-colors duration-300"
+      style={{
+        // Матовий приглушений відтінок свого кольору, кольорова рамка, без світіння
+        background: `linear-gradient(165deg, ${area.tone[0]} 0%, ${area.tone[1]} 75%)`,
+        border: `1.5px solid ${area.color}`,
+        boxShadow: "0 30px 60px -35px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)",
+      }}
+    >
+
+      <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: area.logo ? "#ffffff" : "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+        {area.logo ? <img src={area.logo} alt="" className="h-7 w-7 object-contain" /> : <CloudIcon color="#ffffff" />}
+      </span>
+
+      <span className="relative mt-6 text-[30px] font-semibold leading-none tracking-[-0.02em]">{area.title}</span>
+
+      <ul className="relative mt-5 space-y-2.5">
+        {area.items.map((t) => (
+          <li key={t} className="flex items-center gap-2.5 text-[14px] text-white/70">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full opacity-70" style={{ background: area.color }} />
+            {t}
+          </li>
+        ))}
+      </ul>
+
+      <span className="relative mt-auto inline-flex items-center pt-7 text-[14px] font-semibold text-white/80 transition-colors group-hover:text-white">
+        Детальніше
+        <svg className="ml-1.5 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+    </Link>
+);
+
 const AreaCard = ({ area, i, still }: { area: (typeof AREAS)[number]; i: number; still: boolean }) => {
   return (
     // Зовнішній блок задає положення у віялі, внутрішній — анімацію появи
-    <div className={`relative w-full md:w-[300px] ${area.fan} ${area.z}`}>
+    <div className={`relative w-[300px] shrink-0 ${area.fan} ${area.z}`}>
       <motion.div
         initial={still ? false : { opacity: 0, y: 70, rotateX: 28 }}
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 1.2, delay: TEXT_END + 0.25 + i * 0.12, ease }}
         style={{ transformPerspective: 1200 }}
       >
-        <Link
-          href={area.href}
-          className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-[28px] p-7 transition-colors duration-300"
-          style={{
-            // Матовий приглушений відтінок свого кольору, кольорова рамка, без світіння
-            background: `linear-gradient(165deg, ${area.tone[0]} 0%, ${area.tone[1]} 75%)`,
-            border: `1.5px solid ${area.color}`,
-            boxShadow: "0 30px 60px -35px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)",
-          }}
-        >
-
-          <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: area.logo ? "#ffffff" : "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            {area.logo ? <img src={area.logo} alt="" className="h-7 w-7 object-contain" /> : <CloudIcon color="#ffffff" />}
-          </span>
-
-          <span className="relative mt-6 text-[30px] font-semibold leading-none tracking-[-0.02em]">{area.title}</span>
-
-          <ul className="relative mt-5 space-y-2.5">
-            {area.items.map((t) => (
-              <li key={t} className="flex items-center gap-2.5 text-[14px] text-white/70">
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full opacity-70" style={{ background: area.color }} />
-                {t}
-              </li>
-            ))}
-          </ul>
-
-          <span className="relative mt-auto inline-flex items-center pt-7 text-[14px] font-semibold text-white/80 transition-colors group-hover:text-white">
-            Детальніше
-            <svg className="ml-1.5 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </span>
-        </Link>
+        <CardLink area={area} />
       </motion.div>
+    </div>
+  );
+};
+
+// Телефон: картки віялом, але з однією в центрі. Бічні визирають з-за неї нахилені.
+// Тап по бічній картці або свайп переносить її в центр, тож прочитати можна кожну.
+// Перехід на сторінку — тапом по картці, що вже в центрі
+const MobileFan = ({ still }: { still: boolean }) => {
+  const [active, setActive] = React.useState(1);
+  const go = (i: number) => setActive(Math.max(0, Math.min(AREAS.length - 1, i)));
+
+  return (
+    <div className="md:hidden">
+      <motion.div
+        className="relative mx-auto h-[375px] w-full max-w-[340px] touch-pan-y"
+        onPanEnd={(_, info) => {
+          if (Math.abs(info.offset.x) < 40) return;
+          go(active + (info.offset.x < 0 ? 1 : -1));
+        }}
+      >
+        {AREAS.map((a, i) => {
+          const d = i - active;
+          const far = Math.abs(d);
+          return (
+            <motion.div
+              key={a.href}
+              className="absolute left-1/2 top-0 w-[270px]"
+              style={{ zIndex: 10 - far, marginLeft: -135 }}
+              initial={still ? false : { opacity: 0, y: 60 }}
+              animate={{
+                opacity: 1,
+                // Ближня бічна картка визирає на 62px, дальня — ще трохи за нею
+                x: Math.sign(d) * (far === 0 ? 0 : far === 1 ? 62 : 96),
+                y: far * 20,
+                rotate: d * 7,
+                scale: 1 - far * 0.07,
+              }}
+              transition={{ duration: still ? 0 : 0.55, ease }}
+            >
+              <CardLink
+                area={a}
+                onClick={(e) => {
+                  if (i !== active) {
+                    e.preventDefault();
+                    setActive(i);
+                  }
+                }}
+              />
+              {/* Бічні картки трохи притемнені, щоб центральна читалась */}
+              <motion.span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 rounded-[28px] bg-black"
+                animate={{ opacity: i === active ? 0 : 0.35 + (Math.abs(i - active) - 1) * 0.15 }}
+                transition={{ duration: 0.4 }}
+              />
+            </motion.div>
+          );
+        })}
+      </motion.div>
+
+      {/* Перемикач під картками */}
+      <div className="mt-2 flex items-center justify-center gap-2">
+        {AREAS.map((a, i) => (
+          <button
+            key={a.href}
+            type="button"
+            onClick={() => setActive(i)}
+            aria-label={a.title}
+            aria-pressed={i === active}
+            className="h-2 rounded-full transition-all duration-300"
+            style={{ width: i === active ? 22 : 8, background: i === active ? a.color : "rgba(255,255,255,0.25)" }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Зменшує вміст, якщо він ширший за доступне місце (лише масштаб, без зміни верстки)
+const FitScale = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
+  const outer = React.useRef<HTMLDivElement>(null);
+  const inner = React.useRef<HTMLDivElement>(null);
+  const [box, setBox] = React.useState({ scale: 1, height: 0 });
+
+  React.useEffect(() => {
+    const o = outer.current;
+    const i = inner.current;
+    if (!o || !i) return;
+    const update = () => {
+      const scale = Math.min(1, o.clientWidth / i.scrollWidth);
+      setBox({ scale, height: i.offsetHeight * scale });
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(o);
+    ro.observe(i);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={outer} className={`relative w-full ${className}`} style={box.height ? { height: box.height } : undefined}>
+      <div
+        ref={inner}
+        className="absolute left-1/2 top-0 w-max origin-top"
+        style={{ transform: `translateX(-50%) scale(${box.scale})` }}
+      >
+        {children}
+      </div>
     </div>
   );
 };
@@ -204,12 +324,18 @@ const AboutHero = () => {
           </motion.div>
         </div>
 
-        {/* Три напрямки віялом; на телефоні — одна під одною */}
-        <div className="mt-14 flex flex-col items-stretch gap-4 md:mt-20 md:flex-row md:items-start md:justify-center md:gap-0">
-          {AREAS.map((a, i) => (
-            <AreaCard key={a.href} area={a} i={i} still={reduce} />
-          ))}
+        {/* Три напрямки віялом. На телефоні — віяло з перемиканням (MobileFan),
+            на ширших екранах — усі три поруч, із зменшенням, якщо не вміщаються */}
+        <div className="mt-12 md:hidden">
+          <MobileFan still={reduce} />
         </div>
+        <FitScale className="mt-20 hidden md:block">
+          <div className="flex flex-row items-start justify-center">
+            {AREAS.map((a, i) => (
+              <AreaCard key={a.href} area={a} i={i} still={reduce} />
+            ))}
+          </div>
+        </FitScale>
       </div>
 
       {/* Плавний перехід у білу секцію контактів */}
