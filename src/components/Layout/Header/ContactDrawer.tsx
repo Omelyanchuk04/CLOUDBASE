@@ -183,9 +183,9 @@ const ContactDrawer = ({
             </filter>
           </svg>
 
-          {/* Затемнення */}
+          {/* Затемнення і легке розмиття сторінки, щоб акцент був на панелі */}
           <motion.div
-            className="absolute inset-0 bg-black/20"
+            className="absolute inset-0 bg-black/45 backdrop-blur-[6px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
