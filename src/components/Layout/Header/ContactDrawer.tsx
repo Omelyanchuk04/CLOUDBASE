@@ -235,7 +235,8 @@ const ContactDrawer = ({
               </button>
             </div>
 
-            <div className="relative flex-1 overflow-y-auto overscroll-contain px-6 pb-8">
+            {/* Прокрутка лишається, але системна смуга прихована */}
+            <div className="relative flex-1 overflow-y-auto overscroll-contain px-6 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {/* Контакти: як у секції «Контакти» на сторінці «Про нас», темний варіант */}
               {phoneC && (
                 <a
