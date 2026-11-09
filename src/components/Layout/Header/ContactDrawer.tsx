@@ -77,8 +77,11 @@ const icons: Record<string, React.ReactNode> = {
 const inputCls =
   "w-full min-w-0 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[14px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-white/30";
 
+// Затемнена заливка з відтінком кольору, щоб кнопки не зливались зі склом панелі
+const tintFill = (c: string) => `color-mix(in srgb, ${c} 16%, rgba(8, 9, 14, 0.62))`;
+
 const pill =
-  "inline-flex items-center gap-2 rounded-full bg-white/[0.03] px-4 py-2 text-[14px] font-semibold text-white/90 transition-colors duration-200 hover:bg-white/[0.08] hover:text-white";
+  "inline-flex items-center gap-2 rounded-full px-4 py-2 text-[14px] font-semibold text-white/90 transition-[filter,color] duration-200 hover:brightness-125 hover:text-white";
 
 const ContactDrawer = ({
   open,
@@ -137,11 +140,18 @@ const ContactDrawer = ({
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // Блокуємо прокрутку на <html> і лишаємо місце під смугу прокрутки
+    // (scrollbar-gutter), інакше сторінка й шапка смикаються вбік на її ширину
+    const root = document.documentElement;
+    const prevOverflow = root.style.overflow;
+    const prevGutter = root.style.scrollbarGutter;
+    // Лише коли смуга прокрутки справді займає місце (на Mac з трекпадом її ширина 0)
+    if (window.innerWidth - root.clientWidth > 0) root.style.scrollbarGutter = "stable";
+    root.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      root.style.overflow = prevOverflow;
+      root.style.scrollbarGutter = prevGutter;
     };
   }, [open, onClose]);
 
@@ -186,7 +196,7 @@ const ContactDrawer = ({
           {/* Панель: темна, як сайт. Головне в ній — форма заявки,
               контакти зверху компактно трьома кнопками */}
           <motion.aside
-            className="absolute inset-y-0 right-0 flex w-full max-w-[400px] flex-col overflow-hidden rounded-l-[28px] text-white"
+            className="absolute inset-y-2 right-2 flex w-[calc(100%-16px)] max-w-[400px] flex-col overflow-hidden rounded-[28px] text-white sm:inset-y-3 sm:right-3"
             // Liquid glass: напівпрозорий фон з розмиттям і насиченням того, що під панеллю,
             // світлий відблиск по краю і м'які внутрішні блики
             style={{
@@ -196,20 +206,19 @@ const ContactDrawer = ({
               backdropFilter: refract ? "url(#cb-liquid-glass) blur(6px) saturate(180%)" : "blur(12px) saturate(180%)",
               WebkitBackdropFilter: "blur(12px) saturate(180%)",
               border: "1px solid rgba(255,255,255,0.14)",
-              borderRight: "none",
               boxShadow:
                 "inset 1px 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.06), -30px 0 80px -20px rgba(0,0,0,0.6)",
             }}
             // Виїжджає зверху вниз
-            initial={reduce ? { opacity: 0 } : { y: "-100%" }}
+            initial={reduce ? { opacity: 0 } : { y: "-105%" }}
             animate={reduce ? { opacity: 1 } : { y: 0 }}
-            exit={reduce ? { opacity: 0 } : { y: "-100%" }}
+            exit={reduce ? { opacity: 0 } : { y: "-105%" }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* Одне м'яке світіння вгорі, без плям по всій панелі */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[260px] bg-[radial-gradient(60%_100%_at_50%_0%,rgba(111,134,214,0.18),transparent)]" />
             {/* Відблиск скла: світла смуга з верхнього лівого кута і ледь помітна знизу */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-l-[28px] bg-[linear-gradient(140deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.03)_22%,transparent_45%,transparent_80%,rgba(255,255,255,0.05)_100%)]" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[28px] bg-[linear-gradient(140deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.03)_22%,transparent_45%,transparent_80%,rgba(255,255,255,0.05)_100%)]" />
 
             {/* Верх: заголовок і хрестик */}
             <div className="relative flex items-center justify-between px-6 pt-6">
@@ -244,14 +253,14 @@ const ContactDrawer = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className={pill}
-                    style={{ border: "1.5px solid #2AABEE", rotate: "-1.5deg" }}
+                    style={{ border: "1.5px solid #2AABEE", rotate: "-1.5deg", background: tintFill("#2AABEE") }}
                   >
                     <span className="text-[#2AABEE]">{icons.telegram}</span>
                     {tgC.value}
                   </a>
                 )}
                 {mailC && (
-                  <a href={mailC.href ?? undefined} className={pill} style={{ border: "1.5px solid #d57eeb", rotate: "1.5deg" }}>
+                  <a href={mailC.href ?? undefined} className={pill} style={{ border: "1.5px solid #d57eeb", rotate: "1.5deg", background: tintFill("#d57eeb") }}>
                     {mailC.value}
                   </a>
                 )}
@@ -291,7 +300,7 @@ const ContactDrawer = ({
                         style={
                           active
                             ? { backgroundColor: s.color, border: `1px solid ${s.color}`, color: "#0b0b0f" }
-                            : { border: `1px solid ${s.color}80`, color: s.color }
+                            : { border: `1px solid ${s.color}80`, color: s.color, background: tintFill(s.color) }
                         }
                       >
                         {s.label}
