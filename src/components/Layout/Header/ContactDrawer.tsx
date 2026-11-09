@@ -4,6 +4,9 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { services, useTypewriter } from "@/app/(client)/(home)/sections/ApplicationForm/ApplicationForm";
+import { useLeadForm } from "@/lib/utils/leadForm";
+import PhoneInput from "@/components/UI/Form/PhoneInput";
+import FieldError from "@/components/UI/Form/FieldError";
 
 // Бічна панель справа на всю висоту вікна, виїжджає зверху. Відкривається стрілочкою біля «Заявка» в шапці.
 // Темна, як сайт. Зверху контакти як у секції «Контакти» на сторінці «Про нас»,
@@ -76,6 +79,8 @@ const icons: Record<string, React.ReactNode> = {
 
 const inputCls =
   "w-full min-w-0 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[14px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-white/30";
+// Рамка поля з помилкою
+const errCls = "!border-[#fb7185]/70 focus:!border-[#fb7185]";
 
 // Затемнена заливка з відтінком кольору, щоб кнопки не зливались зі склом панелі
 const tintFill = (c: string) => `color-mix(in srgb, ${c} 16%, rgba(8, 9, 14, 0.62))`;
@@ -102,11 +107,10 @@ const ContactDrawer = ({
   // Форма
   const [serviceId, setServiceId] = useState(services[0].id);
   const service = services.find((s) => s.id === serviceId) ?? services[0];
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
+  // Поля, маска номера і перевірка — спільні з великою формою (lib/utils/leadForm)
+  const form = useLeadForm();
+  const { name, setName, phone, setPhone, message, setMessage, errorOf, touch, refs } = form;
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
-  const canSend = name.trim() !== "" && phone.trim() !== "" && message.trim() !== "";
   const [focused, setFocused] = useState(false);
   // Друк прикладів у полі, як у великій формі; працює лише коли панель відкрита
   const emptyPrompt = !focused && message === "";
@@ -122,17 +126,15 @@ const ContactDrawer = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSend || status === "sending") return;
+    if (status === "sending" || !form.check()) return;
     setStatus("sending");
-    // TODO: той самий запит, що й у великій формі (service.label, name, phone, message)
+    // TODO: той самий запит, що й у великій формі (service.label, name.trim(), form.phoneFull, message.trim())
     setTimeout(() => setStatus("sent"), 1200);
   };
 
   const resetForm = () => {
     setStatus("idle");
-    setName("");
-    setPhone("");
-    setMessage("");
+    form.reset();
   };
 
   // Esc закриває, сторінка під панеллю не прокручується
@@ -334,34 +336,53 @@ const ContactDrawer = ({
                       </div>
                     ) : (
                       <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Ваше ім'я"
-                            autoComplete="name"
-                            className={inputCls}
-                          />
-                          <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="+380"
-                            autoComplete="tel"
-                            className={inputCls}
-                          />
+                        <div className="space-y-2">
+                          <div>
+                            <input
+                              ref={refs.name}
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                              onBlur={touch("name")}
+                              placeholder="Ваше ім'я"
+                              autoComplete="name"
+                              aria-invalid={!!errorOf("name")}
+                              aria-describedby="cd-name-err"
+                              className={`${inputCls} ${errorOf("name") ? errCls : ""}`}
+                            />
+                            <FieldError id="cd-name-err" message={errorOf("name")} />
+                          </div>
+                          <div>
+                            <PhoneInput
+                              ref={refs.phone}
+                              value={phone}
+                              onValueChange={setPhone}
+                              onBlur={touch("phone")}
+                              placeholder="+380 __ ___ __ __"
+                              aria-invalid={!!errorOf("phone")}
+                              aria-describedby="cd-phone-err"
+                              className={`${inputCls} ${errorOf("phone") ? errCls : ""}`}
+                            />
+                            <FieldError id="cd-phone-err" message={errorOf("phone")} />
+                          </div>
                         </div>
 
                         <textarea
+                          ref={refs.message}
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
                           onFocus={() => setFocused(true)}
-                          onBlur={() => setFocused(false)}
+                          onBlur={() => {
+                            setFocused(false);
+                            touch("message")();
+                          }}
+                          aria-invalid={!!errorOf("message")}
+                          aria-describedby="cd-msg-err"
                           onKeyDown={handleKeyDown}
                           rows={4}
                           placeholder={emptyPrompt ? typed || "Опишіть задачу…" : "Опишіть задачу…"}
                           className="mt-3 w-full resize-none bg-transparent px-1 text-[15px] leading-relaxed text-white outline-none placeholder:text-white/35"
                         />
+                        <FieldError id="cd-msg-err" message={errorOf("message")} />
 
                         <div className="mt-2 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
                           <div className="flex min-w-0 items-center gap-2">
@@ -370,7 +391,7 @@ const ContactDrawer = ({
                           </div>
                           <button
                             type="submit"
-                            disabled={!canSend || status === "sending"}
+                            disabled={status === "sending"}
                             aria-label="Надіслати заявку"
                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black transition-colors hover:bg-white/85 disabled:bg-white/15 disabled:text-white/40 ${
                               status === "sending" ? "animate-pulse" : ""

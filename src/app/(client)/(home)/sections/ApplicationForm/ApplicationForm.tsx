@@ -3,6 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { easedGradient } from "@/lib/utils/gradients";
+import { useLeadForm } from "@/lib/utils/leadForm";
+import PhoneInput from "@/components/UI/Form/PhoneInput";
+import FieldError from "@/components/UI/Form/FieldError";
 
 type Service = {
   id: string;
@@ -76,6 +79,8 @@ export const services: Service[] = [
 
 const inputCls =
   "w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-base text-white outline-none transition-colors placeholder:text-white/35 focus:border-white/30";
+// Рамка поля з помилкою
+const errCls = "!border-[#fb7185]/70 focus:!border-[#fb7185]";
 
 // Ефект друкування: пише текст, пауза, стирає і переходить до наступного
 export const useTypewriter = (texts: string[], enabled: boolean) => {
@@ -180,9 +185,9 @@ const ApplicationForm = ({
   const [serviceId, setServiceId] = useState(defaultService);
   const service = services.find((s) => s.id === serviceId) ?? services[0];
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
+  // Поля, маска номера і перевірка — спільні з бічною панеллю (lib/utils/leadForm)
+  const form = useLeadForm();
+  const { name, setName, phone, setPhone, message, setMessage, errorOf, touch, refs } = form;
   const [focused, setFocused] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
@@ -207,16 +212,13 @@ const ApplicationForm = ({
   const emptyPrompt = !focused && message === "";
   const typed = useTypewriter(service.examples, emptyPrompt && inView);
 
-  const canSend =
-    name.trim() !== "" && phone.trim() !== "" && message.trim() !== "";
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSend || status === "sending") return;
+    if (status === "sending" || !form.check()) return;
 
     setStatus("sending");
     // TODO: замініть на реальний запит (API, пошта або Telegram-бот).
-    // Передайте service.label, name, phone і message
+    // Передайте service.label, name.trim(), form.phoneFull (+380XXXXXXXXX) і message.trim()
     setTimeout(() => setStatus("sent"), 1200);
   };
 
@@ -230,9 +232,7 @@ const ApplicationForm = ({
 
   const resetForm = () => {
     setStatus("idle");
-    setName("");
-    setPhone("");
-    setMessage("");
+    form.reset();
   };
 
   return (
@@ -378,28 +378,46 @@ const ApplicationForm = ({
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Ваше ім'я"
-                    autoComplete="name"
-                    className={inputCls}
-                  />
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+380 __ ___ __ __"
-                    autoComplete="tel"
-                    className={inputCls}
-                  />
+                  <div>
+                    <input
+                      ref={refs.name}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      onBlur={touch("name")}
+                      placeholder="Ваше ім'я"
+                      autoComplete="name"
+                      aria-invalid={!!errorOf("name")}
+                      aria-describedby="af-name-err"
+                      className={`${inputCls} ${errorOf("name") ? errCls : ""}`}
+                    />
+                    <FieldError id="af-name-err" message={errorOf("name")} />
+                  </div>
+                  <div>
+                    <PhoneInput
+                      ref={refs.phone}
+                      value={phone}
+                      onValueChange={setPhone}
+                      onBlur={touch("phone")}
+                      placeholder="+380 __ ___ __ __"
+                      aria-invalid={!!errorOf("phone")}
+                      aria-describedby="af-phone-err"
+                      className={`${inputCls} ${errorOf("phone") ? errCls : ""}`}
+                    />
+                    <FieldError id="af-phone-err" message={errorOf("phone")} />
+                  </div>
                 </div>
 
                 <textarea
+                  ref={refs.message}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
+                  onBlur={() => {
+                    setFocused(false);
+                    touch("message")();
+                  }}
+                  aria-invalid={!!errorOf("message")}
+                  aria-describedby="af-msg-err"
                   onKeyDown={handleKeyDown}
                   rows={4}
                   placeholder={
@@ -407,6 +425,7 @@ const ApplicationForm = ({
                   }
                   className="w-full resize-none bg-transparent px-1 text-base leading-relaxed text-white outline-none placeholder:text-white/35"
                 />
+                <FieldError id="af-msg-err" message={errorOf("message")} />
 
                 <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-4">
                   {/* Опис обраного напрямку. key змушує анімацію відіграти при зміні */}
@@ -432,7 +451,7 @@ const ApplicationForm = ({
                     </span>
                     <button
                       type="submit"
-                      disabled={!canSend || status === "sending"}
+                      disabled={status === "sending"}
                       aria-label="Надіслати заявку"
                       className={`flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-200 hover:bg-white/85 active:scale-95 disabled:bg-white/15 disabled:text-white/40 ${
                         status === "sending" ? "animate-pulse" : ""
