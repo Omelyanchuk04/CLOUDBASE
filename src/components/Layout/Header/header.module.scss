@@ -48,15 +48,30 @@
     --menu-hover: rgba(0, 0, 0, 0.04);
     --menu-muted: rgba(0, 0, 0, 0.5);
 
-    --glass-fill-top: rgba(255, 255, 255, 0.6);
-    --glass-fill: rgba(255, 255, 255, 0.3);
-    --glass-edge: rgba(255, 255, 255, 0.9);
+    /* Скло в стилі Apple Liquid Glass для світлих секцій: майже прозора
+       заливка (фон просвічує і насичується), яскраві світлі блики по кромці
+       зсередини, тонка темна лінія ззовні і м'яка тінь — так кнопку видно
+       і на білому, і на кольоровому фоні, але вона лишається склом */
+    --glass-fill-top: rgba(255, 255, 255, 0.26);
+    --glass-fill: rgba(255, 255, 255, 0.08);
+    --glass-edge: rgba(255, 255, 255, 0.5);
     --glass-divider: rgba(0, 0, 0, 0.12);
-    --glass-hover: rgba(0, 0, 0, 0.06);
-    --glass-shade: rgba(0, 0, 0, 0.15);
-    --glass-sheen: rgba(255, 255, 255, 0.7);
-    --glass-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.18);
-    --glass-shadow-hover: 0 16px 30px -14px rgba(0, 0, 0, 0.2);
+    --glass-hover: rgba(255, 255, 255, 0.22);
+    --glass-shade: rgba(0, 0, 0, 0.08);
+    --glass-sheen: rgba(255, 255, 255, 0.6);
+    --glass-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.12),
+      0 8px 22px -10px rgba(0, 0, 0, 0.25);
+    --glass-shadow-hover:
+      0 0 0 0.5px rgba(0, 0, 0, 0.14),
+      0 14px 28px -12px rgba(0, 0, 0, 0.3);
+    --glass-inset:
+      inset 0 1px 0.5px rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0.5px rgba(255, 255, 255, 0.5),
+      inset 1px 0 0.5px rgba(255, 255, 255, 0.35),
+      inset -1px 0 0.5px rgba(255, 255, 255, 0.35),
+      inset 0 0 14px rgba(255, 255, 255, 0.18),
+      inset 0 -10px 16px -12px var(--glass-shade);
 
     --logo-filter: invert(1) brightness(0);
   }
@@ -150,8 +165,8 @@
       var(--glass-fill-top) 0%,
       var(--glass-fill) 100%
     );
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(190%) brightness(1.04);
+    backdrop-filter: blur(10px) saturate(190%) brightness(1.04);
     border: 1px solid var(--glass-edge);
     box-shadow: var(--glass-inset), var(--glass-shadow);
     /* Стиснення при натисканні задає --press. Нахилу немає */
@@ -192,7 +207,7 @@
     }
 
     &:has(:active) {
-      --press: 0.96;
+      --press: 1; /* стиснення при натисканні вимкнено */
       transition:
         transform 0.12s ease,
         box-shadow 0.3s ease;
@@ -402,8 +417,9 @@
       }
     }
 
+    /* Без зменшення при натисканні: лише нахил, як у звичайному стані */
     &:active {
-      transform: rotate(var(--tilt, 0deg)) scale(0.96);
+      transform: rotate(var(--tilt, 0deg));
       transition: none;
     }
   }
