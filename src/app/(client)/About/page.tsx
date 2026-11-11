@@ -5,6 +5,7 @@ import AboutContacts from "./sections/AboutContacts/AboutContacts";
 // Етапи і форма заявки ті самі, що на головній
 import Steps from "../(home)/sections/Steps/Steps";
 import ApplicationForm from "../(home)/sections/ApplicationForm/ApplicationForm";
+import PromoGift from "@/components/UI/PromoGift/PromoGift";
 
 export const metadata: Metadata = {
   title: "Про компанію CloudBASE",
@@ -38,6 +39,8 @@ export default function AboutPage() {
         <AboutContacts />
         <Steps bg="transparent" seamFrom="transparent" padding="2.5rem 0 1rem" />
       </div>
+      {/* Акція: доробка для BAS у подарунок. Над нею фон уже білий */}
+      <PromoGift />
       <ApplicationForm fromColor="#ffffff" />
     </>
   );
