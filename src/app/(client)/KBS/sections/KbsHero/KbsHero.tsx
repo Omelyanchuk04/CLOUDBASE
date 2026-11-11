@@ -32,7 +32,7 @@ const scrollTo = (id: string) => (e: React.MouseEvent) => {
   scrollToSection(id);
 };
 
-const WORDS = ["Встановлення", "і", "супровід"];
+const WORDS = ["Встановлення", "і", "підтримка"];
 const TEXT_END = 0.75; // коли заголовок вже прочитується
 
 const appear = (delay = 0) => ({

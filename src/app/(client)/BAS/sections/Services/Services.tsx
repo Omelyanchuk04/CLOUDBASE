@@ -142,6 +142,15 @@ const Items = ({ s }: { s: BasService }) => (
         </li>
       ))}
     </ul>
+    {/* Важливе обмеження: темна плашка зі знаком оклику, щоб її точно помітили */}
+    {s.warning && (
+      <p className="mt-5 flex max-w-[520px] items-start gap-3 rounded-2xl bg-black/80 px-4 py-3 text-[15px] font-semibold leading-snug text-white shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)]">
+        <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#fde047] text-[15px] font-bold leading-none text-black">
+          !
+        </span>
+        {s.warning}
+      </p>
+    )}
     {s.price && <Price text={s.price} />}
   </>
 );

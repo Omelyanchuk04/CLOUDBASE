@@ -7,9 +7,9 @@ import ApplicationForm from "../(home)/sections/ApplicationForm/ApplicationForm"
 import { KBS_CONFIGS, KBS_SERVICES } from "./kbsData";
 
 export const metadata: Metadata = {
-  title: "KBS: встановлення, супровід і хмара",
+  title: "KBS: встановлення, технічна підтримка і хмара",
   description:
-    "Встановлення та супровід програм «KBS. Облік бюджетної установи» і «KBS. Бухгалтерія комунального підприємства», розміщення KBS у хмарі.",
+    "Встановлення, технічна підтримка і доробки програм «KBS. Облік бюджетної установи» і «KBS. Бухгалтерія комунального підприємства», розміщення KBS у хмарі.",
 };
 
 export default function KbsPage() {

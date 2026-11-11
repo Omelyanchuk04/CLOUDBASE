@@ -76,6 +76,7 @@ export type BasService = {
   title: string;
   items: string[];
   price?: string;
+  warning?: string; // важливе обмеження, показується виділеною плашкою під пунктами
   icon: "install" | "support" | "dev" | "cloud" | "power" | "backup" | "server";
   gradient: [string, string]; // фірмові градієнти з головної
 };
