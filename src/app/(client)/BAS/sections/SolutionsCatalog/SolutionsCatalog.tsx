@@ -109,7 +109,7 @@ const SolutionsCatalog = () => {
       ref={sectionRef}
       id="solutions"
       data-theme="light"
-      className="relative w-full overflow-hidden bg-white pb-16 pt-4 text-neutral-900 md:pb-20 md:pt-6"
+      className="relative w-full overflow-hidden bg-white pb-16 pt-4 text-neutral-900 md:pb-20 md:pt-6 lg:pb-10"
       onPointerEnter={(e) => e.pointerType === "mouse" && setHover(true)}
       onPointerLeave={() => setHover(false)}
     >
@@ -127,21 +127,24 @@ const SolutionsCatalog = () => {
         />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-[1200px] px-6 lg:px-10">
+      {/* До цього блоку прокручують посилання на #solutions: шапка 80px над заголовком */}
+      <div data-scroll-anchor data-scroll-offset="80" className="relative z-10 mx-auto w-full max-w-[1200px] px-6 lg:px-10">
         <motion.h2
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
-          className="text-left text-4xl md:text-6xl bg-gradient-to-b from-[#0b0b10] to-[#0b0b10]/50 bg-clip-text pb-[0.08em] font-semibold leading-[1.05] tracking-[-0.03em] text-transparent"
+          className="text-left text-4xl md:text-5xl bg-gradient-to-b from-[#0b0b10] to-[#0b0b10]/50 bg-clip-text pb-[0.08em] font-semibold leading-[1.05] tracking-[-0.03em] text-transparent"
         >
           Доробки для <span className="bg-gradient-to-b from-[#3b9ae6] to-[#00508c] bg-clip-text text-transparent">BAS</span>
         </motion.h2>
 
         {/* Вкладки категорій: пігулки з нахилом і кольоровою рамкою */}
-        <div className="-mx-6 mb-8 mt-7 flex gap-3 overflow-x-auto px-6 pb-3 pt-2 [scrollbar-width:none] md:mx-0 md:mb-12 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
+        <div className="-mx-6 mb-8 mt-7 flex gap-3 lg:mb-6 lg:mt-5 lg:gap-2.5 overflow-x-auto px-6 pb-3 pt-2 [scrollbar-width:none] md:mx-0 md:mb-12 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
           {tabs.map((t, i) => {
             const on = filter === t.id;
+            // Коли обрано «Усі», підсвічуємо вкладку категорії поточного рішення
+            const current = !on && filter === "all" && t.id === active.category;
             return (
               <motion.button
                 key={t.id}
@@ -153,11 +156,19 @@ const SolutionsCatalog = () => {
                   rotate: tilts[i % tilts.length],
                   // Рамка інлайн: у globals.scss є button { border: none }
                   border: `1.5px solid ${t.color}`,
-                  backgroundColor: on ? t.color : "rgba(255,255,255,0.8)",
+                  backgroundColor: on
+                    ? t.color
+                    : current
+                      ? `color-mix(in srgb, ${t.color} 18%, #ffffff)`
+                      : "rgba(255,255,255,0.8)",
                   color: on ? "#fff" : "#1d1d1f",
-                  boxShadow: on ? `0 12px 24px -10px ${t.color}` : "none",
+                  boxShadow: on
+                    ? `0 12px 24px -10px ${t.color}`
+                    : current
+                      ? `0 10px 22px -14px ${t.color}`
+                      : "none",
                 }}
-                className="inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold backdrop-blur transition-colors duration-300"
+                className="inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold lg:px-4 lg:py-2 lg:text-[13px] backdrop-blur transition-[background-color,box-shadow,color] duration-300"
               >
                 {t.label}
                 <span className={`min-w-[22px] rounded-full px-1.5 text-center text-[12px] ${on ? "bg-white/25" : "bg-neutral-100 text-neutral-500"}`}>
@@ -170,9 +181,9 @@ const SolutionsCatalog = () => {
 
         {/* На телефоні: стрічка, ілюстрація, текст. На ПК: текст і ілюстрація, стрічка внизу */}
         <div className="flex flex-col">
-          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12">
             {/* Текст обраного рішення */}
-            <div className="lg:min-h-[440px] lg:pt-4">
+            <div className="lg:min-h-[300px]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={active.id}
@@ -181,16 +192,10 @@ const SolutionsCatalog = () => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.35, ease }}
                 >
-                  <span
-                    className="inline-flex rounded-full px-3 py-1 text-[13px] font-semibold"
-                    style={{ backgroundColor: cat.tint, color: cat.accent }}
-                  >
-                    {cat.label}
-                  </span>
-                  <h3 className="mt-4 text-3xl font-semibold leading-[1.1] tracking-tight md:text-[40px]">
+                  <h3 className="text-3xl font-semibold leading-[1.1] tracking-tight md:text-[34px]">
                     {active.title}
                   </h3>
-                  <p className="mt-4 text-[16px] leading-relaxed text-neutral-600 md:text-[17px]">
+                  <p className="mt-4 text-[16px] leading-relaxed text-neutral-600 lg:mt-3">
                     {active.desc}
                   </p>
                   {active.note && (
@@ -203,7 +208,7 @@ const SolutionsCatalog = () => {
               <button
                 type="button"
                 onClick={scrollToApplication}
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#0068b4] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_12px_24px_-12px_#0068b4] transition-colors hover:bg-[#005a9c]"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#0068b4] lg:mt-6 px-6 py-3 text-[15px] font-semibold text-white shadow-[0_12px_24px_-12px_#0068b4] transition-colors hover:bg-[#005a9c]"
               >
                 Замовити доробку
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -214,7 +219,7 @@ const SolutionsCatalog = () => {
 
             {/* Велика панель з ілюстрацією */}
             <div
-              className="relative order-first aspect-[4/3] overflow-hidden rounded-[32px] ring-1 ring-black/5 transition-[background] duration-700 lg:order-none"
+              className="relative order-first aspect-[4/3] overflow-hidden rounded-[32px] lg:aspect-auto lg:h-[clamp(260px,calc(100svh-520px),400px)] ring-1 ring-black/5 transition-[background] duration-700 lg:order-none"
               style={{ background: `linear-gradient(135deg, ${cat.tint} 0%, #ffffff 85%)` }}
             >
               <AnimatePresence mode="wait" initial={false}>
@@ -233,7 +238,7 @@ const SolutionsCatalog = () => {
           </div>
 
           {/* Стрічка карток обраної категорії */}
-          <div className="order-first mb-6 flex items-center gap-4 lg:order-none lg:mb-0 lg:mt-12">
+          <div className="order-first mb-6 flex items-center gap-4 lg:order-none lg:mb-0 lg:mt-6">
             <div
               ref={scrollerRef}
               // Зліва стрічка доходить до краю екрана, як у Chrome. --edge — відстань
@@ -252,7 +257,7 @@ const SolutionsCatalog = () => {
                     type="button"
                     onClick={() => select(i)}
                     aria-pressed={on}
-                    className="relative flex h-[132px] w-[300px] shrink-0 snap-start items-stretch overflow-hidden rounded-[24px] text-left md:w-[330px]"
+                    className="relative flex h-[132px] w-[300px] shrink-0 lg:h-[108px] snap-start items-stretch overflow-hidden rounded-[24px] text-left md:w-[330px]"
                     style={{
                       backgroundColor: c.tint,
                       boxShadow: on ? `inset 0 0 0 3px ${c.accent}` : "none",
@@ -287,7 +292,7 @@ const SolutionsCatalog = () => {
               <button
                 type="button"
                 onClick={scrollToApplication}
-                className="flex h-[132px] w-[300px] shrink-0 snap-start flex-col justify-between rounded-[24px] p-5 text-left text-white md:w-[330px]"
+                className="flex h-[132px] w-[300px] shrink-0 snap-start lg:h-[108px] flex-col justify-between rounded-[24px] p-5 text-left text-white md:w-[330px]"
                 style={{ background: "linear-gradient(135deg, #0068b4 0%, #3b8fe0 100%)" }}
               >
                 <span className="text-[16px] font-semibold leading-snug tracking-tight">

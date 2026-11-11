@@ -13,7 +13,7 @@ import { scrollToSection } from "@/lib/utils/scrollToSection";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const GiftIcon = () => (
-  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect x="3" y="8" width="18" height="4" rx="1" />
     <path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
     <path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5" />
@@ -111,12 +111,12 @@ const PromoGift = ({ bg = "#ffffff" }: { bg?: string }) => {
         };
 
   return (
-    <section id="gift" data-theme="light" className="relative w-full px-6 py-10 md:py-14 lg:px-10" style={{ backgroundColor: bg }}>
-      <motion.div {...rise(0)} className="relative mx-auto w-full max-w-[1200px]">
+    <section id="gift" data-theme="light" className="relative w-full py-10 md:py-14" style={{ backgroundColor: bg }}>
+      <motion.div {...rise(0)} className="relative mx-auto w-full max-w-[1200px] px-6 lg:px-10">
         {/* Градієнтна рамка в кольорах сайту */}
         {/* Без кольорової рамки: м'яка тінь і ледь помітний контур */}
         <div className="rounded-[34px] shadow-[0_30px_70px_-35px_rgba(30,60,110,0.35)]">
-          <div className="relative overflow-hidden rounded-[34px] bg-[#fcfcfd] px-6 ring-1 ring-black/[0.06] py-8 md:px-12 md:py-12">
+          <div className="relative overflow-hidden rounded-[34px] bg-[#fcfcfd] px-6 py-9 ring-1 ring-black/[0.06] md:px-14 md:py-14">
             {/* М'які плями всередині картки */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-0">
               <div className="absolute -right-24 -top-28 h-[420px] w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(72,198,239,0.14),transparent)]" />
@@ -126,7 +126,7 @@ const PromoGift = ({ bg = "#ffffff" }: { bg?: string }) => {
             {/* Іконка подарунка в правому верхньому куті картки */}
             <motion.span
               aria-hidden="true"
-              className="absolute right-6 top-6 z-10 hidden h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#d9800b] shadow-[0_20px_40px_-18px_rgba(217,128,11,0.45)] md:flex"
+              className="absolute right-6 top-6 z-10 hidden h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#d9800b] shadow-[0_20px_40px_-18px_rgba(217,128,11,0.45)] md:flex"
               animate={reduce ? undefined : { rotate: [-6, 6, -6], y: [0, -4, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -136,7 +136,7 @@ const PromoGift = ({ bg = "#ffffff" }: { bg?: string }) => {
 
             <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
               <div>
-                <h2 className="text-[32px] font-semibold leading-[1.08] tracking-[-0.03em] text-neutral-900 md:text-[46px]">
+                <h2 className="text-[28px] font-semibold leading-[1.1] tracking-[-0.03em] text-neutral-900 md:text-[36px]">
                   Доробка для BAS
                   <br />
                   на рік{" "}
@@ -145,18 +145,18 @@ const PromoGift = ({ bg = "#ffffff" }: { bg?: string }) => {
                   </span>
                 </h2>
 
-                <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-neutral-600 md:text-[17px]">
+                <p className="mt-4 max-w-[460px] text-[15px] leading-relaxed text-neutral-500">
                   Підключіть хоча б одне робоче місце в нашій хмарі — і отримайте одну доробку для BAS з
                   каталогу на вибір. Користуйтеся нею весь рік без доплат.
                 </p>
 
-                <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4">
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
                   <Link
                     href="/BAS#solutions"
                     onClick={(e) => {
                       if (catalogHere && scrollToSection("solutions")) e.preventDefault();
                     }}
-                    className="group inline-flex items-center gap-2 rounded-full bg-[#0b0b0f] px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-neutral-800"
+                    className="group inline-flex items-center gap-2 rounded-full bg-[#0b0b0f] px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-neutral-800"
                   >
                     Обрати доробку
                     <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -168,7 +168,7 @@ const PromoGift = ({ bg = "#ffffff" }: { bg?: string }) => {
                     onClick={(e) => {
                       if (scrollToSection("application")) e.preventDefault();
                     }}
-                    className="group inline-flex items-center text-[15px] font-semibold text-neutral-700 transition-colors hover:text-neutral-900"
+                    className="group inline-flex items-center text-[14px] font-semibold text-neutral-600 transition-colors hover:text-neutral-900"
                   >
                     Залишити заявку
                     <svg className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
@@ -187,21 +187,21 @@ const PromoGift = ({ bg = "#ffffff" }: { bg?: string }) => {
                     <motion.li
                       key={s.n}
                       {...rise(i + 1)}
-                      className="relative flex gap-5 pb-7 last:pb-0"
+                      className="relative flex gap-4 pb-6 last:pb-0"
                     >
                       {/* З'єднувальна лінія до наступного кроку */}
                       {i < STEPS.length - 1 && (
-                        <span aria-hidden="true" className="absolute bottom-0 left-[21px] top-12 w-px bg-neutral-900/10" />
+                        <span aria-hidden="true" className="absolute bottom-0 left-[17px] top-10 w-px bg-neutral-900/[0.07]" />
                       )}
                       <span
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-[15px] font-bold tracking-tight"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] text-[13px] font-bold tracking-tight [&_svg]:h-[18px] [&_svg]:w-[18px]"
                         style={{ color: s.color, background: `color-mix(in srgb, ${s.color} 12%, #ffffff)` }}
                       >
                         {festive ? React.createElement(FESTIVE_ICONS[i]) : s.n}
                       </span>
-                      <span className="pt-1.5">
-                        <span className="block text-[17px] font-semibold leading-snug tracking-[-0.01em] text-neutral-900">{s.title}</span>
-                        <span className="mt-1 block text-[14px] leading-relaxed text-neutral-500">{s.text}</span>
+                      <span className="pt-1">
+                        <span className="block text-[15px] font-semibold leading-snug text-neutral-900">{s.title}</span>
+                        <span className="mt-0.5 block text-[13px] leading-relaxed text-neutral-500">{s.text}</span>
                       </span>
                     </motion.li>
                   ))}
