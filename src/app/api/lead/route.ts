@@ -32,6 +32,65 @@ const limited = (ip: string) => {
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
+// Назви сторінок для повідомлення
+const PAGES: Record<string, string> = {
+  "/": "Головна",
+  "/bas": "BAS",
+  "/kbs": "KBS",
+  "/cloud": "Хмара",
+  "/about": "Про нас",
+};
+const pageName = (path: string) => PAGES[path.toLowerCase().replace(/\/+$/, "") || "/"] ?? path;
+
+// Пристрій, система і браузер з рядка User-Agent
+const describeDevice = (ua: string): string => {
+  if (!ua) return "Невідомо";
+  const tablet = /iPad|Tablet|Android(?!.*Mobile)/i.test(ua);
+  const phone = !tablet && /iPhone|iPod|Android.*Mobile|Mobile|Windows Phone/i.test(ua);
+  const type = tablet ? "Планшет" : phone ? "Телефон" : "Комп'ютер";
+
+  const os = /iPhone|iPod/.test(ua)
+    ? "iPhone (iOS)"
+    : /iPad/.test(ua)
+      ? "iPad (iPadOS)"
+      : /Android/.test(ua)
+        ? "Android"
+        : /Windows/.test(ua)
+          ? "Windows"
+          : /Mac OS X|Macintosh/.test(ua)
+            ? "macOS"
+            : /CrOS/.test(ua)
+              ? "ChromeOS"
+              : /Linux/.test(ua)
+                ? "Linux"
+                : "";
+
+  // Порядок важливий: Edge, Opera й інші теж містять «Chrome» у рядку
+  const browser = /Telegram/i.test(ua)
+    ? "Telegram"
+    : /Instagram/i.test(ua)
+      ? "Instagram"
+      : /FBAN|FBAV/i.test(ua)
+        ? "Facebook"
+        : /Edg\//.test(ua)
+          ? "Edge"
+          : /OPR\/|Opera/.test(ua)
+            ? "Opera"
+            : /YaBrowser/.test(ua)
+              ? "Yandex"
+              : /SamsungBrowser/.test(ua)
+                ? "Samsung Internet"
+                : /Firefox|FxiOS/.test(ua)
+                  ? "Firefox"
+                  : /Chrome|CriOS/.test(ua)
+                    ? "Chrome"
+                    : /Safari/.test(ua)
+                      ? "Safari"
+                      : "";
+
+  return [type, os, browser].filter(Boolean).join(" · ");
+};
+
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
 export async function POST(req: Request) {
@@ -86,7 +145,10 @@ export async function POST(req: Request) {
     "<b>Задача:</b>",
     esc(message),
     "",
-    `<i>${esc([source, page, time].filter(Boolean).join(" · "))}</i>`,
+    `<b>Сторінка:</b> ${esc(page ? (pageName(page) === page ? page : `${pageName(page)} (${page})`) : "Невідомо")}`,
+    `<b>Пристрій:</b> ${esc(describeDevice(req.headers.get("user-agent") ?? ""))}`,
+    "",
+    `<i>${esc([source, time].filter(Boolean).join(" · "))}</i>`,
   ].join("\n");
 
   const results = await Promise.all(

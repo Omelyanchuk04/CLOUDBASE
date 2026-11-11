@@ -30,7 +30,7 @@ interface ContactItem {
   href: string | null; // null — пункт без посилання, наприклад графік
 }
 
-// Контакти в бічній панелі (стрілочка біля "Заявка"). Замініть на реальні дані
+// Контакти в бічній панелі (стрілочка біля "Заявка"). Телефон ще тимчасовий
 const contacts: ContactItem[] = [
   {
     id: "phone",
@@ -41,14 +41,14 @@ const contacts: ContactItem[] = [
   {
     id: "telegram",
     label: "Telegram",
-    value: "@cloudbase",
-    href: "https://t.me/cloudbase",
+    value: "@CLOUDBASE_CHAT",
+    href: "https://t.me/CLOUDBASE_CHAT",
   },
   {
     id: "email",
     label: "Email",
-    value: "info@cloudbase.ua",
-    href: "mailto:info@cloudbase.ua",
+    value: "cloudbase.com.ua@gmail.com",
+    href: "mailto:cloudbase.com.ua@gmail.com",
   },
   {
     id: "hours",
