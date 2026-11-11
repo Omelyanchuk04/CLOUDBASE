@@ -330,6 +330,24 @@ const Configurations = ({
                 <p className="mt-4 text-[15px] leading-relaxed text-neutral-600 md:text-base">
                   {active.description}
                 </p>
+                {/* УТП: що ми робимо з цією конфігурацією */}
+                {active.usp && (
+                  <ul className="mt-6 space-y-2.5">
+                    {active.usp.map((u) => (
+                      <li key={u} className="flex items-start gap-3 text-[15px] font-medium leading-snug text-neutral-800">
+                        <span
+                          className="mt-[1px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white"
+                          style={{ background: `linear-gradient(135deg, ${active.gradient[0]}, ${active.gradient[1]})` }}
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        </span>
+                        {u}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {active.price && <Price text={active.price} />}
                 <a
                   href="#application"
@@ -358,6 +376,21 @@ const Configurations = ({
               </div>
             </motion.article>
           </AnimatePresence>
+
+          {/* Під карткою: якщо потрібної конфігурації немає в списку */}
+          <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 px-2 text-[15px] text-neutral-600">
+            Не знайшли своєї конфігурації?
+            <a
+              href="#application"
+              onClick={scrollToApplication}
+              className="group inline-flex items-center font-semibold text-[#0066cc] transition-opacity hover:opacity-80"
+            >
+              Напишіть нам, і ми допоможемо
+              <svg className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </p>
         </div>
         </div>
       </div>
