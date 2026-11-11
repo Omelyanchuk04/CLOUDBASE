@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { services, useTypewriter } from "@/app/(client)/(home)/sections/ApplicationForm/ApplicationForm";
-import { useLeadForm } from "@/lib/utils/leadForm";
+import { sendLead, useLeadForm } from "@/lib/utils/leadForm";
 import PhoneInput from "@/components/UI/Form/PhoneInput";
 import FieldError from "@/components/UI/Form/FieldError";
 
@@ -124,12 +124,30 @@ const ContactDrawer = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [sendError, setSendError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "sending" || !form.check()) return;
+    const website = String(new FormData(e.currentTarget).get("website") ?? "");
+
     setStatus("sending");
-    // TODO: той самий запит, що й у великій формі (service.label, name.trim(), form.phoneFull, message.trim())
-    setTimeout(() => setStatus("sent"), 1200);
+    setSendError(null);
+    // Заявка йде на /api/lead, а звідти в Telegram
+    const error = await sendLead({
+      service: service.label,
+      name: name.trim(),
+      phone: form.phoneFull,
+      message: message.trim(),
+      source: "Бічна панель",
+      website,
+    });
+    if (error) {
+      setSendError(error);
+      setStatus("idle");
+      return;
+    }
+    setStatus("sent");
   };
 
   const resetForm = () => {
@@ -383,6 +401,9 @@ const ContactDrawer = ({
                           className="mt-3 w-full resize-none bg-transparent px-1 text-[15px] leading-relaxed text-white outline-none placeholder:text-white/35"
                         />
                         <FieldError id="cd-msg-err" message={errorOf("message")} />
+                {/* Пастка для ботів: люди цього поля не бачать */}
+                <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 opacity-0" />
+                <FieldError id="cd-msg-err-send" message={sendError} />
 
                         <div className="mt-2 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
                           <div className="flex min-w-0 items-center gap-2">

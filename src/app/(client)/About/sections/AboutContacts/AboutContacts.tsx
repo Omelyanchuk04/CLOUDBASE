@@ -82,7 +82,7 @@ const AboutContacts = () => {
       />
 
 
-      <div className="relative z-10 mx-auto w-full max-w-[860px] px-6 text-left md:text-center">
+      <div data-scroll-anchor className="relative z-10 mx-auto w-full max-w-[860px] px-6 text-left md:text-center">
         <motion.h2
           {...rise(0)}
           className="bg-gradient-to-b from-neutral-900 to-neutral-500 bg-clip-text pb-[0.06em] text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-transparent md:text-6xl"

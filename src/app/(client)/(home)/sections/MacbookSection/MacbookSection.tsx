@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { MacbookScroll } from "@/components/UI/MacbookScroll/MacbookScroll";
 import styles from "./MacbookSection.module.scss";
+import { scrollToSection } from "@/lib/utils/scrollToSection";
 
 // Скляна кнопка: відблиск слідує за курсором.
 // Тільки для миші, на сенсорному екрані цей ефект не потрібен
@@ -57,8 +58,12 @@ const MacbookSection = () => {
             </motion.span>
             <br />
             <motion.span className="inline-block" {...appear(0.4)}>
+            {/* Веде до форми заявки внизу цієї ж сторінки */}
             <Link
-              href="/BAS"
+              href="/#application"
+              onClick={(e) => {
+                if (scrollToSection("application")) e.preventDefault();
+              }}
               className={styles.glassBtn}
               onPointerMove={handleGlassMove}
               onPointerLeave={handleGlassLeave}

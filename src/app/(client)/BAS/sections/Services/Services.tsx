@@ -203,7 +203,8 @@ const Services = ({
       </div>
 
       {/* Основний блок рівно на висоту екрана */}
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1200px] flex-col px-6 pb-14 pt-28 lg:h-[100svh] lg:px-10 lg:pb-12 lg:pt-24">
+      {/* data-scroll-anchor з нульовим відступом: блок рівно на екран, тож прокручуємо точно до його верху */}
+      <div data-scroll-anchor data-scroll-offset="0" className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1200px] flex-col px-6 pb-14 pt-28 lg:h-[100svh] lg:px-10 lg:pb-12 lg:pt-24">
         {/* Заголовок: назва продукту в кольорі активної послуги + лічильник */}
         <div className="flex items-end justify-between gap-6">
           <h2

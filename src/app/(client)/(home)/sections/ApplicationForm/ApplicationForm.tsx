@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { easedGradient } from "@/lib/utils/gradients";
-import { useLeadForm } from "@/lib/utils/leadForm";
+import { sendLead, useLeadForm } from "@/lib/utils/leadForm";
 import PhoneInput from "@/components/UI/Form/PhoneInput";
 import FieldError from "@/components/UI/Form/FieldError";
 
@@ -212,14 +212,30 @@ const ApplicationForm = ({
   const emptyPrompt = !focused && message === "";
   const typed = useTypewriter(service.examples, emptyPrompt && inView);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [sendError, setSendError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "sending" || !form.check()) return;
+    const website = String(new FormData(e.currentTarget).get("website") ?? "");
 
     setStatus("sending");
-    // TODO: замініть на реальний запит (API, пошта або Telegram-бот).
-    // Передайте service.label, name.trim(), form.phoneFull (+380XXXXXXXXX) і message.trim()
-    setTimeout(() => setStatus("sent"), 1200);
+    setSendError(null);
+    // Заявка йде на /api/lead, а звідти в Telegram
+    const error = await sendLead({
+      service: service.label,
+      name: name.trim(),
+      phone: form.phoneFull,
+      message: message.trim(),
+      source: "Форма «Залиште заявку»",
+      website,
+    });
+    if (error) {
+      setSendError(error);
+      setStatus("idle");
+      return;
+    }
+    setStatus("sent");
   };
 
   // Enter надсилає, Shift+Enter дає новий рядок
@@ -282,8 +298,9 @@ const ApplicationForm = ({
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[860px] px-6">
-        {/* Заголовок: на телефоні зліва, на ПК по центру */}
-        <div className="text-left md:text-center">
+        {/* Заголовок: на телефоні зліва, на ПК по центру.
+            data-scroll-anchor: до нього прокручують кнопки «Заявка», а не до верху секції з переходом */}
+        <div data-scroll-anchor className="text-left md:text-center">
           {/* Градієнтна заливка тексту від білого до сірого */}
           <h2
             className={`bg-gradient-to-b from-white to-white/40 bg-clip-text font-semibold leading-[1.05] tracking-[-0.03em] text-transparent ${
@@ -426,6 +443,9 @@ const ApplicationForm = ({
                   className="w-full resize-none bg-transparent px-1 text-base leading-relaxed text-white outline-none placeholder:text-white/35"
                 />
                 <FieldError id="af-msg-err" message={errorOf("message")} />
+                {/* Пастка для ботів: люди цього поля не бачать */}
+                <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 opacity-0" />
+                <FieldError id="af-msg-err-send" message={sendError} />
 
                 <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-4">
                   {/* Опис обраного напрямку. key змушує анімацію відіграти при зміні */}

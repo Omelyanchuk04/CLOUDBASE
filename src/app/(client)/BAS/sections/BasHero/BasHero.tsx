@@ -10,6 +10,7 @@ import {
 } from "framer-motion";
 import { easedFade } from "@/lib/utils/gradients";
 import styles from "./BasHero.module.scss";
+import { scrollToSection } from "@/lib/utils/scrollToSection";
 
 // Hero: темний фон з бірюзовою, бурштиновою та індиго плямами і три скриншоти BAS.
 // Поява: заголовок проявляється хвилею світла, потім пласкі скриншоти
@@ -38,9 +39,7 @@ const handleGlassLeave = (e: React.PointerEvent<HTMLAnchorElement>) => {
 
 const scrollTo = (id: string) => (e: React.MouseEvent) => {
   e.preventDefault();
-  document
-    .getElementById(id)
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollToSection(id);
 };
 
 // Заголовок проявляється «хвилею» світла зліва направо (анімована маска)

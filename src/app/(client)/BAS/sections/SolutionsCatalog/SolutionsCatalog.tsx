@@ -13,6 +13,7 @@ import {
 import { ease, Fit } from "../shared/Illustration";
 import { SOLUTION_VISUALS } from "./SolutionVisuals";
 import { edgeMask } from "@/lib/utils/gradients";
+import { scrollToSection } from "@/lib/utils/scrollToSection";
 
 const AUTOPLAY_SECONDS = 7;
 
@@ -29,7 +30,7 @@ const fadeUp: Variants = {
 };
 
 const scrollToApplication = () => {
-  document.getElementById("application")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollToSection("application");
 };
 
 const Visual = ({ s, play }: { s: Solution; play: boolean }) => {

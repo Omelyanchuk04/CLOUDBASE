@@ -127,3 +127,32 @@ export const useLeadForm = () => {
     phoneFull: phone.length === PHONE_DIGITS ? `+380${phone}` : "",
   };
 };
+
+/* ---------------- Надсилання заявки ---------------- */
+
+export type Lead = {
+  service: string;
+  name: string;
+  phone: string; // +380XXXXXXXXX
+  message: string;
+  source: string; // з якої форми
+  website?: string; // приховане поле-пастка для ботів
+};
+
+// Надсилає заявку на /api/lead, звідки вона йде в Telegram.
+// Повертає null, якщо все добре, або текст помилки для показу у формі
+export const sendLead = async (lead: Lead): Promise<string | null> => {
+  const fallback = "Не вдалося надіслати заявку. Спробуйте ще раз або зателефонуйте нам";
+  try {
+    const res = await fetch("/api/lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...lead, page: window.location.pathname }),
+    });
+    if (res.ok) return null;
+    const data = await res.json().catch(() => null);
+    return (data && typeof data.error === "string" && data.error) || fallback;
+  } catch {
+    return "Немає з'єднання. Перевірте інтернет і спробуйте ще раз";
+  }
+};

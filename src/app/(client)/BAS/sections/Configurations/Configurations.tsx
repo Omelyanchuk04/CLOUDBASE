@@ -8,6 +8,7 @@ import { AppWindow, Bar, ease, Fit } from "../shared/Illustration";
 
 import { edgeMask } from "@/lib/utils/gradients";
 import { Price } from "../Services/Services";
+import { scrollToSection } from "@/lib/utils/scrollToSection";
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
@@ -15,7 +16,7 @@ const fadeUp: Variants = {
 
 const scrollToApplication = (e: React.MouseEvent) => {
   e.preventDefault();
-  document.getElementById("application")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollToSection("application");
 };
 
 // Нахил пігулок, як у шапці та формі заявки

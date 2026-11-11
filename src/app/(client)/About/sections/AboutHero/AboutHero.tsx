@@ -5,6 +5,7 @@ import Link from "next/link";
 import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
 import { easedFade } from "@/lib/utils/gradients";
 import styles from "../../../BAS/sections/BasHero/BasHero.module.scss";
+import { scrollToSection } from "@/lib/utils/scrollToSection";
 
 // Hero «Про нас»: темний фон з блакитною, фіолетовою і жовтою плямами
 // (кольори пігулок шапки). Під текстом три картки напрямків віялом.
@@ -27,7 +28,7 @@ const handleGlassLeave = (e: React.PointerEvent<HTMLAnchorElement>) => {
 
 const scrollTo = (id: string) => (e: React.MouseEvent) => {
   e.preventDefault();
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollToSection(id);
 };
 
 const WORDS = [

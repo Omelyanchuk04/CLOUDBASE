@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./header.module.scss";
 import ContactDrawer from "./ContactDrawer";
+import { scrollToSection } from "@/lib/utils/scrollToSection";
 
 interface NavItem {
   id: string;
@@ -212,10 +213,9 @@ const Header: React.FC = () => {
   // Інакше звичайний перехід на головну до форми (href="/#application")
   const handleApplicationClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     setMenuOpen(false);
-    const el = document.getElementById("application");
-    if (!el) return;
+    if (!document.getElementById("application")) return;
     e.preventDefault();
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToSection("application");
   };
 
   // Скляна кнопка: відблиск слідує за курсором.
