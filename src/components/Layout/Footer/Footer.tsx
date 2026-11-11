@@ -10,9 +10,9 @@ const links = [
   { label: "Про нас", href: "/About", color: "#fde047", tilt: "-1.5deg" },
 ];
 
-// Контакти. Telegram і пошта справжні, телефон ще тимчасовий (ті самі дані на «Про нас» і в шапці)
+// Контакти. Контакти справжні (ті самі дані на «Про нас» і в шапці)
 const contacts = [
-  { label: "+380 00 000 00 00", href: "tel:+380000000000", icon: "phone" },
+  { label: "+38 093 069 26 26", href: "tel:+380930692626", icon: "phone" },
   { label: "@CLOUDBASE_CHAT", href: "https://t.me/CLOUDBASE_CHAT", icon: "telegram", external: true },
   { label: "cloudbase.com.ua@gmail.com", href: "mailto:cloudbase.com.ua@gmail.com", icon: "mail" },
 ] as const;

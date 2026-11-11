@@ -9,9 +9,9 @@ import { easedFade } from "@/lib/utils/gradients";
 // Зверху і знизу плавні переходи в кольори сусідніх секцій.
 // Великий градієнтний номер телефону, пігулки Telegram і пошти з кольоровою
 // рамкою і нахилом, як у шапці, і графік зі статусом.
-// Telegram і пошта справжні, телефон ще тимчасовий (ті самі дані в шапці й футері)
+// Контакти справжні (ті самі дані в шапці й футері)
 
-const PHONE = { value: "+380 00 000 00 00", href: "tel:+380000000000" };
+const PHONE = { value: "+38 093 069 26 26", href: "tel:+380930692626" };
 const EMAIL = "cloudbase.com.ua@gmail.com";
 const TELEGRAM = { value: "@CLOUDBASE_CHAT", href: "https://t.me/CLOUDBASE_CHAT" };
 const HOURS = { days: "Пн–Пт", from: 9, to: 18 };
