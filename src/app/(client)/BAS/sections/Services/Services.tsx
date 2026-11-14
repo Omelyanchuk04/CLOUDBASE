@@ -214,7 +214,7 @@ const Services = ({
       {/* Основний блок рівно на висоту екрана */}
       {/* data-scroll-anchor з нульовим відступом: блок рівно на екран, тож прокручуємо точно до його верху */}
       <div data-scroll-anchor data-scroll-offset="0" className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1200px] flex-col px-6 pb-14 pt-28 lg:h-[100svh] lg:px-10 lg:pb-12 lg:pt-24">
-        {/* Заголовок: назва продукту в кольорі активної послуги + лічильник */}
+        {/* Заголовок: назва продукту в кольорі активної послуги */}
         <div className="flex items-end justify-between gap-6">
           <h2
             className="text-4xl md:text-6xl bg-gradient-to-b from-white to-white/40 bg-clip-text pb-[0.08em] font-semibold leading-[1.05] tracking-[-0.03em] text-transparent"
@@ -222,24 +222,6 @@ const Services = ({
             {title ?? <>Послуги для <span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to bottom, #ffffff -40%, ${accent})` }}>{product}</span></>}
           </h2>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={cur.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3, ease }}
-                className="flex items-center gap-3 text-right"
-              >
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: gradientOf(cur) }} />
-                <span className="text-lg font-semibold text-white/85">{cur.title}</span>
-              </motion.div>
-            </AnimatePresence>
-            <span className="font-semibold tabular-nums text-white/40">
-              <span className="text-white">0{active + 1}</span> / 0{services.length}
-            </span>
-          </div>
         </div>
 
         {/* ПК: гармошка. Активна панель розгортається, інші стають смугами */}

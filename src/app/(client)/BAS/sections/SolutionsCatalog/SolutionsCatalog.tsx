@@ -50,6 +50,15 @@ const SolutionsCatalog = () => {
   const [autoplay, setAutoplay] = useState(true);
   const [hover, setHover] = useState(false);
   const reduceMotion = useReducedMotion();
+  // Автоперемикання лише на ПК: на телефоні рішення гортають самі
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { amount: 0.35 });
@@ -62,7 +71,7 @@ const SolutionsCatalog = () => {
   );
   const active = list[Math.min(index, list.length - 1)];
   const cat = catById[active.category];
-  const running = autoplay && inView && !hover && !reduceMotion;
+  const running = desktop && autoplay && inView && !hover && !reduceMotion;
 
   const next = useCallback(() => setIndex((i) => (i + 1) % list.length), [list.length]);
 
@@ -140,7 +149,7 @@ const SolutionsCatalog = () => {
         </motion.h2>
 
         {/* Вкладки категорій: пігулки з нахилом і кольоровою рамкою */}
-        <div className="-mx-6 mb-8 mt-7 flex gap-3 lg:mb-6 lg:mt-5 lg:gap-2.5 overflow-x-auto px-6 pb-3 pt-2 [scrollbar-width:none] md:mx-0 md:mb-12 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
+        <div className="-mx-6 mb-5 mt-5 flex gap-2 lg:mb-6 overflow-x-auto px-6 pb-3 pt-2 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
           {tabs.map((t, i) => {
             const on = filter === t.id;
             // Коли обрано «Усі», підсвічуємо вкладку категорії поточного рішення
@@ -168,10 +177,10 @@ const SolutionsCatalog = () => {
                       ? `0 10px 22px -14px ${t.color}`
                       : "none",
                 }}
-                className="inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold lg:px-4 lg:py-2 lg:text-[13px] backdrop-blur transition-[background-color,box-shadow,color] duration-300"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold lg:px-3.5 lg:py-1.5 lg:text-[13px] backdrop-blur transition-[background-color,box-shadow,color] duration-300"
               >
                 {t.label}
-                <span className={`min-w-[22px] rounded-full px-1.5 text-center text-[12px] ${on ? "bg-white/25" : "bg-neutral-100 text-neutral-500"}`}>
+                <span className={`min-w-[18px] rounded-full px-1 text-center text-[10px] lg:min-w-[20px] lg:text-[11px] ${on ? "bg-white/25" : "bg-neutral-100 text-neutral-500"}`}>
                   {t.count}
                 </span>
               </motion.button>
@@ -219,7 +228,7 @@ const SolutionsCatalog = () => {
 
             {/* Велика панель з ілюстрацією */}
             <div
-              className="relative order-first aspect-[4/3] overflow-hidden rounded-[32px] lg:aspect-auto lg:h-[clamp(260px,calc(100svh-520px),400px)] ring-1 ring-black/5 transition-[background] duration-700 lg:order-none"
+              className="relative order-first aspect-[4/3] max-h-[340px] w-full overflow-hidden rounded-[24px] md:rounded-[32px] lg:max-h-none lg:aspect-auto lg:h-[clamp(260px,calc(100svh-520px),400px)] ring-1 ring-black/5 transition-[background] duration-700 lg:order-none"
               style={{ background: `linear-gradient(135deg, ${cat.tint} 0%, #ffffff 85%)` }}
             >
               <AnimatePresence mode="wait" initial={false}>
@@ -257,18 +266,18 @@ const SolutionsCatalog = () => {
                     type="button"
                     onClick={() => select(i)}
                     aria-pressed={on}
-                    className="relative flex h-[132px] w-[300px] shrink-0 lg:h-[108px] snap-start items-stretch overflow-hidden rounded-[24px] text-left md:w-[330px]"
+                    className="relative flex h-[92px] w-[230px] shrink-0 snap-start items-stretch overflow-hidden rounded-[18px] text-left lg:h-[108px] lg:w-[330px] lg:rounded-[24px]"
                     style={{
                       backgroundColor: c.tint,
                       boxShadow: on ? `inset 0 0 0 3px ${c.accent}` : "none",
                     }}
                   >
-                    <span className="flex flex-1 items-start p-5 pr-3">
-                      <span className="line-clamp-4 text-[15px] font-semibold leading-snug tracking-tight text-neutral-900">
+                    <span className="flex flex-1 items-start p-3.5 pr-2 lg:p-5 lg:pr-3">
+                      <span className="line-clamp-3 text-[13px] font-semibold lg:line-clamp-4 lg:text-[15px] leading-snug tracking-tight text-neutral-900">
                         {s.title}
                       </span>
                     </span>
-                    <span className="pointer-events-none relative mr-4 mt-4 w-[120px] shrink-0 overflow-hidden rounded-t-xl bg-white/60">
+                    <span className="pointer-events-none relative mr-3 mt-3 w-[84px] shrink-0 lg:mr-4 lg:mt-4 lg:w-[120px] overflow-hidden rounded-t-xl bg-white/60">
                       <Visual s={s} play={false} />
                     </span>
 
@@ -292,13 +301,13 @@ const SolutionsCatalog = () => {
               <button
                 type="button"
                 onClick={scrollToApplication}
-                className="flex h-[132px] w-[300px] shrink-0 snap-start lg:h-[108px] flex-col justify-between rounded-[24px] p-5 text-left text-white md:w-[330px]"
+                className="flex h-[92px] w-[230px] shrink-0 snap-start flex-col justify-between rounded-[18px] p-3.5 text-left text-white lg:h-[108px] lg:w-[330px] lg:rounded-[24px] lg:p-5"
                 style={{ background: "linear-gradient(135deg, #0068b4 0%, #3b8fe0 100%)" }}
               >
-                <span className="text-[16px] font-semibold leading-snug tracking-tight">
+                <span className="text-[14px] font-semibold leading-snug tracking-tight lg:text-[16px]">
                   Немає потрібної доробки?
                 </span>
-                <span className="inline-flex items-center gap-2 text-[14px] text-white/75">
+                <span className="inline-flex items-center gap-2 text-[12px] text-white/75 lg:text-[14px]">
                   Опишіть задачу у заявці
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14M13 6l6 6-6 6" />
