@@ -48,9 +48,13 @@ const MacbookSection = () => {
       <MacbookScroll
         title={
           <div className={styles.titleWrapper}>
-            <motion.span className={styles.title} {...appear(0.1)}>
-              Обслуговування бухгалтерських програм
-            </motion.span>
+            <motion.h1
+              className={styles.title}
+              style={{ textWrap: "balance", maxWidth: "17em" }}
+              {...appear(0.1)}
+            >
+              Обслуговування бухгалтерських програм BAS і KBS
+            </motion.h1>
             <br />
             <motion.span className={styles.subtitle} {...appear(0.25)}>
               Встановлюємо, налаштовуємо й переносимо дані в хмару. Забезпечуємо

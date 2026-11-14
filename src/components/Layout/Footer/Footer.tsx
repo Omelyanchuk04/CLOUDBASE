@@ -56,7 +56,7 @@ const Footer = () => {
       <div className="relative mx-auto -mt-[5vw] w-full max-w-[1200px] px-6 pb-8 lg:px-10 xl:-mt-[70px]">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5 self-start md:self-auto">
-            <img src="/logo.png" alt="" className="h-6 w-auto" />
+            <img src="/logo-sm.png" alt="" width={242} height={160} loading="lazy" className="h-6 w-auto" />
             <span className="text-[16px] font-bold tracking-wide">CloudBASE</span>
           </Link>
 

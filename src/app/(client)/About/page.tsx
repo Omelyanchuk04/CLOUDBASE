@@ -1,3 +1,4 @@
+import { ROUTES, pageMeta } from "@/lib/seo";
 import type { Metadata } from "next";
 import AboutHero from "./sections/AboutHero/AboutHero";
 import AboutText from "./sections/AboutText/AboutText";
@@ -7,11 +8,13 @@ import Steps from "../(home)/sections/Steps/Steps";
 import ApplicationForm from "../(home)/sections/ApplicationForm/ApplicationForm";
 import PromoGift from "@/components/UI/PromoGift/PromoGift";
 
-export const metadata: Metadata = {
-  title: "Про компанію CloudBASE",
+export const metadata: Metadata = pageMeta({
+  title: "Про компанію і контакти",
   description:
-    "CloudBASE встановлює й супроводжує BAS і KBS, робить доробки і надає хмару для роботи програм. Контакти компанії.",
-};
+    "CloudBASE обслуговує бухгалтерські програми BAS і KBS та надає хмару в оренду. Телефон +38 093 069 26 26, Telegram @CLOUDBASE_CHAT. Пн–Пт, 9:00–18:00.",
+  path: ROUTES.about,
+  keywords: ["CloudBASE контакти"],
+});
 
 export default function AboutPage() {
   return (

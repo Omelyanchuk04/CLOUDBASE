@@ -6,6 +6,8 @@ import "./globals.scss";
 import Header from "../components/Layout/Header/Header";
 import Footer from "../components/Layout/Footer/Footer";
 import ScrollToTop from "@/components/Layout/ScrollToTop";
+import JsonLd from "@/components/SEO/JsonLd";
+import { BASE_KEYWORDS, SITE_NAME, SITE_URL, organizationSchema } from "@/lib/seo";
 
 // Підключення шрифту (оптимізовано Next.js)
 const inter = Inter({
@@ -21,54 +23,51 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+// Загальні метадані. Заголовок, опис і канонічну адресу кожна сторінка задає сама (lib/seo.ts).
+// Іконки (icon.png, apple-icon.png, favicon.ico) і картинку для соцмереж (opengraph-image.jpg)
+// Next підключає сам з файлів у папці app
 export const metadata: Metadata = {
-  // Заміни на реальний домен після деплою. Це обов'язково для коректної роботи OpenGraph
-  metadataBase: new URL("https://cloudbase.ua"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "CloudBASe | Енергонезалежні хмарні сервери для бізнесу",
-    template: "%s | CloudBASe",
+    default: "CloudBASE — обслуговування BAS і KBS, оренда хмари",
+    template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Оренда програм BAS у хмарі з автономним живленням та підтримкою. Ваш бізнес працює стабільно навіть під час блекауту. Надійні сервери в Україні.",
-  keywords: [
-    "BAS",
-    "хмарний сервер",
-    "VPS Україна",
-    "1С хмара",
-    "енергонезалежність",
-    "оренда сервера",
-    "хмарна інфраструктура",
-    "бухгалтерія онлайн",
-  ],
-  authors: [{ name: "CloudBASe" }],
-  creator: "CloudBASe",
+    "Обслуговування бухгалтерських програм BAS і KBS: встановлення, супровід, доробки. Оренда хмари для BAS, KBS, M.E.Doc — доступ 24/7, щоденні резервні копії.",
+  keywords: BASE_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "business",
+  formatDetection: { telephone: true, email: true, address: false },
   // Спеціальні налаштування для iOS Safari
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "CloudBASe",
+    title: SITE_NAME,
   },
   openGraph: {
-    title: "CloudBASe | Енергонезалежні хмарні сервери",
-    description:
-      "Оренда програм BAS у хмарі з автономним живленням та підтримкою.",
-    url: "/",
-    siteName: "CloudBASe",
+    siteName: SITE_NAME,
     locale: "uk_UA",
     type: "website",
-    // Розкоментуй та додай шлях до картинки, коли вона буде готова
-    images: [
-      {
-        url: "/icon.png",
-        width: 1200,
-        height: 630,
-        alt: "CloudBASe банер",
-      },
-    ],
   },
+  twitter: { card: "summary_large_image" },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  // Коди підтвердження з Google Search Console і Bing Webmaster Tools (необов'язково)
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
   },
 };
 
@@ -81,6 +80,8 @@ export default function RootLayout({
     // Змінна inter.variable додає клас, який ми використовуємо в globals.scss
     <html lang="uk" className={inter.variable} data-scroll-behavior="smooth">
       <body>
+        {/* Дані про компанію для пошукових систем */}
+        <JsonLd data={organizationSchema()} />
         {/* Додаємо компонент шапки перед основним контентом */}
         {/* Перехід на іншу сторінку завжди починається з верху */}
         <ScrollToTop />

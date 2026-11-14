@@ -250,8 +250,10 @@ const Header: React.FC = () => {
             aria-label="CloudBASE, на головну"
           >
             <img
-              src="/logo.png"
-              alt="Cloudbase Logo"
+              src="/logo-sm.png"
+              alt=""
+              width={242}
+              height={160}
               className={styles["hero-header__logo"]}
               style={{ filter: "var(--logo-filter)" }}
             />
